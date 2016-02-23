@@ -1,0 +1,31 @@
+{
+  "name": "vip",
+  "version": "0.0.1",
+  "homepage": "https://github.com/tprobinson/vip.git",
+  "authors": [
+    "tprobinson93"
+  ],
+  "description": "Vidya Intarweb Playlist",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "effeckt",
+    "vidya",
+    "animations",
+    "css3",
+    "jquery"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jQuery": "~2.1.4",
+    "modernizr": "~2.8.3"
+  }
+}

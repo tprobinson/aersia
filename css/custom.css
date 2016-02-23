@@ -1,0 +1,766 @@
+.foot-text {
+	margin: 0 auto;
+	text-align: center;
+}
+
+/* Overlays */
+.loading {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	color: #DDD;
+	text-shadow: -2px -2px rgba(25,25,25,0.5);
+	text-align: center;
+	font-size: 72px;
+	line-height: 5rem;
+	top: 0;
+	left: 0;
+	z-index:4;
+}
+
+.topcoat-progress-bar {
+position: relative;
+z-index:3;
+  overflow: hidden;
+  width: 75%;
+  height: 1.25rem;
+  margin: 20px auto;
+  border-radius: 12px;
+  background-color: #373737;
+  box-shadow: 0 1px rgba(255,255,255,0.25), inset 0 1px rgba(0,0,0,0.12);
+}
+.topcoat-progress-bar > .progress {
+  display: block;
+  height: 100%;
+  border-radius: 12px 0 0 12px;
+  background-color: #e0f0fa;
+  box-shadow: inset 0 1px rgba(0,0,0,0.12);
+}
+.progress--complete {
+  width: 100%;
+}
+.progress--forever {
+	position: absolute;
+	left: 0; top: 0;
+	width: 200%;
+	background-repeat: repeat;
+	background-image: url("../img/ui/ui-bg_diagonals-thick_15_0b3e6f_40x40.png");
+	animation: scrollforever 5s linear infinite;
+	transform: translate3d(0,0,0); /* Trick browser into using GPU */
+}
+@keyframes scrollforever {
+	0% { transform: translateX(0); }
+	100% { transform: translateX(-50%); }
+}
+
+/* Status indicators */
+.statusbox {
+	position:absolute;
+	height: 10px;
+	left: 0; bottom: 0;
+	background-color: #DDD;
+	border-top: 5px solid #999;
+	overflow: hidden;
+	padding: 5px;
+
+	display: flex;
+	justify-content: flex-start;
+}
+
+/* The foldy button */
+.statustext {
+	margin-right: 3px;
+	padding-right: 3px;
+}
+
+.statustext>span {
+	color: #666;
+	text-align: center;
+	font-size: 80%;
+	line-height: 13px;
+}
+
+.statusbox:hover {
+	height: 45px;
+}
+
+.statusbox:hover>.statustext>span {
+	line-height:45px;
+}
+
+/* Colors */
+.status-bad { background: #B00; }
+
+.status-good { background: #0B0; }
+
+.status-dev { background: #66B; }
+
+
+.indicator {
+	height: 45px;
+	width: 45px;
+	flex: 0 0 auto;
+	position:relative;
+	margin-right: 0.5rem;
+	border-radius: 100%;
+	box-shadow: inset 0 0 5px 5px rgba(0,0,0,0.2);
+}
+
+/* Make everything in it centered */
+.indicator>figure, .indicator>span {
+	line-height: 45px;
+	display: block;
+	position: absolute;
+	text-align: center;
+	height: 100%;
+	width: 100%;
+	top: 0; left: 0;
+	margin: 0;
+}
+
+/* Give it a spherical gradient */
+.indicator>figure {
+	border-radius: 100%;
+	background: transparent;
+	background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.4) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0.4) 100%);
+}
+
+
+/* Global animation junk! */
+#outputopt,
+#outputopt>div,
+#updateoutput,
+.shade,
+.remove
+{ transition: all 0.25s ease; }
+
+/* Modal dialog */
+
+.effeckt-modal-confirm,
+.effeckt-modal-cancel
+{
+	line-height: 1.75rem;
+	font-size: 1rem;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+
+.md-modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	width: 50%;
+	max-width: 630px;
+	min-width: 320px;
+	height: auto;
+	z-index: 2000;
+	visibility: hidden;
+	backface-visibility: hidden;
+	transform: translateX(-50%) translateY(-50%);
+}
+
+.md-show {
+	visibility: visible;
+}
+
+.md-overlay {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	visibility: hidden;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	opacity: 0;
+	background: rgba(143,27,15,0.8);
+	transition: all 0.3s;
+}
+
+.md-show ~ .md-overlay {
+	opacity: 1;
+	visibility: visible;
+}
+
+
+.effeckt-modal-wrap {
+  transform: translate(-50%, -50%);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  max-width: 320px;
+  min-width: 630px;
+  z-index: 2000;
+  display: none;
+}
+
+.effeckt-modal {
+  visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.effeckt-show .effeckt-modal {
+  visibility: visible;
+}
+
+.effeckt-overlay.effeckt-show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.effeckt-overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: 250ms;
+  z-index:1;
+  background-color:rgba(0,0,0,0.5);
+}
+
+/*
+  Individual modal styles with animations/transitions
+*/
+
+/* Effect 2: Slide from the right */
+
+.md-effect-2 .effeckt-modal {
+  transform: translateX(30%);
+  opacity: 0;
+  transition: 250ms cubic-bezier(0.25, 0.5, 0.5, 0.9);
+}
+
+.effeckt-show.md-effect-2 .effeckt-modal {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+
+/* Flexbox layout! */
+/* Main layouts */
+body {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+
+header {
+	display: flex;
+	margin: 0 5%;
+	justify-content: space-between;
+}
+
+header h1, .nav-tabs{ display: flex; flex: 1 1 auto; }
+
+/* Container list */
+.nav-tabs ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    position: relative;
+
+	display: flex;
+	flex: 1;
+	align-self: flex-end;
+	justify-content: flex-end;
+}
+
+/* Each list item */
+.nav-tabs li {
+	flex: 0 1 auto;
+	margin: 0 0.5rem;
+}
+
+/* Text/link in each item */
+.nav-tabs a {
+    display: block;
+    padding: 15px 1rem;
+
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+
+    color: white;
+    background: #2368BC; /*#e44d26; */
+}
+
+.nav-tabs a:hover,
+.nav-tabs a:visited {
+    color: white;
+}
+
+.nav-tabs a:hover {
+    text-decoration: underline;
+}
+
+
+.main-container, .wrapper {
+	position: relative;
+	display: flex;
+	justify-content: inherit; /* for the tabs who cannot have display:flex */
+	max-height: 100%;
+}
+
+/* Items that do not grow or shrink */
+.header-container, .footer-container {
+	flex: 0 0;
+}
+
+/* Items that do grow and shrink */
+.main-container, .wrapper, #tab-panels {
+	flex: 1 1 0;
+}
+
+/* Tab layouts */
+#tab-panels { position: relative; }
+.tab-panel { position: absolute; width: 100%; height: 100%; justify-content: space-between; }
+
+/* Tab 503 layouts */
+.hbox, .vbox {
+	flex: 1 1 auto;
+	display: flex;
+	justify-content:space-between;
+	position:relative;
+}
+.vbox { flex-direction: column; }
+.hbox { flex-direction: row; }
+
+.center { justify-content: center; }
+.end { justify-content: flex-end; }
+.aend { align-items: flex-end; }
+
+.centertext { text-align: center; }
+
+.nogrow { flex-grow: 0; }
+.noshrink { flex-shrink: 0; }
+.wrap { flex-wrap: wrap; }
+.nowrap { flex-wrap: nowrap; }
+
+.margins-tb { margin-top: 0.75rem; margin-bottom: 0.75rem; }
+.margins-lr { margin-left: 0.75rem; margin-right: 0.75rem; }
+
+.halfview { max-width: 49.5%; } .mh100 { max-height: 100%; }/* REWORK: Why does output put so much pressure? */
+.fullview { max-width: 90%; }
+.minimized { background-color: #222; width: 50px; flex: 0 0 auto; }
+
+.halfview, .fullview { justify-content: flex-start; }
+
+#messagebox {
+	position: absolute;
+	z-index: 5;
+	top: -35px;
+	margin: 0 auto;
+	text-align: center;
+	padding: 15px;
+	color: #DDD;
+	line-height: 1.125rem;
+
+}
+.mboxsuccess { border: 1px solid #29FF19; background-color: rgba(41,255,25,0.25); }
+.mboxerror { border: 1px solid #E60009; background-color: rgba(247,40,49,0.25); }
+.mboxinfo { border: 1px solid #8BD5EA; background-color: rgba(53,209,255,0.25); }
+.closebutton { position: absolute; top: 3px; right: 3px; }
+
+
+/* Overrides on Topcoat */
+.topcoat-list__container { overflow-y: scroll; }
+.topcoat-list__item{ padding: 0.75rem 1.75rem; }
+.topcoat-switch { z-index: 1; }
+.topcoat-range { margin-top: .5em; width: 100%; }
+.topcoat-button-bar__item:first-child .topcoat-button--large--cta { border-top-right-radius: 0; border-bottom-right-radius:0; } /* fix CTA on button bar */
+.topcoat-button-bar__item:last-child .topcoat-button--large--cta { border-top-left-radius: 0; border-bottom-left-radius:0; }
+
+.topcoat-button-bar__item > .topcoat-button-bar__button:not(:first-child),
+.topcoat-button-bar__item > .topcoat-button-bar__button--large:not(:first-child)
+{ border-left: 0; }
+
+.topcoat-button-bar__item:last-child > .topcoat-button-bar__button:not(:last-child),
+.topcoat-button-bar__item:last-child > .topcoat-button-bar__button--large:not(:last-child)
+{ border-right: 0; }
+
+.btnmiddle { border-left: 0; border-right: 0; } /* odd that this would need to be overridden */
+legend { color: #DADADA; }
+
+/* This is removed by UnCSS, even with ignores. This SHOULD be temporary. */
+@keyframes moveIn {
+  to {
+    opacity: 1;
+    transform: translateX(0); } }
+
+/* List styles */
+
+/*Headers*/
+.list-header, .expanded-header {
+	margin: 0;
+	padding: 4px 1rem;
+	background-color: #cccfcf;
+	border-top: solid 1px rgba(255, 255, 255, 0.5);
+	border-bottom: solid 1px rgba(255, 255, 255, 0.23);
+}
+
+.list-header,
+.rule-header,
+.andor-header,
+.baduser-header,
+.expanded-header
+{
+	display:flex;
+	justify-content: space-between;
+	align-items:center;
+}
+
+h2 { margin: 0; } /* Firefox, wtf? */
+
+h5, h6 {
+	margin: 0;
+	font-weight: 400;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+h5 {
+	color: #555;
+}
+
+h6 {
+	font-size: 0.9em;
+	color: #656565;
+}
+
+input[type=number] {
+    width: 3rem;
+}
+
+.rule-header { /* unexpanded state */
+	padding-top: 0.25rem; padding-bottom: 0.25rem;
+	position: relative; /* keeps buttons in */
+}
+
+.baduser-header { /* unexpanded state */
+	padding: 0;
+	display: flex;
+}
+
+.expanded-header {
+	padding-top:3px; padding-bottom:3px;
+	border-top-left-radius:7px;
+	border-top-right-radius:7px;
+	border: 1px outset;
+}
+
+.andor-header { /* unexpanded state */
+	display: flex;
+	border-radius:15px;
+	background-color: #B4D7F4;
+	border: 1px outset;
+	padding: 0.25rem;
+}
+
+.andor-header.expanded-header {
+	border-bottom-left-radius:0;
+	border-bottom-right-radius:0;
+	padding-top: 2px; padding-bottom: 2px;
+}
+
+.andor-header>select { margin: 2px 1rem; }
+
+.andor-header,
+.andorblock>.ruleblock
+{ border-color:#B4D7F4; }
+
+
+
+/*Blocks*/
+.ruleblock {
+    position: relative;
+	padding: 5px; padding-top: 0;
+	margin-bottom: 1rem;
+	display: flex;
+	flex-wrap:wrap;
+	border: 1px outset #aaa;
+}
+.ruleblock:first-child { border-top-width:0; }
+.ruleblock:last-child { margin-bottom: 0; }
+.ruleblock>.topcoat-list__item { /*nested blocks won't inflate so much*/ padding: 0; }
+
+.expandedblock { padding: 0.5rem; }
+
+
+.controlblock {
+	flex: 0 0 auto;
+	margin: 0.5rem;
+}
+.controlblock.slider { width: 85%; }
+
+.andorblock {
+	border:0;
+	border-left: 2px outset #222;
+	border-top-left-radius:15px;
+	border-bottom-left-radius:15px;
+	width: 100%;
+}
+
+.andorblock.expandedblock { margin: 1rem 0; }
+.andorblock>.ruleblock {
+	border-bottom-left-radius: 13px; /* looks funny otherwise */
+	border-bottom-right-radius: 15px;
+	border-left:0;
+}
+
+.andorblock>.ruleblock>.ruleblock:first-child
+{ border-top-width:1px; } /* ergh this is so awkward this needs a rework */
+
+
+/* when in simple mode, hide controls that aren't tagged "simple" */
+.simplelist .rule-header>*,
+.simplelist .andor-header>*,
+.simplelist .baduser-header>*,
+.simplelist .controlblock
+{ display:none; }
+
+.simplelist .controlblock.simple,
+.simplelist .baduser-header>h5
+{ display: block; flex: 1 1 auto; margin: 0; }
+
+/* show only the top-level remove button */
+.simplelist .rule-header>.remove,
+.simplelist .baduser-header>.remove
+{ display: inline-block; position:absolute; right:-1.5rem; top:-0.25rem; }
+
+/* Re-style the visible controls. */
+.simplelist .rule-header,
+.simplelist .andor-header,
+.simplelist .ruleblock,
+.andorblock
+{
+	padding: 0;
+	margin: 0;
+	border: 0;
+	background: none;
+	width: 100%;
+}
+
+.simplelist .labelsmall /* like a header h5 */
+{
+	color: #555;
+	font-size: 1rem;
+	font-weight: 400;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+	font-style: normal;
+}
+
+.simplelist h5
+{ font-size: 1rem; }
+
+
+
+/* Styles for the second pane */
+
+.output {
+	flex: 1 1 auto;
+	background-color: #222;
+	color: #DDD;
+	border: 1px solid #DDD;
+	overflow: scroll;
+	white-space: pre;
+	position:relative;
+}
+
+/*
+#outputoverlay {
+	text-align:right;
+	position:absolute;
+	top: 0.25rem; left: 0; right: 1rem;
+	z-index:1;
+	pointer-events:none;
+	cursor:pointer;
+}
+*/
+
+.output_container:hover>.outputopt,
+.output_container:hover>.updateoutput
+{ opacity: 0.5; }
+
+.output_container:hover>.outputopt:hover,
+.output_container:hover>.updateoutput:hover
+{ opacity:1; }
+
+.outputopt,
+.updateoutput
+{
+	opacity:0;
+	z-index:1;
+	position:absolute;
+	top: 5px;
+}
+
+.updateoutput { right: 46px; }
+
+.outputopt {
+	right: 23px;
+/*
+	for use with topcoat-button
+*/
+	overflow: visible;
+	width:18px;
+	height:18px;
+	padding:0;
+}
+
+.outputopt>div {
+	position: absolute;
+	right: 1.5rem;
+	background-color: rgba(255,255,255,0.1);
+	border:2px solid #666;
+	border-radius:3px;
+	padding: 2px;
+}
+
+.outputmodebox {
+	z-index:1;
+	position:absolute;
+	left:0; right:0;
+	bottom: 1.5rem;
+	pointer-events:none;
+	text-align:center;
+	text-shadow:0px 0px 10px #FFF, -1px 1px 0px #444;
+	font-size: 0.8rem;
+}
+
+/* Syntax highlighting */
+pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+.string { color: green; }
+.number { color: darkorange; }
+.boolean { color: blue; }
+.null { color: magenta; }
+.key { color: red; }
+
+/* buttons */
+.add, .remove, .reload { flex: 0 0 auto; }
+.spacer { flex: 1 1 auto; }
+.togglesimple { flex: 0 0 auto; }
+.output-button { height: 2rem; flex: 1 0 auto; margin: 0 15px; }
+#commit { flex: 2 1 auto; }
+
+.remove, .shade
+{ margin-left: 5px; margin-right: 5px; }
+
+/* show remove and shade when you hover the element */
+.remove,
+.shade
+{ opacity: 0; }
+
+ul:hover .remove,
+ul:hover .shade
+{ opacity:0.5; }
+
+ul:hover .remove:hover,
+ul:hover .shade:hover
+{ opacity:1; }
+
+
+/* Cordon overlay */
+.cordon { position: relative; }
+.cordon:before {
+	position:absolute;
+	content: 'Under Construction';
+	width: 100%;
+	height: 100%;
+	background-image: url("../img/ui/ui-bg_diagonals-thick_15_0b3e6f_40x40.png");
+	opacity: 0.35;
+	color: #FCFF63;
+	text-transform: uppercase;
+	text-align: center;
+	font-weight: bolder;
+}
+
+/* Normal elements */
+.separator:last-of-type, .separatorlight:last-of-type {
+	border-right: none;
+	margin-right: inherit;
+	padding-right: inherit;
+}
+.separator, .separatorlight, .separator:only-of-type, .separatorlight:only-of-type {
+	padding-right: 7px;
+	margin-right: 7px;
+}
+.separator { border-right: 1px solid #222; }
+.separatorlight { border-right: 1px solid #C5C3C2; }
+
+span.label { font-weight: bold; }
+span.value { font-style: italic; }
+
+.labelsmall {
+	margin: 0;
+	font-style: italic;
+	font-size: 85%;
+	color: #888; /* add text-shadow on non-mobiles */
+}
+
+/* styles for the slider bar */
+.measuremarks {
+	position: relative;
+	margin: 0 7px;
+	display: flex;
+	height: 1rem;
+}
+
+.measuremarks>div {
+	position: relative;
+	flex-grow: 1;
+	height:5px;
+	border-right: 1px solid #444;
+}
+
+.measuremarks>div:first-of-type {
+	border-left: 1px solid #444;
+}
+
+/* the numbers */
+.measuremarks span {
+	position: absolute;
+	font-size: 75%;
+	font-style: italic;
+	top: 100%;
+}
+.measuremarks>span {
+	left: -0.25rem; /* the minimum mark */
+	top: 5px; /* same as height */
+}
+.measuremarks>div>span {
+	right: -0.25rem;
+}
+
+
+.shade {
+	animate: all;
+	animation: unflip 0.5s ease-in-out;
+	animation-fill-mode:forwards;
+/*
+	background-image: url("../img/checkbox_unchecked_dark.png");
+*/
+}
+.expandedbutton { width: 16px; right: 4px; background-image: url("../img/checkbox_checked_dark.png"); }
+
+.flip {
+	transform: translate3d(0,0,0);
+	animation: flip 0.5s ease-in-out;
+	animation-fill-mode:forwards;
+}
+
+@keyframes flip {
+	0% { transform: rotateZ(0deg); }
+	100% { transform: rotateZ(180deg); }
+}
+
+@keyframes unflip {
+	0% { transform: rotateZ(180deg); }
+	100% { transform: rotateZ(360deg); }
+}
+
+.no-animation {
+	animation: none;
+}

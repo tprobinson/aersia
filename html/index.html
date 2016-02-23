@@ -1,0 +1,83 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="" ng-app="vip"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang="" ng-app="vip"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang="" ng-app="vip"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="" ng-app="vip"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title><!--%= friendlyname --> v<!--%= version --></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+		<link rel="shortcut icon" href="favicon.ico">
+		<link rel="icon" type="image/png" href="favicon.png">
+
+        <link rel="stylesheet" href="assets/css/tidy.min.css">
+
+        <script src="assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+<!-- Modal dialog. Future functionality?
+		<div class="effeckt-modal-wrap" id="effeckt-modal-wrap"> <!-- for centering transform --><!--
+			<div class="effeckt-modal topcoat-overlay" id="effeckt-modal">
+				<h1></h1>
+				<div class="effeckt-modal-content">
+					<p>Are you sure?</p>
+				</div>
+				<div class="topcoat-overlay-buttons">
+					<button class="effeckt-modal-cancel topcoat-button">Cancel</button>
+					<button class="effeckt-modal-confirm topcoat-button--cta">Commit</button>
+				</div>
+			</div>
+		</div>
+		<div class="effeckt-overlay" id="effeckt-overlay"></div>
+    -->
+
+        <!-- <div class="header-container">
+            <header>
+				<div class="vbox">
+					<h1 class="title"><!--%= friendlyname --><!--</h1>
+					<h4 id="logintext"></h4>
+                </div>
+                <!-- Tab buttons
+                <div class="nav-tabs">
+                    <ul>
+                        <li><a href="#tab-dummy"></a></li>
+                    </ul>
+                </div> --><!--
+            </header>
+        </div> -->
+
+        <div class="controls-container">
+			<div class="hbox">
+				controls
+            </div>
+        </div>
+
+        <div class="playlist-container clearfix" ng-controller="vipController as playlist">
+            <div class="playlist vbox clearfix" ng-controller="playController as play" ng-repeat="song in playlist.songs">
+                <li ng-click="play.log(song)" ng-class="{ active: play.isCurrentSong(song) }">{{song.creator}} - {{song.title}}, @ {{song.location}}</li>
+            </div> <!-- main -->
+        </div> <!-- main-container -->
+
+        <!-- <div class="footer-container">
+        <div class="statusbox"><div class="statustext"><span>Status</span></div></div>
+            <footer class="wrapper hbox">
+                <div class="hbox"><h3 class="foot-text">Authorized users only</h3></div>
+            </footer>
+        </div> -->
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="assets/js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
+
+        <script
+        <script src="assets/js/angular.js"></script>
+        <script src="assets/js/plugins.js"></script>
+        <script src="assets/js/main.js"></script>
+    </body>
+</html>

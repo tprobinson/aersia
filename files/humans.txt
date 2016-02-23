@@ -1,0 +1,41 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Trevor Robinson -- Developer
+
+# THANKS
+
+    <name>
+
+# TECHNOLOGY COLOPHON
+
+    Modernizr - https://github.com/modernizr/modernizr
+    Copyright ???
+    Licensed under the MIT License.
+
+    Angular - http://angular.io
+    Copyright 2016, Google
+    Licensed under the MIT License.
+
+    jQuery - https://jquery.org
+    Copyright 2016, jQuery Foundation
+    Licensed under the MIT License.
+    (some images from jQuery UI)
+
+    Effeckt.css - https://github.com/h5bp/Effeckt.css/
+    Unknown license
+
+    Easytabs.js - https://github.com/JangoSteve/jQuery-EasyTabs
+    Copyright Alfa Jango, LLC
+    Licensed under dual MIT and GPLv3 licenses.
+
+    Topcoat.css - https://github.com/topcoat/topcoat
+    Copyright 2013(?)
+    Licensed under the Apache 2.0 license.
+    (other images from this)
+
+    Simptip - https://github.com/arashmanteghi/simptip
+    Copyright (c) 2013 Arash Manteghi
+    Licensed under the MIT license.
