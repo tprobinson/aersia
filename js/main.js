@@ -30,60 +30,80 @@
 	//Initialize Angular app
 	var app = angular.module("vip", [ ]);
 
-	var autoplay = 0;
+	var autoplay = 1;
 
-	var list = [
-		{
-			creator: "Persona 3",
-			title: "Crombie the Zombie - When the Moon's Reaching Out Stars (Dual Version)",
-			location: "http://vip.aersia.net/mu/persona3-crombie-whenthemoonsreachingoutstars(dual).m4a"
-		},
-		{
-			creator: "Persona 3",
-			title: "Tetsuya Kobayashi - Battle for Everyone's Souls",
-			location: "http://vip.aersia.net/mu/persona3-tetsuyakobayashi-battleforeveryonessouls.m4a"
-		},
-	];
+	app.controller("vipController", function($scope,$http) {
+		/////
+		//Init XML2JSON
+		// Create x2js instance with default config
+		var x2js = new X2JS();
 
-	app.controller("vipController", function() {
+		this.songs = '';
+		this.curSong = '';
 
-		//Get our list of songs
-		// var xhr = new XMLHttpRequest();
+		this.player = document.getElementsByTagName("audio")[0];
 
+		this.player.addEventListener('ended', function() {
+			//Playing finished, shuffle if we autoplay.
+			if( autoplay )
+			{ this.shuffleSong(); }
+		});
 
-		this.songs = list;
-	});
+		this.playSong = function(song) {
 
+			//Stop and unregister the old song.
+			this.player.pause();
+			this.player.src = '';
+			this.curSong = '';
 
+			//log
+			console.log("Playing song: "+song.title);
 
-	app.controller("playController", function() {
-		this.curSong = null;
-
-		if( autoplay )
-		{
-			this.curSong = list[0];
-		}
-
-		this.selectSong = function(song) {
+			//Start the new song.
 			this.curSong = song;
-			playSong(this.curSong);
+			this.player.src = song.location;
+			this.player.play();
+		};
+
+		this.shuffleSong = function() {
+			this.playSong(this.songs[Math.floor(Math.random() * this.songs.length)]);
 		};
 
 		this.isCurrentSong = function(song) {
 			return song === this.curSong;
 		};
 
-		this.playSong = function(song) {
-			console.log("Playing song: "+song);
+		this.init = function() {
+			console.log(this.songs);
+			$scope.songs = this.songs;
+			if( autoplay )
+			{ this.shuffleSong(); }
 		};
 
-		this.log = function(logged) {
-			console.log(logged);
-		};
 
+		/////
+		//Get our list of songs
+		// var vip = this; //preserve our this, since xhr needs this.
+		//
+		// var xhr = new XMLHttpRequest();
+		// xhr.open('GET', 'roster.xml', true);
+		// xhr.responseType = 'document';
+		// xhr.onload = function(e) {
+		// 	if (xhr.readyState === xhr.DONE) {
+		//         if (xhr.status === 200) {
+		// 			if( this.responseXML === null ) { throw new Error("Error in getting song list."); }
+		// 			vip.songs = x2js.dom2js(this.responseXML).playlist.trackList.track;
+		// 			vip.init();
+		//         }
+		//     }
+		//
+		// };
+		//
+		// xhr.send();
+		$http.get('roster.xml')
+			.then(function(res) {
+				$scope.songs = x2js.dom2js(this.responseXML).playlist.trackList.track;
+			});
 	});
-
-
-
 
 })();

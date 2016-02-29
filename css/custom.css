@@ -96,42 +96,10 @@ z-index:3;
 .status-dev { background: #66B; }
 
 
-.indicator {
-	height: 45px;
-	width: 45px;
-	flex: 0 0 auto;
-	position:relative;
-	margin-right: 0.5rem;
-	border-radius: 100%;
-	box-shadow: inset 0 0 5px 5px rgba(0,0,0,0.2);
-}
-
-/* Make everything in it centered */
-.indicator>figure, .indicator>span {
-	line-height: 45px;
-	display: block;
-	position: absolute;
-	text-align: center;
-	height: 100%;
-	width: 100%;
-	top: 0; left: 0;
-	margin: 0;
-}
-
-/* Give it a spherical gradient */
-.indicator>figure {
-	border-radius: 100%;
-	background: transparent;
-	background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.4) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0.4) 100%);
-}
 
 
 /* Global animation junk! */
-#outputopt,
-#outputopt>div,
-#updateoutput,
-.shade,
-.remove
+.playlist
 { transition: all 0.25s ease; }
 
 /* Modal dialog */
@@ -248,10 +216,32 @@ body {
 	min-height: 100vh;
 }
 
-header {
+audio {
 	display: flex;
-	margin: 0 5%;
-	justify-content: space-between;
+	width: 100%;
+}
+.fake { opacity:0; visibility:hidden; }
+#controls {
+	position:fixed;
+	top:0;
+	left: 0;
+	width: 100vw;
+}
+
+/* Styles for the second pane */
+
+.playlist-container {
+	flex: 1 1 auto;
+	background-color: #183C63;
+	color: #FF9148;
+	overflow: scroll;
+	position:relative;
+}
+
+.playlist>li {
+	border-bottom: 1px solid #036;
+	padding: 6px;
+	font-size: 10px;
 }
 
 header h1, .nav-tabs{ display: flex; flex: 1 1 auto; }
@@ -306,12 +296,12 @@ header h1, .nav-tabs{ display: flex; flex: 1 1 auto; }
 }
 
 /* Items that do not grow or shrink */
-.header-container, .footer-container {
+.controls-container, .footer-container {
 	flex: 0 0;
 }
 
 /* Items that do grow and shrink */
-.main-container, .wrapper, #tab-panels {
+.playlist-container, .wrapper, #tab-panels {
 	flex: 1 1 0;
 }
 
@@ -391,27 +381,6 @@ legend { color: #DADADA; }
     opacity: 1;
     transform: translateX(0); } }
 
-/* List styles */
-
-/*Headers*/
-.list-header, .expanded-header {
-	margin: 0;
-	padding: 4px 1rem;
-	background-color: #cccfcf;
-	border-top: solid 1px rgba(255, 255, 255, 0.5);
-	border-bottom: solid 1px rgba(255, 255, 255, 0.23);
-}
-
-.list-header,
-.rule-header,
-.andor-header,
-.baduser-header,
-.expanded-header
-{
-	display:flex;
-	justify-content: space-between;
-	align-items:center;
-}
 
 h2 { margin: 0; } /* Firefox, wtf? */
 
@@ -432,202 +401,6 @@ h6 {
 
 input[type=number] {
     width: 3rem;
-}
-
-.rule-header { /* unexpanded state */
-	padding-top: 0.25rem; padding-bottom: 0.25rem;
-	position: relative; /* keeps buttons in */
-}
-
-.baduser-header { /* unexpanded state */
-	padding: 0;
-	display: flex;
-}
-
-.expanded-header {
-	padding-top:3px; padding-bottom:3px;
-	border-top-left-radius:7px;
-	border-top-right-radius:7px;
-	border: 1px outset;
-}
-
-.andor-header { /* unexpanded state */
-	display: flex;
-	border-radius:15px;
-	background-color: #B4D7F4;
-	border: 1px outset;
-	padding: 0.25rem;
-}
-
-.andor-header.expanded-header {
-	border-bottom-left-radius:0;
-	border-bottom-right-radius:0;
-	padding-top: 2px; padding-bottom: 2px;
-}
-
-.andor-header>select { margin: 2px 1rem; }
-
-.andor-header,
-.andorblock>.ruleblock
-{ border-color:#B4D7F4; }
-
-
-
-/*Blocks*/
-.ruleblock {
-    position: relative;
-	padding: 5px; padding-top: 0;
-	margin-bottom: 1rem;
-	display: flex;
-	flex-wrap:wrap;
-	border: 1px outset #aaa;
-}
-.ruleblock:first-child { border-top-width:0; }
-.ruleblock:last-child { margin-bottom: 0; }
-.ruleblock>.topcoat-list__item { /*nested blocks won't inflate so much*/ padding: 0; }
-
-.expandedblock { padding: 0.5rem; }
-
-
-.controlblock {
-	flex: 0 0 auto;
-	margin: 0.5rem;
-}
-.controlblock.slider { width: 85%; }
-
-.andorblock {
-	border:0;
-	border-left: 2px outset #222;
-	border-top-left-radius:15px;
-	border-bottom-left-radius:15px;
-	width: 100%;
-}
-
-.andorblock.expandedblock { margin: 1rem 0; }
-.andorblock>.ruleblock {
-	border-bottom-left-radius: 13px; /* looks funny otherwise */
-	border-bottom-right-radius: 15px;
-	border-left:0;
-}
-
-.andorblock>.ruleblock>.ruleblock:first-child
-{ border-top-width:1px; } /* ergh this is so awkward this needs a rework */
-
-
-/* when in simple mode, hide controls that aren't tagged "simple" */
-.simplelist .rule-header>*,
-.simplelist .andor-header>*,
-.simplelist .baduser-header>*,
-.simplelist .controlblock
-{ display:none; }
-
-.simplelist .controlblock.simple,
-.simplelist .baduser-header>h5
-{ display: block; flex: 1 1 auto; margin: 0; }
-
-/* show only the top-level remove button */
-.simplelist .rule-header>.remove,
-.simplelist .baduser-header>.remove
-{ display: inline-block; position:absolute; right:-1.5rem; top:-0.25rem; }
-
-/* Re-style the visible controls. */
-.simplelist .rule-header,
-.simplelist .andor-header,
-.simplelist .ruleblock,
-.andorblock
-{
-	padding: 0;
-	margin: 0;
-	border: 0;
-	background: none;
-	width: 100%;
-}
-
-.simplelist .labelsmall /* like a header h5 */
-{
-	color: #555;
-	font-size: 1rem;
-	font-weight: 400;
-	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-	font-style: normal;
-}
-
-.simplelist h5
-{ font-size: 1rem; }
-
-
-
-/* Styles for the second pane */
-
-.output {
-	flex: 1 1 auto;
-	background-color: #222;
-	color: #DDD;
-	border: 1px solid #DDD;
-	overflow: scroll;
-	white-space: pre;
-	position:relative;
-}
-
-/*
-#outputoverlay {
-	text-align:right;
-	position:absolute;
-	top: 0.25rem; left: 0; right: 1rem;
-	z-index:1;
-	pointer-events:none;
-	cursor:pointer;
-}
-*/
-
-.output_container:hover>.outputopt,
-.output_container:hover>.updateoutput
-{ opacity: 0.5; }
-
-.output_container:hover>.outputopt:hover,
-.output_container:hover>.updateoutput:hover
-{ opacity:1; }
-
-.outputopt,
-.updateoutput
-{
-	opacity:0;
-	z-index:1;
-	position:absolute;
-	top: 5px;
-}
-
-.updateoutput { right: 46px; }
-
-.outputopt {
-	right: 23px;
-/*
-	for use with topcoat-button
-*/
-	overflow: visible;
-	width:18px;
-	height:18px;
-	padding:0;
-}
-
-.outputopt>div {
-	position: absolute;
-	right: 1.5rem;
-	background-color: rgba(255,255,255,0.1);
-	border:2px solid #666;
-	border-radius:3px;
-	padding: 2px;
-}
-
-.outputmodebox {
-	z-index:1;
-	position:absolute;
-	left:0; right:0;
-	bottom: 1.5rem;
-	pointer-events:none;
-	text-align:center;
-	text-shadow:0px 0px 10px #FFF, -1px 1px 0px #444;
-	font-size: 0.8rem;
 }
 
 /* Syntax highlighting */

@@ -190,7 +190,7 @@ module.exports = function(grunt) {
       },
       mainjs: {
         files: [
-          { expand: true, flatten:true, src: ['./js/main.js','node_modules/angular/angular.js'], dest: '<%= dirs.output %>assets/js' }
+          { expand: true, flatten:true, src: ['./js/main.js','node_modules/angular/angular.js','node_modules/x2js/x2js.js'], dest: '<%= dirs.output %>assets/js' }
         ]
       }
     },

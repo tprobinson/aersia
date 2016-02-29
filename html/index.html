@@ -17,7 +17,7 @@
 
         <script src="assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
     </head>
-    <body>
+    <body ng-controller="vipController as vip">
         <!--[if lt IE 8]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
@@ -54,14 +54,21 @@
         </div> -->
 
         <div class="controls-container">
-			<div class="hbox">
-				controls
+			<div class="hbox" id="controls">
+				<audio controls>
+                    <p>Your browser does not support the <code>audio</code> element </p>
+                </audio>
+            </div>
+            <div class="hbox fake">
+				<audio controls>
+                </audio>
             </div>
         </div>
 
-        <div class="playlist-container clearfix" ng-controller="vipController as playlist">
-            <div class="playlist vbox clearfix" ng-controller="playController as play" ng-repeat="song in playlist.songs">
-                <li ng-click="play.log(song)" ng-class="{ active: play.isCurrentSong(song) }">{{song.creator}} - {{song.title}}, @ {{song.location}}</li>
+        <!-- <div class="playlist-container clearfix" ng-controller="playlistController as playlist"> -->
+        <div class="playlist-container clearfix">
+            <div class="playlist vbox clearfix">
+                <li ng-click="vip.playSong(song)" ng-repeat="song in vip.songs track by song.title" ng-class="{ active: vip.isCurrentSong(song) }">{{song.creator}} - {{song.title}}</li>
             </div> <!-- main -->
         </div> <!-- main-container -->
 
@@ -75,7 +82,7 @@
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="assets/js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
 
-        <script
+        <script src="assets/js/x2js.js"></script>
         <script src="assets/js/angular.js"></script>
         <script src="assets/js/plugins.js"></script>
         <script src="assets/js/main.js"></script>
