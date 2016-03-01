@@ -101,7 +101,7 @@ z-index:3;
 /* Global animation junk! */
 body
 {
-	transition: all 0.25s ease;
+	/*transition: all 0.25s ease;
 	transform: translate3d(0,0,0); /* Trick browser into using GPU */
 }
 
@@ -267,7 +267,7 @@ audio {
 	overflow:hidden;
 }
 
-.playlist {  overflow-y:scroll; height: 100%;}
+.playlist {  position: relative; overflow:hidden; height: 100%;}
 
 .playlist>li {
 	border-bottom: 1px solid #036;
@@ -286,53 +286,6 @@ audio {
 .active-song {
 	background-color: #FF9148;
 	color: #036;
-}
-
-/* Scrollbar styles: https://www.script-tutorials.com/custom-scrollbars-cross-browser-solution/ */
-
-.ssb_down {
-background:transparent url(../images/icon-arrow-down.png);
-bottom:0;
-cursor:pointer;
-position:absolute;
-right:0;
-}
-
-.ssb_sb {
-/*background:transparent url(../images/middle.png);*/
-background-color: #ff9148;
-width: 5px;
-cursor:pointer;
-position:absolute;
-right:1px;
-}
-
-.ssb_sb_down {
-/*background:transparent url(../images/middrag.png);*/
-background-color: #4687ef;
-}
-
-.ssb_sb_over {
-/*background:transparent url(../images/midhover.png);*/
-background-color: #4687ef;
-}
-
-.ssb_st {
-background:transparent url(../images/back.png);
-cursor:pointer;
-height:100%;
-position:absolute;
-right:0;
-top:0;
-padding: 2px;
-}
-
-.ssb_up {
-background:transparent url(../images/icon-arrow-up.png);
-cursor:pointer;
-position:absolute;
-right:0;
-top:0;
 }
 
 header h1, .nav-tabs{ display: flex; flex: 1 1 auto; }

@@ -37,6 +37,7 @@
     "desandro-classie": "^1.0.1",
     "multiline": "^1.0.2",
     "normalize.css": "^3.0.3",
+    "perfect-scrollbar": "^0.6.10",
     "x2js": "^2.0.0"
   }
 }

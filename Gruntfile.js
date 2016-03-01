@@ -43,7 +43,11 @@ module.exports = function(grunt) {
     watch: {
 	  scss: {
 		files: ['scss/**/*.scss'],
-		tasks: ['scss']
+		tasks: ['scss:build']
+	  },
+      scssps: {
+		files: ['node_modules/perfect-scrollbar/src/css/*.scss'],
+		tasks: ['scss:ps']
 	  },
 	  css: {
 		files: [
@@ -51,6 +55,8 @@ module.exports = function(grunt) {
             'css/topcoat-desktop-dark.css',
             'css/effeckt.css',
             'css/boilerplate.css',
+            'css/simptip.css',
+            'node_modules/perfect-scrollbar/dist/css/*.css',
             'css/custom.css'
         ],
 		tasks: ['css']
@@ -60,7 +66,12 @@ module.exports = function(grunt) {
 		tasks: ['concat:js','copy:js']
 	  },
 	  mainjs: {
-		files: ['js/main.js'],
+		files: [
+            'js/main.js',
+            'node_modules/angular/angular.js',
+            'node_modules/x2js/x2js.js',
+            'node_modules/perfect-scrollbar/dist/js/perfect-scrollbar.js'
+        ],
 		tasks: ['copy:mainjs']
 	  },
 	  html: {
@@ -101,7 +112,12 @@ module.exports = function(grunt) {
         options : {
           style : 'expanded'
         }
+    },
+    ps: {
+      files : {
+          'css/perfect-scrollbar.css': 'node_modules/perfect-scrollbar/src/css/main.scss'
       }
+    }
     },
 
     template: {
@@ -190,7 +206,12 @@ module.exports = function(grunt) {
       },
       mainjs: {
         files: [
-          { expand: true, flatten:true, src: ['./js/main.js','node_modules/angular/angular.js','node_modules/x2js/x2js.js'], dest: '<%= dirs.output %>assets/js' }
+          { expand: true, flatten:true, src: [
+              './js/main.js',
+              'node_modules/angular/angular.js',
+              'node_modules/x2js/x2js.js',
+              'node_modules/perfect-scrollbar/dist/js/perfect-scrollbar.js'
+          ], dest: '<%= dirs.output %>assets/js' }
         ]
       }
     },
@@ -235,6 +256,7 @@ module.exports = function(grunt) {
         src: [
         'css/tidy.css',
         'css/simptip.css',
+        'node_modules/perfect-scrollbar/dist/css/perfect-scrollbar.css',
         'css/custom.css'
         ],
         dest: 'css/tidy.concat.css'

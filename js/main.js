@@ -43,6 +43,10 @@
 
 		this.player = document.getElementsByTagName("audio")[0];
 		this.playlist = document.getElementById("playlist");
+		Ps.initialize(this.playlist, { theme: 'vip'}); //create scrollbar
+		Ps.update(this.playlist); // update the scrollbar
+
+
 
 		this.player.onended = function() {
 			//Playing finished, shuffle if we autoplay.
@@ -71,7 +75,6 @@
 			//Trigger the playlist to scroll.
 			this.scrollToSong(song);
 
-
 		};
 
 		this.shuffleSong = function() {
@@ -95,8 +98,6 @@
 				if( this.autoplay )
 				{ this.shuffleSong(); }
 			}.bind(this),1000); // scrollbar initialization
-
-
 		};
 
 		this.scrollToSong = function(song) {
@@ -108,29 +109,12 @@
 
 			//Make the playlist scroll to the currently playing song.
 			this.playlist.scrollTo(0,height*this.curSong.index);
+			Ps.update(this.playlist); // update the scrollbar
 
 		}.bind(this);
 
-
 		/////
-		//Get our list of songs
-		// var vip = this; //preserve our this, since xhr needs this.
-		//
-		// var xhr = new XMLHttpRequest();
-		// xhr.open('GET', 'roster.xml', true);
-		// xhr.responseType = 'document';
-		// xhr.onload = function(e) {
-		// 	if (xhr.readyState === xhr.DONE) {
-		//         if (xhr.status === 200) {
-		// 			if( this.responseXML === null ) { throw new Error("Error in getting song list."); }
-		// 			vip.songs = x2js.dom2js(this.responseXML).playlist.trackList.track;
-		// 			vip.init();
-		//         }
-		//     }
-		//
-		// };
-		//
-		// xhr.send();
+		// Get our list of songs.
 		$http.get('roster.xml')
 			.then(function(res) {
 				$scope.vipCtrl.songs = x2js.xml2js(res.data).playlist.trackList.track;

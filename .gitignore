@@ -1,4 +1,11 @@
 /node_modules/*
+!/node_modules/perfect-scrollbar
+/node_modules/perfect-scrollbar/*
+!/node_modules/perfect-scrollbar/src
+/node_modules/perfect-scrollbar/src/*
+!/node_modules/perfect-scrollbar/src/css
+!/node_modules/perfect-scrollbar/src/css/variables.scss
+!/node_modules/perfect-scrollbar/src/css/themes.scss
 
 /dist
 /dist/*
