@@ -17,7 +17,7 @@
 
         <script src="assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
     </head>
-    <body ng-controller="vipController as vip">
+    <body ng-controller="vipController as vipCtrl">
         <!--[if lt IE 8]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
@@ -59,16 +59,13 @@
                     <p>Your browser does not support the <code>audio</code> element </p>
                 </audio>
             </div>
-            <div class="hbox fake">
-				<audio controls>
-                </audio>
-            </div>
         </div>
 
         <!-- <div class="playlist-container clearfix" ng-controller="playlistController as playlist"> -->
-        <div class="playlist-container clearfix">
-            <div class="playlist vbox clearfix">
-                <li ng-click="vip.playSong(song)" ng-repeat="song in vip.songs track by song.title" ng-class="{ active: vip.isCurrentSong(song) }">{{song.creator}} - {{song.title}}</li>
+        <div class="playlist-container hbox clearfix">
+            <div class="playlist vbox clearfix" id="playlist">
+                <li ng-click="vipCtrl.playSong(song)"
+                    ng-repeat="song in vipCtrl.songs track by song.index">{{song.creator}} - {{song.title}}</li>
             </div> <!-- main -->
         </div> <!-- main-container -->
 

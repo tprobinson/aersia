@@ -99,8 +99,13 @@ z-index:3;
 
 
 /* Global animation junk! */
-.playlist
-{ transition: all 0.25s ease; }
+body
+{
+	transition: all 0.25s ease;
+	transform: translate3d(0,0,0); /* Trick browser into using GPU */
+}
+
+
 
 /* Modal dialog */
 
@@ -210,22 +215,45 @@ z-index:3;
 
 /* Flexbox layout! */
 /* Main layouts */
+/* Dark, bordery color: #036 */
+/* Lighter, main blue: #183C63 */
+/* Bright, activey blue: #4687ef */
+/* Orange: #FF9148 */
+/* Dull purple, for things like timeline bg: #635d62 */
 body {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
+	/*overflow:hidden;*/
+	height: 100vh;
 }
 
 audio {
 	display: flex;
 	width: 100%;
 }
-.fake { opacity:0; visibility:hidden; }
 #controls {
-	position:fixed;
 	top:0;
 	left: 0;
 	width: 100vw;
+}
+
+/* Styles for the player controls */
+#timeline{
+	width: 400px;
+	height: 20px;
+	background: #635d62;
+	margin-top: 20px;
+	flex: 1 1 auto;
+	border-radius: 0;
+}
+
+#playhead{
+	width: 2px;
+	height: 5px;
+	border-radius: 0;
+	background: #FF9148;
+	border:1px solid #635d62;
 }
 
 /* Styles for the second pane */
@@ -234,14 +262,77 @@ audio {
 	flex: 1 1 auto;
 	background-color: #183C63;
 	color: #FF9148;
-	overflow: scroll;
 	position:relative;
+	height: 100%;
+	overflow:hidden;
 }
+
+.playlist {  overflow-y:scroll; height: 100%;}
 
 .playlist>li {
 	border-bottom: 1px solid #036;
-	padding: 6px;
-	font-size: 10px;
+	padding: 3px 10px;
+	font-size: 12px;
+	overflow: visible; /* make this one big long pane */
+
+	top:0;
+}
+
+.playlist>li:hover {
+	background-color: #4687ef;
+	color: #036;
+}
+
+.active-song {
+	background-color: #FF9148;
+	color: #036;
+}
+
+/* Scrollbar styles: https://www.script-tutorials.com/custom-scrollbars-cross-browser-solution/ */
+
+.ssb_down {
+background:transparent url(../images/icon-arrow-down.png);
+bottom:0;
+cursor:pointer;
+position:absolute;
+right:0;
+}
+
+.ssb_sb {
+/*background:transparent url(../images/middle.png);*/
+background-color: #ff9148;
+width: 5px;
+cursor:pointer;
+position:absolute;
+right:1px;
+}
+
+.ssb_sb_down {
+/*background:transparent url(../images/middrag.png);*/
+background-color: #4687ef;
+}
+
+.ssb_sb_over {
+/*background:transparent url(../images/midhover.png);*/
+background-color: #4687ef;
+}
+
+.ssb_st {
+background:transparent url(../images/back.png);
+cursor:pointer;
+height:100%;
+position:absolute;
+right:0;
+top:0;
+padding: 2px;
+}
+
+.ssb_up {
+background:transparent url(../images/icon-arrow-up.png);
+cursor:pointer;
+position:absolute;
+right:0;
+top:0;
 }
 
 header h1, .nav-tabs{ display: flex; flex: 1 1 auto; }
