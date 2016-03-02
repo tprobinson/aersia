@@ -45,10 +45,6 @@ module.exports = function(grunt) {
 		files: ['scss/**/*.scss'],
 		tasks: ['scss:build']
 	  },
-      scssps: {
-		files: ['node_modules/perfect-scrollbar/src/css/*.scss'],
-		tasks: ['scss:ps']
-	  },
 	  css: {
 		files: [
             'node_modules/normalize.css/normalize.css',
@@ -112,11 +108,6 @@ module.exports = function(grunt) {
         options : {
           style : 'expanded'
         }
-    },
-    ps: {
-      files : {
-          'css/perfect-scrollbar.css': 'node_modules/perfect-scrollbar/src/css/main.scss'
-      }
     }
     },
 
@@ -377,6 +368,17 @@ module.exports = function(grunt) {
           dest: '<%= dirs.output %>assets/'
         }]
       }
+    },
+
+    svgstore: {
+        options: {
+            prefix : 'shape-', // This will prefix each <g> ID
+        },
+        default : {
+            files: {
+                'assets/img/svg-icons.svg': ['icons/*.svg'],
+            }
+        }
     },
 
     uglify: {

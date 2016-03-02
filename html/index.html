@@ -55,13 +55,33 @@
 
         <div class="controls-container">
 			<div class="hbox" id="controls">
-				<audio controls>
-                    <p>Your browser does not support the <code>audio</code> element </p>
-                </audio>
+				<audio> <!--<script type="text/javascript">location.href='vip.swf';</script>--> <p>Your browser does not support the <code>audio</code> element.</p> </audio>
+                <div id="playpause" ng-click="vipCtrl.togglePlay();" ng-class="{ controlsPaused: vipCtrl.playing }">
+                    <svg viewBox="0 0 100 100" class="icon shape-codepen"><use xlink:href="#shape-codepen"></use></svg>
+                </div>
+                <div id="prev" ng-click="vipCtrl.seek(-1);">
+                    <svg viewBox="0 0 100 100" class="icon shape-codepen"><use xlink:href="#shape-codepen"></use></svg>
+                </div>
+                <div id="next" ng-click="vipCtrl.seek(1);">
+                    <svg viewBox="0 0 100 100" class="icon shape-codepen"><use xlink:href="#shape-codepen"></use></svg>
+                </div>
+                <div>
+                    <div id="time"></div>
+                    <div id="timeline" ng-click="vipCtrl.seekBar($event);"><div id="playhead"></div></div>
+                    <div id="loadPct"></div>
+                </div>
+                <div id="fullscreen" ng-click="vipCtrl.toggleFullscreen();">
+                    <svg viewBox="0 0 100 100" class="icon shape-codepen"><use xlink:href="#shape-codepen"></use></svg>
+                </div>
+                <div id="volumeMute" ng-click="vipCtrl.mute();" ng-class="{ controlsMuted: vipCtrl.prevVolume > 0 }">
+                    <svg viewBox="0 0 100 100" class="icon shape-codepen"><use xlink:href="#shape-codepen"></use></svg>
+                </div>
+                <div id="volumeBar" ng-click="vipCtrl.volume($event);">
+                    <svg viewBox="0 0 100 100" class="icon shape-codepen"><use xlink:href="#shape-codepen"></use></svg>
+                </div>
             </div>
         </div>
 
-        <!-- <div class="playlist-container clearfix" ng-controller="playlistController as playlist"> -->
         <div class="playlist-container hbox clearfix">
             <div class="playlist vbox clearfix" id="playlist">
                 <li ng-click="vipCtrl.playSong(song)"

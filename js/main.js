@@ -21,43 +21,61 @@
 */
 /* jshint -W116 */
 (function() {
-
-	//Helper functions
-
-
-
 	//Initialize Angular app
 	var app = angular.module("vip", [ ]);
 
+	app.controller("vipController", ['$scope','$http', function($scope,$http) {
 
-
-	app.controller("vipController", function($scope,$http) {
-		/////
-		//Init XML2JSON
 		// Create x2js instance with default config
 		var x2js = new X2JS();
 
+		//Initialize variables
 		this.songs = '';
 		this.curSong = '';
 		this.autoplay = 1;
+		this.playing = 0;
+		this.prevVolume = 0;
 
+		//Grab DOM elements
 		this.player = document.getElementsByTagName("audio")[0];
 		this.playlist = document.getElementById("playlist");
-		Ps.initialize(this.playlist, { theme: 'vip'}); //create scrollbar
-		Ps.update(this.playlist); // update the scrollbar
 
+		this.time = document.getElementById("time");
+		this.timeline = document.getElementById("timeline");
+		this.loadPct = document.getElementById("loadPct");
+		this.volumeBar = document.getElementById("volumeBar");
 
+		//Initalize scrollbar
+		Ps.initialize(this.playlist, {
+			theme: 'vip',
+			minScrollbarLength: 20
+		}); //create scrollbar
+		// Ps.update(this.playlist); // update the scrollbar
+		// bind it to update whenever the window resizes.
+		addEvent(window,"resize",function() {
+				Ps.update(this.playlist);
+			}.bind(this)
+		);
 
+		//Hook audio player
+		//This will be called whenever a song ends.
 		this.player.onended = function() {
-			//Playing finished, shuffle if we autoplay.
 			if( this.autoplay )
 			{ this.shuffleSong(); }
 		}.bind(this);
 
+		//This will be called every time a new song loads.
+		this.player.canplaythrough = function () {
+			//Update the song's metadata and use that for our seek bar.
+			this.curSong.duration = this.player.duration; // ,aybe don't do this
+
+		};
+
+		//Other functions
 		this.playSong = function(song) {
 
 			//Stop and unregister the old song.
-			this.player.pause();
+			this.pause();
 			this.player.src = '';
 			if( this.curSong !== null && this.curSong !== '' )
 			{ removeClass(this.playlist.children[this.curSong.index],'active-song'); }
@@ -70,12 +88,15 @@
 			this.curSong = song;
 			addClass(this.playlist.children[this.curSong.index],'active-song');
 			this.player.src = song.location;
-			this.player.play();
+			this.play();
 
 			//Trigger the playlist to scroll.
 			this.scrollToSong(song);
-
 		};
+
+		this.updateSongMetadata = function(song) {
+
+		}.bind(this);
 
 		this.shuffleSong = function() {
 			//Start a random song.
@@ -113,14 +134,92 @@
 
 		}.bind(this);
 
+
+
+
+		//
+		//
+		// function moveplayhead(e) {
+		// 	var newMargLeft = e.pageX - timeline.offsetLeft;
+		//
+		// 	if (newMargLeft = 0 amp;amp; newMargLeft = timelineWidth) {
+		// 		playhead.style.marginLeft = newMargLeft + "px";
+		// 	}
+		// 	if (newMargLeft  0) {
+		// 		playhead.style.marginLeft = "0px";
+		// 	}
+		// 	if (newMargLeft  timelineWidth) {
+		// 		playhead.style.marginLeft = timelineWidth + "px";
+		// 	}
+		// }
 		/////
-		// Get our list of songs.
+		// Audio player control functions, in button order, then helper function order.
+		// Assistance from: http://www.alexkatz.me/html5-audio/building-a-custom-html5-audio-player-with-javascript/
+
+		this.togglePlay = function(bool) {
+			if( bool !== null ) { bool = !this.playing; }
+
+			if( bool ) { this.play(); }
+			else { this.pause(); }
+		};
+
+		this.play = function() {
+			this.player.play();
+			this.playing = 1;
+		};
+
+		this.pause = function() {
+			this.player.pause();
+			this.playing = 0;
+		};
+
+		this.seek = function(amt) {
+			var index = this.curSong.index + amt;
+			if( index >= 0 && index <= this.songs.length )
+			{ this.playSong(this.songs[index]); }
+		};
+
+		this.seekBar = function(e,amt) {
+			var pct = 0;
+
+			//Respond to either click or direct invocation
+			if( e !== '' ) { pct = clickPercent(e,this.timeline); }
+			else { pct = amt; }
+
+			//move playhead//Makes timeline clickable
+			timeline.addEventListener("click", function (event) {
+				moveplayhead(event);
+				music.currentTime = duration * clickPercent(event);
+			}, false);
+			this.player.currentTime = this.song.duration * clickPercent(e,this.timeline);
+		};
+
+		this.toggleFullscreen = function() {
+			document.body.requestFullscreen();
+		};
+
+		this.volumeMute = function() {
+			//Toggle
+			var vol = this.player.volume;
+			this.volume('',this.prevVolume);
+			this.prevVolume = vol;
+		};
+
+		this.volume = function(e,amt) {
+			//Respond to either click or direct invocation
+			if( e === '' ) { this.player.volume = amt; }
+			else
+			{ this.player.volume = clickPercent(e,this.volumeBar); }
+		};
+
+		/////
+		// Get our list of songs and initialize.
 		$http.get('roster.xml')
 			.then(function(res) {
 				$scope.vipCtrl.songs = x2js.xml2js(res.data).playlist.trackList.track;
 				$scope.vipCtrl.init();
-			});
-	});
+		});
+	}]);
 
 })();
 
@@ -169,3 +268,35 @@ function removeClass(el, className) {
     el.className=el.className.replace(reg, ' ');
   }
 }
+
+function addEvent(object, type, callback) {
+    if (object == null || typeof(object) == 'undefined') return;
+    if (object.addEventListener) {
+        object.addEventListener(type, callback, false);
+    } else if (object.attachEvent) {
+        object.attachEvent("on" + type, callback);
+    } else {
+        object["on"+type] = callback;
+    }
+}
+
+// returns click as decimal (.77) of the total object's width
+function clickPercent(e,obj) {
+	return (e.pageX - obj.offsetLeft) / obj.offsetWidth;
+}
+
+
+});
+
+//Test for SVG support and polyfill if no. https://css-tricks.com/svg-sprites-use-better-icon-fonts/
+/MSIE|Trident/.test(navigator.userAgent) && document.addEventListener('DOMContentLoaded', function () {
+  [].forEach.call(document.querySelectorAll('svg'), function (svg) {
+	var use = svg.querySelector('use');
+
+	if (use) {
+	  var object = document.createElement('object');
+	  object.data = use.getAttribute('xlink:href');
+	  object.className = svg.getAttribute('class');
+	  svg.parentNode.replaceChild(object, svg);
+	}
+  });
