@@ -103,6 +103,7 @@ body
 {
 	/*transition: all 0.25s ease;
 	transform: translate3d(0,0,0); /* Trick browser into using GPU */
+	font-family: sans-serif
 }
 
 /* Fullscreen fix for Webkit */
@@ -111,6 +112,7 @@ body:-webkit-full-screen {
   height: 100%;
 }
 
+li { list-style: none; }
 
 /* Modal dialog */
 
@@ -288,7 +290,7 @@ body {
 #playpause.controlsPlaying>svg:first-child {display:none;}
 #playpause.controlsPlaying>svg:last-child {display:flex;}
 
-#time, #loadPct {
+#timeText, #loadPct {
 	margin-left: 5px;
 	margin-right: 15px;
 	font-size: 10px;
@@ -306,10 +308,24 @@ body {
 	align-items: stretch;
 }
 
-#timeline {
+#timeline, #loadBar, #playedBar {
 	height: 5px;
-	background: #635d62;
+	background: transparent;
 }
+
+#timeline {
+	position: relative;
+	overflow: hidden;
+}
+
+#loadBar, #playedBar {
+	position: absolute;
+	right: 0%;
+	width: 100%;
+}
+
+#loadBar { background-color: #635d62; }
+#playedBar { background-color: #FF9148; }
 
 #playhead{
 	position:absolute;
@@ -317,12 +333,11 @@ body {
 	height: 7px;
 	top: 5px;
 	background: #FF9148;
-	/*border:1px solid #635d62;*/
 }
 
 .volbox {
 	align-items: center;
-	padding-right: 5px;
+	padding-right:2px;
 }
 
 #volumeMute>svg:last-child { display:none; }
@@ -337,6 +352,12 @@ body {
 	border-width: 5px 20px 5px 0;
 	border-color: transparent #FF9148 transparent transparent;
 	-webkit-transform:rotate(360deg); /* fix for fuzzy */
+}
+
+/* An invisible hitbox to max volume */
+#volumeMax {
+	width:3px;
+	height: 17px;
 }
 
 

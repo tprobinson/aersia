@@ -67,9 +67,12 @@
                 <svg width="17px" height="17px" ><use xlink:href="#icon-next" /></svg>
             </div>
             <div class="timebox">
-                <div id="time">00:00</div>
+                <div id="timeText">00:00</div>
                 <div class="vbox">
-                    <div id="timeline" ng-click="vipCtrl.seekBar($event);"></div>
+                    <div id="timeline" ng-click="vipCtrl.seekBar($event);">
+                        <div id="loadBar"></div>
+                        <div id="playedBar"></div>
+                    </div>
                     <div id="playhead"></div>
                 </div>
                 <div id="loadPct">0%</div>
@@ -78,11 +81,13 @@
             <svg width="17px" height="17px" ><use xlink:href="#icon-fullscreen" /></svg>
             </div>
             <div class="volbox hbox">
-                <div id="volumeMute" ng-click="vipCtrl.mute();" ng-class="{ controlsMuted: vipCtrl.prevVolume > 0 }">
+                <div id="volumeMute" ng-click="vipCtrl.toggleMute();" ng-class="{ controlsMuted: vipCtrl.prevVolume > 0 }">
                     <svg width="17px" height="17px" ><use xlink:href="#icon-vol" /></svg>
                     <svg width="17px" height="17px" ><use xlink:href="#icon-volMute" /></svg>
                 </div>
                 <div id="volumeBar" ng-click="vipCtrl.volume($event);">
+                </div>
+                <div id="volumeMax" ng-click="vipCtrl.volume('',1);">
                 </div>
             </div>
         </div>
