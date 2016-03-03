@@ -40,6 +40,7 @@
 		this.player = document.getElementsByTagName("audio")[0];
 		this.playlist = document.getElementById("playlist");
 
+		this.playpause = document.getElementById("playpause");
 		this.time = document.getElementById("time");
 		this.timeline = document.getElementById("timeline");
 		this.loadPct = document.getElementById("loadPct");
@@ -166,11 +167,13 @@
 		this.play = function() {
 			this.player.play();
 			this.playing = 1;
+			addClass(this.playpause,"controlsPlaying");
 		};
 
 		this.pause = function() {
 			this.player.pause();
 			this.playing = 0;
+			removeClass(this.playpause,"controlsPlaying");
 		};
 
 		this.seek = function(amt) {
@@ -195,7 +198,7 @@
 		};
 
 		this.toggleFullscreen = function() {
-			document.body.requestFullscreen();
+			toggleFullScreen();
 		};
 
 		this.volumeMute = function() {
@@ -286,7 +289,31 @@ function clickPercent(e,obj) {
 }
 
 
-});
+//https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
+function toggleFullScreen() {
+  if (!document.fullscreenElement &&    // alternative standard method
+      !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  // current working methods
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) {
+      document.documentElement.msRequestFullscreen();
+    } else if (document.documentElement.mozRequestFullScreen) {
+      document.documentElement.mozRequestFullScreen();
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
+}
 
 //Test for SVG support and polyfill if no. https://css-tricks.com/svg-sprites-use-better-icon-fonts/
 /MSIE|Trident/.test(navigator.userAgent) && document.addEventListener('DOMContentLoaded', function () {
@@ -300,3 +327,4 @@ function clickPercent(e,obj) {
 	  svg.parentNode.replaceChild(object, svg);
 	}
   });
+});

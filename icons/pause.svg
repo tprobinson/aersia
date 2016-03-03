@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 15 15">
+<g transform="translate(377 -500.4)" display="none">
+<path d="m-372 504.4 5 3.5-5 3.5z" fill-rule="evenodd" fill="#ff9148"/>
+</g>
+<g fill="#ff9148">
+<rect style="color-rendering:auto;color:#000000;isolation:auto;mix-blend-mode:normal;shape-rendering:auto;solid-color:#000000;image-rendering:auto" height="7" width="2" y="4" x="5"/>
+<rect style="color-rendering:auto;color:#000000;isolation:auto;mix-blend-mode:normal;shape-rendering:auto;solid-color:#000000;image-rendering:auto" height="7" width="2" y="4" x="8"/>
+</g>
+<g display="none" fill="#ff9148">
+<path d="m10 4-5 3.5 5 3.5z" fill-rule="evenodd"/>
+<rect style="color-rendering:auto;color:#000000;isolation:auto;mix-blend-mode:normal;shape-rendering:auto;solid-color:#000000;image-rendering:auto" height="7" width="2" display="inline" y="4" x="5"/>
+</g>
+<g display="none" fill="#ff9148">
+<path d="m5 4 5 3.5-5 3.5z" fill-rule="evenodd"/>
+<rect style="color-rendering:auto;color:#000000;isolation:auto;mix-blend-mode:normal;shape-rendering:auto;solid-color:#000000;image-rendering:auto" height="7" width="2" display="inline" y="4" x="8"/>
+</g>
+<g display="none" fill="#ff9148">
+<rect style="color-rendering:auto;color:#000000;isolation:auto;mix-blend-mode:normal;shape-rendering:auto;solid-color:#000000;image-rendering:auto" height="5" width="5" display="inline" y="5" x="5"/>
+<path style="color-rendering:auto;color:#000000;isolation:auto;mix-blend-mode:normal;shape-rendering:auto;solid-color:#000000;image-rendering:auto" d="m5 3h-2v2h1v-1h1z" display="inline"/>
+<path style="color-rendering:auto;color:#000000;isolation:auto;mix-blend-mode:normal;shape-rendering:auto;solid-color:#000000;image-rendering:auto" d="m12 5v-2h-2v1h1v1z" display="inline"/>
+<path style="color-rendering:auto;color:#000000;isolation:auto;mix-blend-mode:normal;shape-rendering:auto;solid-color:#000000;image-rendering:auto" d="m10 12h2v-2h-1v1h-1z" display="inline"/>
+<path style="color-rendering:auto;color:#000000;isolation:auto;mix-blend-mode:normal;shape-rendering:auto;solid-color:#000000;image-rendering:auto" d="m3 10v2h2v-1h-1v-1z" display="inline"/>
+</g>
+<g display="none" fill="#ff9148">
+<rect style="color-rendering:auto;color:#000000;isolation:auto;mix-blend-mode:normal;shape-rendering:auto;solid-color:#000000;image-rendering:auto" height="3" width="2" display="inline" y="6" x="5"/>
+<path style="color-rendering:auto;color:#000000;isolation:auto;mix-blend-mode:normal;shape-rendering:auto;solid-color:#000000;image-rendering:auto" d="m8 6 2-2v7l-2-2z" display="inline"/>
+</g>
+</svg>

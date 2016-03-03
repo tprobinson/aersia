@@ -372,11 +372,17 @@ module.exports = function(grunt) {
 
     svgstore: {
         options: {
-            prefix : 'shape-', // This will prefix each <g> ID
+            prefix : 'icon-', // This will prefix each <g> ID
+            inheritviewbox: true,
+            //includedemo: true,
+            svg: {
+                viewBox : '0 0 15 15',
+                xmlns: 'http://www.w3.org/2000/svg'
+            }
         },
         default : {
             files: {
-                'assets/img/svg-icons.svg': ['icons/*.svg'],
+                '<%= dirs.output %>assets/img/icons.svg': ['icons/*.svg'],
             }
         }
     },
