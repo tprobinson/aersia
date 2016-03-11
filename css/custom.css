@@ -257,9 +257,14 @@ body {
 .controls-container div {
 	display: flex;
 	flex: 0 1 auto;
-	height: 17px;
-	line-height: 17px;
+	min-height: 17px;
 	vertical-align:middle;
+}
+
+/* Give a one-pixel gap to show the gradient border through */
+.controls-container>div {
+	margin: 1px;
+	margin-right: 0;
 
 	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#3d6389+0,072d53+100 */
 	background: rgb(61,99,137); /* Old browsers */
@@ -271,12 +276,6 @@ body {
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3d6389', endColorstr='#072d53',GradientType=0 ); /* IE6-8 */
 }
 
-/* Give a one-pixel gap to show the gradient border through */
-.controls-container>div {
-	margin: 1px;
-	margin-right: 0;
-}
-
 .controls-container>div:last-of-type {
 	margin-right: 1px;
 }
@@ -284,6 +283,7 @@ body {
 .controls-container svg {
 	height: 17px;
 	width: 17px;
+	shape-rendering: crispedges;
 }
 
 #playpause>svg:last-child { display:none; }
@@ -296,6 +296,9 @@ body {
 	font-size: 10px;
 	text-align:center;
 	font-weight: bold;
+
+	line-height: 0;
+	margin-top: 50%;
 }
 
 .controls-container>.timebox, .timebox>.vbox{
