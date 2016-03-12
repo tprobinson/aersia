@@ -238,6 +238,15 @@ body {
 	width: 100%;
 }*/
 
+/* Touch style interface */
+.touch .controls-container {
+	order:2;
+	height: auto;
+	min-height: 2rem;
+	height: 10vh;
+
+}
+
 /* Styles for the player controls */
 .controls-container {
 	width: 100vw;
