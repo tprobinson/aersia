@@ -374,9 +374,9 @@ module.exports = function(grunt) {
         options: {
             prefix : 'icon-', // This will prefix each <g> ID
             inheritviewbox: true,
-            //includedemo: true,
+            includedemo: true,
             svg: {
-                viewBox : '0 0 15 15',
+                viewBox : '0 0 17 17',
                 xmlns: 'http://www.w3.org/2000/svg'
             }
         },

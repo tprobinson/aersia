@@ -232,6 +232,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
+	overflow:hidden;
 }
 
 /*audio {
@@ -241,10 +242,59 @@ body {
 /* Touch style interface */
 .touch .controls-container {
 	order:2;
-	height: auto;
-	min-height: 2rem;
-	height: 10vh;
+	height: 7vh;
+}
 
+.touch .controls-container>div {
+	width: 7vh;
+	height: 7vh;
+}
+.touch .controls-container svg {
+	width: 100%;
+	height: 100%;
+}
+
+.touch .playlist-container {
+	height: 93vh;
+}
+
+.touch #volbox {
+	width: 14vh;
+}
+
+.touch #volumeMax {
+	width: 7vh;
+	height: 7vh;
+}
+
+/* An invisible hitbox to max volume */
+.touch #volumeMax {
+	width: 2vh;
+	height: 7vh;
+}
+
+.touch #timeline, .touch #loadBar, .touch #playedBar {
+	height: 3vh;
+}
+
+.touch #volumeBar {
+	border-width: 2vh 11vh 2vh 0;
+}
+
+.touch #playhead{
+	width: 0.25vh;
+	height: 5vh;
+	top: 50%;
+	transform: translateY(-50%);
+	background: #FF9148;
+}
+
+/* For theming, collect all items of the same color and theme them here. */
+g, path,   {
+	/*fill: */
+	/*background-color: */ /* playedBar, playhead */
+	/*color: */
+	/*border-color:*/
 }
 
 /* Styles for the player controls */
@@ -266,7 +316,6 @@ body {
 .controls-container div {
 	display: flex;
 	flex: 0 1 auto;
-	min-height: 17px;
 	vertical-align:middle;
 }
 
@@ -292,7 +341,6 @@ body {
 .controls-container svg {
 	height: 17px;
 	width: 17px;
-	shape-rendering: crispedges;
 }
 
 #playpause>svg:last-child { display:none; }
@@ -307,7 +355,7 @@ body {
 	font-weight: bold;
 
 	line-height: 0;
-	margin-top: 50%;
+	transform:translateY(50%); /* vertical centering on responsive display */
 }
 
 .controls-container>.timebox, .timebox>.vbox{
