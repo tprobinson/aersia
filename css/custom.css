@@ -245,7 +245,7 @@ body {
 	height: 7vh;
 }
 
-.touch .controls-container>div {
+.touch .controls-container>div, .touch #volumeMute {
 	width: 7vh;
 	height: 7vh;
 }
@@ -258,8 +258,8 @@ body {
 	height: 93vh;
 }
 
-.touch #volbox {
-	width: 14vh;
+.touch .controls-container .volbox {
+	width: auto;
 }
 
 .touch #volumeMax {
@@ -287,6 +287,10 @@ body {
 	top: 50%;
 	transform: translateY(-50%);
 	background: #FF9148;
+}
+
+.touch #timeText, .touch #loadPct {
+	font-size: 2vh;
 }
 
 /* For theming, collect all items of the same color and theme them here. */
@@ -380,12 +384,11 @@ g, path,   {
 
 #loadBar, #playedBar {
 	position: absolute;
-	right: 0%;
 	width: 100%;
 }
 
-#loadBar { background-color: #635d62; }
-#playedBar { background-color: #FF9148; }
+#loadBar { background-color: #635d62; right: 0%; }
+#playedBar { background-color: #FF9148; right: 100%; }
 
 #playhead{
 	position:absolute;

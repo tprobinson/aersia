@@ -230,29 +230,12 @@
 			//console.log('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+height*this.curSong.index);
 
 			//Make the playlist scroll to the currently playing song.
-			this.playlist.scrollTop = height*this.curSong.index;
-			Ps.update(this.playlist); // update the scrollbar
+			scrollToSmooth(this.playlist,height * this.curSong.index, 600);
+			// this.playlist.scrollTop = height*this.curSong.index;
+			// Ps.update(this.playlist); // update the scrollbar
 
 		}.bind(this);
 
-
-
-
-		//
-		//
-		// function moveplayhead(e) {
-		// 	var newMargLeft = e.pageX - timeline.offsetLeft;
-		//
-		// 	if (newMargLeft = 0 amp;amp; newMargLeft = timelineWidth) {
-		// 		playhead.style.marginLeft = newMargLeft + "px";
-		// 	}
-		// 	if (newMargLeft  0) {
-		// 		playhead.style.marginLeft = "0px";
-		// 	}
-		// 	if (newMargLeft  timelineWidth) {
-		// 		playhead.style.marginLeft = timelineWidth + "px";
-		// 	}
-		// }
 		/////
 		// Audio player control functions, in button order, then helper function order.
 		// Assistance from: http://www.alexkatz.me/html5-audio/building-a-custom-html5-audio-player-with-javascript/
@@ -325,28 +308,75 @@
 })();
 
 // Animation functions
-
-// Adapted from http://stackoverflow.com/questions/21474678/scrolltop-animation-without-jquery
-function scrollToSmooth(scrollLocation,scrollDuration) {
+function scrollToSmooth(el,targetScroll,duration) {
     // const   scrollHeight = window.scrollY,
-	var		scrollHeight = window.scrollY,
-            scrollStep = Math.PI / ( scrollDuration / 15 ),
-            cosParameter = scrollHeight / 2;
-    var     scrollCount = 0,
-            scrollMargin;
+	var		beginScroll = el.scrollTop,
+			beginTime = Date.now();
+
+	// console.log('Beginning animation: '+beginTime+' '+beginScroll+' to '+targetScroll);
     requestAnimationFrame(step);
     function step () {
         setTimeout(function() {
-            if ( window.scrollY != scrollLocation ) {
-                    requestAnimationFrame(step);
-                scrollCount = scrollCount + 1;
-                scrollMargin = cosParameter - cosParameter * Math.cos( scrollCount * scrollStep );
-                window.scrollTo( 0, ( scrollHeight - scrollMargin ) );
+			//Get our time diff to scale against.
+			var now = Date.now();
+
+            // if ( el.scrollTop < targetScroll && now <= beginTime + duration) {
+			if ( now <= beginTime + duration) {
+				//Queue the next frame ahead of time
+				requestAnimationFrame(step);
+
+				//This is probably overcomplicated, but this gets the amount we need to add to the initial scroll for our time
+				//Sort of an easeIn
+                var mod =
+					Math.sin (
+						(2 * Math.PI) + 						//beginning at 2Pi to ease in.
+						(
+							Math.PI/2 							//ending at 3/2Pi
+							* ((now - beginTime) / duration)	// multiplied by delta to get where we are on curve
+						)
+					) * (Math.abs(targetScroll-beginScroll));	// scaled up to the amount that we need to move.
+
+				// console.log('anim: '+now+' '+el.scrollTop+' + '+mod);
+
+				//Set the scroll
+				if( beginScroll < targetScroll ) { el.scrollTop = beginScroll + mod; }
+				else { el.scrollTop = beginScroll - mod; }
+
+            } else {
+				//Final frame, don't schedule another.
+				// console.log('Ending animation: d:'+deadlock+' end:'+ (now > (beginTime + duration))+' s:'+el.scrollTop);
+            	el.scrollTop = targetScroll;
             }
         }, 15 );
     }
 }
 
+// function testEase(begin,duration,end) {
+// 	var now = begin;
+// 	var done = 0;
+// 	var i = 0;
+// 	while ( !done ) {
+// 		i++;
+// 		if (i > 1000 ) { done = 1;}
+//
+// 		var pct = (now-begin) / (end-begin);
+//
+// 		var mod =
+// 			pct *
+// 			//the cosine curve scaled by how far we are.
+// 			((Math.cos (
+// 				Math.PI + //beginning at Pi to ease in
+// 				(Math.PI * Math.abs(pct))
+// 			) + 1 ) / 2)
+// 		;
+// 		var delta =
+// 		now += mod;
+// 			console.log('pct: '+pct+', now: '+now+', mod: '+mod);
+// 			if( now  >= end ) { done = 1; }
+// 	}
+// }
+
+//Class manipulation convenience functions
 function hasClass(el, className) {
   if (el.classList)
     return el.classList.contains(className);
@@ -447,3 +477,16 @@ function zeroPadNonLog(num, numZeros) {
 	}
   });
 });
+
+//
+// function easeOutBounce(t, b, c, d) {
+//     if ((t/=d) < (1/2.75)) {
+// 		return c*(7.5625*t*t) + b;
+// 	} else if (t < (2/2.75)) {
+// 		return c*(7.5625*(t-=(1.5/2.75))*t + .75) + b;
+// 	} else if (t < (2.5/2.75)) {
+// 		return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + b;
+// 	} else {
+// 		return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
+// 	}
+// }
