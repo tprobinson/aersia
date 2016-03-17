@@ -53,6 +53,9 @@
 		this.loadPct = document.getElementById("loadPct");
 		this.volumeBar = document.getElementById("volumeBar");
 
+		this.styleSheet = document.createElement('style');
+		this.styleTextColor = '';
+
 		//Initalize scrollbar
 		Ps.initialize(this.playlist, {
 			theme: 'vip',
@@ -326,17 +329,23 @@ function scrollToSmooth(el,targetScroll,duration) {
 				requestAnimationFrame(step);
 
 				//This is probably overcomplicated, but this gets the amount we need to add to the initial scroll for our time
-				//Sort of an easeIn
                 var mod =
-					Math.sin (
-						(2 * Math.PI) + 						//beginning at 2Pi to ease in.
-						(
-							Math.PI/2 							//ending at 3/2Pi
-							* ((now - beginTime) / duration)	// multiplied by delta to get where we are on curve
-						)
-					) * (Math.abs(targetScroll-beginScroll));	// scaled up to the amount that we need to move.
 
-				// console.log('anim: '+now+' '+el.scrollTop+' + '+mod);
+					//Sin easeIn
+					// Math.sin (
+					// 	(2 * Math.PI) + 						//beginning at 2Pi to ease in.
+					// 	(
+					// 		Math.PI/2 							//ending at 3/2Pi
+					// 		* ((now - beginTime) / duration)	// multiplied by delta to get where we are on curve
+					// 	)
+					// ) * (Math.abs(targetScroll-beginScroll));	// scaled up to the amount that we need to move.
+
+					//Exponential easeIn
+					(-1 * Math.pow(((now - beginTime) / duration) - 1,2) + 1)	// y = -x^2 + 1
+					* (Math.abs(targetScroll-beginScroll));						// scaled up to the amount that we need to move.
+
+
+				//  console.log('anim: '+ (now-beginTime) +' + '+mod);
 
 				//Set the scroll
 				if( beginScroll < targetScroll ) { el.scrollTop = beginScroll + mod; }

@@ -14,6 +14,7 @@ module.exports = function(grunt) {
 
   var dirs = {
       output: "dist/",
+      generated: "generated/",
   };
 
   grunt.template.addDelimiters('html-comments-delimiters', '<!--%', '-->');
@@ -51,8 +52,8 @@ module.exports = function(grunt) {
             'css/topcoat-desktop-dark.css',
             'css/effeckt.css',
             'css/boilerplate.css',
-            'css/simptip.css',
-            'node_modules/perfect-scrollbar/dist/css/*.css',
+            '<%= dirs.generated %>simptip.css',
+            'node_modules/perfect-scrollbar/dist/css/perfect-scrollbar.css',
             'css/custom.css'
         ],
 		tasks: ['css']
@@ -78,9 +79,13 @@ module.exports = function(grunt) {
 		files: ['html/**/*.php'],
 		tasks: 'template-php'
 	  },
-	  stuff: {
+      stuff: {
 		files: ['files/**/*.*'],
 		tasks: 'copy:stuff'
+	  },
+      svgs: {
+		files: ['icons/*.svg'],
+		tasks: ['svgstore','template:html']
 	  },
       livereload: {
         options: {
@@ -100,7 +105,7 @@ module.exports = function(grunt) {
           {
             src : ['*.scss', 'effeckts/*.scss','modules/*.scss'],
             cwd : 'scss',
-            dest : 'css',
+            dest : '<%= dirs.generated %>',
             ext : '.css',
             expand : true
           }
@@ -115,10 +120,17 @@ module.exports = function(grunt) {
         html: { files: [{ dest: '<%= dirs.output %>', src: '*.html', cwd: 'html', expand:true }],
             options: {
                 delimiters: 'html-comments-delimiters',
-                data: function() { return {
-                    version: pkg.version,
-                    friendlyname: pkg.friendlyname,
-                }; }
+                data: function() {
+                    var svg = grunt.file.read(dirs.generated+'icons.include');
+
+                    svg = svg.replace(new RegExp('viewBox'),'style="visibility:hidden;width:0;height:0;" viewBox');
+
+                    return {
+                        version: pkg.version,
+                        friendlyname: pkg.friendlyname,
+                        compiledsvg: svg
+                    };
+                }
             }
         },
 
@@ -245,12 +257,12 @@ module.exports = function(grunt) {
       },
       tidycss: {
         src: [
-        'css/tidy.css',
-        'css/simptip.css',
+        '<%= dirs.generated %>tidy.css',
+        '<%= dirs.generated %>simptip.css',
         'node_modules/perfect-scrollbar/dist/css/perfect-scrollbar.css',
         'css/custom.css'
         ],
-        dest: 'css/tidy.concat.css'
+        dest: '<%= dirs.generated %>tidy.concat.css'
       }
     },
 
@@ -283,7 +295,7 @@ module.exports = function(grunt) {
         },
         files: [
           {
-            src : ['css/effeckt.css','css/main.css','css/simptip.css','css/topcoat-desktop-dark.css'],
+            src : ['css/effeckt.css','css/main.css','<%= dirs.generated %>simptip.css','css/topcoat-desktop-dark.css'],
             cwd : '',
             dest : '<%= dirs.output %>assets/',
             expand : true
@@ -296,7 +308,7 @@ module.exports = function(grunt) {
       },
       files: [
         {
-          src : ['css/tidy.concat.css'],
+          src : ['<%= dirs.generated %>tidy.concat.css'],
           cwd : '',
           dest : '.',
           expand : true
@@ -331,7 +343,7 @@ module.exports = function(grunt) {
                 ]
             },
             files: {
-                'css/tidy.css': ['html/index.html']
+                '<%= dirs.generated %>tidy.css': ['html/index.html']
             }
         }
     },
@@ -342,7 +354,7 @@ module.exports = function(grunt) {
         },
 		tidy: {
 			files: {
-				'<%= dirs.output %>assets/css/tidy.min.css': ['css/tidy.concat.css'],
+				'<%= dirs.output %>assets/css/tidy.min.css': ['<%= dirs.generated %>tidy.concat.css'],
 			}
 		}
 	},
@@ -382,7 +394,7 @@ module.exports = function(grunt) {
         },
         default : {
             files: {
-                '<%= dirs.output %>assets/img/icons.svg': ['icons/*.svg'],
+                '<%= dirs.generated %>icons.include': ['icons/*.svg'],
             }
         }
     },
@@ -390,16 +402,17 @@ module.exports = function(grunt) {
     uglify: {
 		options: {
 		  mangle: {
-			except: ['jQuery', 'angular', '$']
+			except: ['jQuery', 'angular', '$'],
+            screw_ie8: true,
+            reserveDOMProperties: true,
+            mangleProperties: true,
+            nameCache: '/tmp/grunt-uglify-cache.json'
 		  },
 		  compress: {
 			  //drop_console: true,
 			  //maxLineLen: 100,
-			  screwIE8: true,
-			  dead_code: true,
-			  mangleProperties: true,
-			  reserveDOMCache: true,
-			  nameCache: '/tmp/grunt-uglify-cache.json'
+			  screw_ie8: true,
+			  dead_code: true
 		  }
 		},
 		test: {

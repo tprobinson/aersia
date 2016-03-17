@@ -95,15 +95,9 @@ z-index:3;
 
 .status-dev { background: #66B; }
 
-
-
-
-/* Global animation junk! */
 body
 {
-	/*transition: all 0.25s ease;
-	transform: translate3d(0,0,0); /* Trick browser into using GPU */
-	font-family: sans-serif
+	font-family: "Titillium Web", sans-serif;
 }
 
 /* Fullscreen fix for Webkit */
@@ -222,22 +216,12 @@ li { list-style: none; }
 
 /* Flexbox layout! */
 /* Main layouts */
-/* Dark, bordery color: #036 */
-/* Lighter, main blue: #183C63 */
-/* Bright, activey blue: #4687ef */
-/* Orange: #FF9148 */
-/* Dull orange, the back of the scrollbar: #7f6157
-/* Dull purple, for things like timeline bg: #635d62 */
 body {
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
 	overflow:hidden;
 }
-
-/*audio {
-	width: 100%;
-}*/
 
 /* Touch style interface */
 .touch .controls-container {
@@ -286,7 +270,6 @@ body {
 	height: 5vh;
 	top: 50%;
 	transform: translateY(-50%);
-	background: #FF9148;
 }
 
 .touch #timeText, .touch #loadPct {
@@ -294,27 +277,55 @@ body {
 }
 
 /* For theming, collect all items of the same color and theme them here. */
-g, path,   {
-	/*fill: */
-	/*background-color: */ /* playedBar, playhead */
-	/*color: */
-	/*border-color:*/
+
+/* Orange: #FF9148 */
+/* Items with fill */ g, path { fill: #FF9148; transition: fill 0.5s ease; }
+/* Items with color */ .controls-container, .playlist-container { color: #FF9148; transition: color 0.5s ease; }
+/* Items with background-color */ #playedBar, #playhead, .active-song { background-color: #FF9148; transition: background-color 0.5s ease; }
+/* Items with special triangle border color */ #volumeBar { border-color: transparent #FF9148 transparent transparent; transition: border-color 0.5s ease; }
+
+/* Dark, bordery color: #036 */
+/* Items with color */ .playlist>li:hover, .active-song { color: #036; /* transition: color 0.5s ease; Transition on hover is annoying*/ }
+/* Items with border color */ .playlist>li { border-bottom: 1px solid #036; transition: border-color 0.5s ease; } /* I guess color overrides border-color if border is EVER specified without its shorthand syntax. Why. */
+
+/* Lighter, main blue: #183C63 */
+/* Items with background-color */ .playlist-container { background-color: #183C63; transition: background-color 0.5s ease; }
+
+/* Bright, activey blue: #4687ef */
+/* Items with background-color */ .playlist>li:hover { background-color: #4687ef; /*transition: background-color 0.5s ease; Transition on hover is annoying*/ }
+
+
+/* Dull orange, the back of the scrollbar: #7f6157 */
+/* oh boy I get to override the scrollbar */
+
+/* Dull purple, for things like timeline bg: #635d62 */
+/* Items with background-color */ #loadBar { background-color: #635d62; transition: background-color 0.5s ease; }
+
+/* Gradients */
+.controls-container { /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#c0ccd9+1,000c19+100 */
+	background: #c0ccd9; /* Old browsers */
+	background: -moz-linear-gradient(top, #c0ccd9 1%, #000c19 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(top, #c0ccd9 1%,#000c19 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to bottom, #c0ccd9 1%,#000c19 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c0ccd9', endColorstr='#000c19',GradientType=0 ); /* IE6-9 */
 }
+
+.controls-container>div { /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#3d6389+0,072d53+100 */
+	background: rgb(61,99,137); /* Old browsers */
+	/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzNkNjM4OSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwNzJkNTMiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top,  rgba(61,99,137,1) 0%, rgba(7,45,83,1) 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(top,  rgba(61,99,137,1) 0%,rgba(7,45,83,1) 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to bottom,  rgba(61,99,137,1) 0%,rgba(7,45,83,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3d6389', endColorstr='#072d53',GradientType=0 ); /* IE6-8 */
+}
+
 
 /* Styles for the player controls */
 .controls-container {
 	width: 100vw;
 	height: 19px;
 	display: flex;
-
-	color: #FF9148;
-
-	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#c0ccd9+1,000c19+100 */
-	background: #c0ccd9; /* Old browsers */
-	background: -moz-linear-gradient(top, #c0ccd9 1%, #000c19 100%); /* FF3.6-15 */
-	background: -webkit-linear-gradient(top, #c0ccd9 1%,#000c19 100%); /* Chrome10-25,Safari5.1-6 */
-	background: linear-gradient(to bottom, #c0ccd9 1%,#000c19 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c0ccd9', endColorstr='#000c19',GradientType=0 ); /* IE6-9 */
 }
 
 .controls-container div {
@@ -327,15 +338,6 @@ g, path,   {
 .controls-container>div {
 	margin: 1px;
 	margin-right: 0;
-
-	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#3d6389+0,072d53+100 */
-	background: rgb(61,99,137); /* Old browsers */
-	/* IE9 SVG, needs conditional override of 'filter' to 'none' */
-	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzNkNjM4OSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwNzJkNTMiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-	background: -moz-linear-gradient(top,  rgba(61,99,137,1) 0%, rgba(7,45,83,1) 100%); /* FF3.6-15 */
-	background: -webkit-linear-gradient(top,  rgba(61,99,137,1) 0%,rgba(7,45,83,1) 100%); /* Chrome10-25,Safari5.1-6 */
-	background: linear-gradient(to bottom,  rgba(61,99,137,1) 0%,rgba(7,45,83,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3d6389', endColorstr='#072d53',GradientType=0 ); /* IE6-8 */
 }
 
 .controls-container>div:last-of-type {
@@ -374,7 +376,6 @@ g, path,   {
 
 #timeline, #loadBar, #playedBar {
 	height: 5px;
-	background: transparent;
 }
 
 #timeline {
@@ -387,15 +388,14 @@ g, path,   {
 	width: 100%;
 }
 
-#loadBar { background-color: #635d62; right: 0%; }
-#playedBar { background-color: #FF9148; right: 100%; }
+#loadBar { right: 0%; }
+#playedBar { right: 100%; }
 
 #playhead{
 	position:absolute;
 	width: 2px;
 	height: 7px;
 	top: 5px;
-	background: #FF9148;
 }
 
 .volbox {
@@ -413,7 +413,6 @@ g, path,   {
 	height: 0;
 	border-style: solid;
 	border-width: 5px 20px 5px 0;
-	border-color: transparent #FF9148 transparent transparent;
 	-webkit-transform:rotate(360deg); /* fix for fuzzy */
 }
 
@@ -429,8 +428,6 @@ g, path,   {
 
 .playlist-container {
 	flex: 1 1 auto;
-	background-color: #183C63;
-	color: #FF9148;
 	position:relative;
 	height: 100%;
 	overflow:hidden;
@@ -439,22 +436,12 @@ g, path,   {
 .playlist {  position: relative; overflow:hidden; height: 100%;}
 
 .playlist>li {
-	border-bottom: 1px solid #036;
-	padding: 3px 10px;
+	padding: 0 10px;
+	line-height: 22px;
 	font-size: 12px;
 	overflow: visible; /* make this one big long pane */
 
 	top:0;
-}
-
-.playlist>li:hover {
-	background-color: #4687ef;
-	color: #036;
-}
-
-.active-song {
-	background-color: #FF9148;
-	color: #036;
 }
 
 header h1, .nav-tabs{ display: flex; flex: 1 1 auto; }

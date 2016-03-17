@@ -5,6 +5,9 @@
 /dist
 /dist/*
 
+/generated
+/generated/*
+
 /css/modules/*
 /css/*
 !/css/disabled/*

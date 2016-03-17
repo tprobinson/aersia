@@ -10,21 +10,21 @@
 </rdf:RDF>
 </metadata>
 <g transform="translate(377,-498.4)" display="none">
-<path fill-rule="evenodd" fill="#ff9148" d="m-372,504.4,5,3.5-5,3.5z"/>
+<path fill="#ff9148" d="m-372,504.4,5,3.5-5,3.5z" fill-rule="evenodd"/>
 </g>
-<g transform="translate(0,2)" fill="#ff9148" display="none">
+<g display="none" transform="translate(0,2)" fill="#ff9148">
 <rect style="color:#000000;" height="7" width="2" y="4" x="5" display="inline"/>
 <rect style="color:#000000;" height="7" width="2" y="4" x="8" display="inline"/>
 </g>
-<g transform="translate(0,2)" fill="#ff9148" display="none">
-<path fill-rule="evenodd" d="M10,4,5,7.5,10,11z"/>
+<g display="none" transform="translate(0,2)" fill="#ff9148">
+<path d="M10,4,5,7.5,10,11z" fill-rule="evenodd"/>
 <rect style="color:#000000;" height="7" width="2" y="4" x="5" display="inline"/>
 </g>
-<g transform="translate(0,2)" fill="#ff9148" display="none">
-<path fill-rule="evenodd" d="M5,4,10,7.5,5,11z"/>
+<g display="none" transform="translate(0,2)" fill="#ff9148">
+<path d="M5,4,10,7.5,5,11z" fill-rule="evenodd"/>
 <rect style="color:#000000;" height="7" width="2" y="4" x="8" display="inline"/>
 </g>
-<g transform="translate(0,2)" fill="#ff9148" display="none">
+<g display="none" transform="translate(0,2)" fill="#ff9148">
 <rect style="color:#000000;" height="5" width="5" y="5" x="5" display="inline"/>
 <path style="color:#000000;" d="M5,3h-2v2h1v-1h1z" display="inline"/>
 <path style="color:#000000;" d="M12,5v-2h-2v1h1v1z" display="inline"/>
@@ -33,6 +33,6 @@
 </g>
 <g fill="#ff9148" transform="translate(1,1)">
 <rect style="color:#000000;" height="3" width="2" y="6" x="5"/>
-<path style="color:#000000;" d="m8,6,2-2v7l-2-2z"/>
+<path style="color:#000000;" d="M8,5,11,2,11,13,8,10z"/>
 </g>
 </svg>
