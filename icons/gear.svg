@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" height="100%" width="100%" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 17 17">
+<metadata>
+<rdf:RDF>
+<cc:Work rdf:about="">
+<dc:format>image/svg+xml</dc:format>
+<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+<dc:title/>
+</cc:Work>
+</rdf:RDF>
+</metadata>
+<g transform="translate(377,-498.4)" display="none">
+<path fill-rule="evenodd" d="m-372,504.4,5,3.5-5,3.5z" fill="#ff9148"/>
+</g>
+<g fill="#ff9148" display="none" transform="translate(0,2)">
+<rect style="color:#000000;" height="7" width="2" y="4" x="5" display="inline"/>
+<rect style="color:#000000;" height="7" width="2" y="4" x="8" display="inline"/>
+</g>
+<g fill="#ff9148" display="none" transform="translate(0,2)">
+<path d="M10,4,5,7.5,10,11z" fill-rule="evenodd"/>
+<rect style="color:#000000;" height="7" width="2" y="4" x="5" display="inline"/>
+</g>
+<g fill="#ff9148" display="none" transform="translate(0,2)">
+<path d="M5,4,10,7.5,5,11z" fill-rule="evenodd"/>
+<rect style="color:#000000;" height="7" width="2" y="4" x="8" display="inline"/>
+</g>
+<g fill="#ff9148" display="none" transform="translate(0,2)">
+<rect style="color:#000000;" height="5" width="5" y="5" x="5" display="inline"/>
+<path style="color:#000000;" d="M5,3h-2v2h1v-1h1z" display="inline"/>
+<path style="color:#000000;" d="M12,5v-2h-2v1h1v1z" display="inline"/>
+<path style="color:#000000;" d="m10,12h2v-2h-1v1h-1z" display="inline"/>
+<path style="color:#000000;" d="m3,10v2h2v-1h-1v-1z" display="inline"/>
+</g>
+<path style="enable-background:accumulate;color:#000000;" fill-rule="nonzero" fill="#ff9148" d="m6.938,3.484-0.625,0.5,0.3438,1.031c-0.307,0.167-0.593,0.357-0.845,0.594l-0.8438-0.625-0.6875,0.4062-0.2188,0.7812,0.875,0.6562c-0.135,0.296-0.218,0.61-0.28,0.939h-1.094l-0.3125,0.75,0.3125,0.75h1.094c0.06199,0.3283,0.1443,0.6428,0.2812,0.9375l-0.875,0.6562,0.2812,0.7188,0.625,0.4688,0.8438-0.625c0.2514,0.2376,0.5373,0.4273,0.8438,0.5938l-0.3438,1.031,0.6562,0.4062,0.75,0.0625,0.3438-1.062c0.1645,0.02061,0.3299,0.0625,0.5,0.0625s0.3355-0.04189,0.5-0.0625l0.3438,1.062,0.75-0.0625,0.6562-0.4062-0.3438-1.031c0.3064-0.1664,0.5923-0.3562,0.8438-0.5938l0.8438,0.625,0.625-0.4688,0.2812-0.7188-0.875-0.6562c0.137-0.2947,0.2193-0.6092,0.2812-0.9375h1.094l0.1875-0.75-0.1875-0.75h-1.094c-0.05-0.315-0.14-0.629-0.27-0.924l0.875-0.6562-0.2188-0.7812-0.6875-0.4062-0.8438,0.625c-0.25-0.238-0.53-0.428-0.84-0.594l0.3438-1.031-0.625-0.5-0.7812,0.03125-0.3438,1.062c-0.1645-0.02061-0.3299-0.0625-0.5-0.0625s-0.3355,0.04189-0.5,0.0625l-0.336-1.062-0.781-0.032zm1.625,3.438,0.9375,0.3125,0.5938,0.7812,0,1-0.5938,0.7812-0.9375,0.3125-0.9375-0.3125-0.5938-0.7812,0-1,0.5938-0.7812,0.9375-0.3125z"/>
+</svg>

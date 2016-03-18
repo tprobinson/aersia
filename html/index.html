@@ -78,6 +78,9 @@
                 </div>
                 <div id="loadPct">0%</div>
             </div>
+            <div id="gear" ng-click="vipCtrl.toggleOptionsBox();">
+            <svg width="17px" height="17px" ><use xlink:href="#icon-gear" /></svg>
+            </div>
             <div id="fullscreen" ng-click="vipCtrl.toggleFullscreen();">
             <svg width="17px" height="17px" ><use xlink:href="#icon-fullscreen" /></svg>
             </div>
@@ -94,6 +97,23 @@
         </div>
 
         <div class="playlist-container hbox clearfix">
+            <div class="optionsbox" ng-show="vipCtrl.optionsBoxShown">
+                <div class='ownline'><span>Options</span></div>
+                <div class='ownline'>
+                    <div><label class="topcoat-checkbox"><input type="checkbox" name="autoplay" ng-model="vipCtrl.autoplay" /><div class="topcoat-checkbox__checkmark"></div>Autoplay</label></div>
+                    <div><label class="topcoat-checkbox"><input type="checkbox" name="touch" ng-model = "vipCtrl.touchLayoutEnabled" ng-click="vipCtrl.toggleTouchLayout();" /><div class="topcoat-checkbox__checkmark"></div>Touch Layout</label></div>
+                    <div><label class="topcoat-checkbox"><input type="checkbox" name="anims" ng-model="vipCtrl.animationsEnabled" /><div class="topcoat-checkbox__checkmark"></div>Scroll Smooth</label></div>
+                </div>
+                <div class="ownline">
+                    <div><label class="topcoat-checkbox"><input type="color" name="colorfocus" ng-model="vipCtrl.styles.focus.set" ng-change="vipCtrl.styleSet();" />Focus Color</label></div>
+                    <div><label class="topcoat-checkbox"><input type="color" name="colorbackground" ng-model="vipCtrl.styles.background.set" ng-change="vipCtrl.styleSet();" />Background Color</label></div>
+                    <div><label class="topcoat-checkbox"><input type="color" name="colorcontrast" ng-model="vipCtrl.styles.contrast.set" ng-change="vipCtrl.styleSet();" />Contrast Color</label></div>
+                    <div><label class="topcoat-checkbox"><input type="color" name="coloractive" ng-model="vipCtrl.styles.active.set" ng-change="vipCtrl.styleSet();" />Active Color</label></div>
+                    <div><label class="topcoat-checkbox"><input type="color" name="colorscrollbar" ng-model="vipCtrl.styles.scrollbar.set" ng-change="vipCtrl.styleSet();" />Scrollbar Color</label></div>
+                    <div><label class="topcoat-checkbox"><input type="color" name="colorloadbar" ng-model="vipCtrl.styles.loadbar.set" ng-change="vipCtrl.styleSet();" />Loadbar Color</label></div>
+                </div>
+            </div>
+
             <div class="playlist vbox clearfix" id="playlist">
                 <li ng-click="vipCtrl.playSong(song)"
                     ng-repeat="song in vipCtrl.songs track by song.index">{{song.creator}} - {{song.title}}</li>

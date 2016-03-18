@@ -32,12 +32,15 @@
 		//Initialize variables
 		this.songs = '';
 		this.curSong = '';
-		this.autoplay = 1;
+		this.autoplay = true;
 		this.playing = 0;
 		this.prevVolume = 0;
 		this.lastTimeText = '';
 		this.lastLoadText = '';
 		this.fullyLoaded = 0;
+		this.optionsBoxShown = false;
+		this.animationsEnabled = true;
+		this.touchLayoutEnabled = false;
 
 
 		//Grab DOM elements
@@ -54,7 +57,56 @@
 		this.volumeBar = document.getElementById("volumeBar");
 
 		this.styleSheet = document.createElement('style');
-		this.styleTextColor = '';
+		document.head.appendChild(this.styleSheet);
+		this.styles = {
+			"focus": { // Orange: #FF9148
+				"default": "#FF9148",
+				"set": "#FF9148",
+				"cssText": [
+					"g, path { fill: ","; transition: fill 0.5s ease; }\n"+
+					".controls-container, .playlist-container { color: ","; transition: color 0.5s ease; }\n"+
+					"#playedBar, #playhead, .active-song { background-color: ","; transition: background-color 0.5s ease; }\n"+
+					"#volumeBar { border-color: transparent "," transparent transparent; transition: border-color 0.5s ease; }"
+				]
+			},
+			"background": { // Lighter, main blue: #183C63
+				"default": "#183C63",
+				"set": "#183C63",
+				"cssText": [
+					".playlist-container { background-color: ##COLOR##; transition: background-color 0.5s ease; }"
+				]
+			},
+			"contrast": { // Dark, bordery color: #036
+				"default": "#003366",
+				"set": "#003366",
+				"cssText": [
+					".playlist>li:hover, .active-song { color: ","; }\n"+
+					".playlist>li { border-bottom: 1px solid ","; transition: border-color 0.5s ease; }"
+				]
+
+			},
+			"active": { // Bright, activey blue: #4687ef
+				"default": "#4687ef",
+				"set": "#4687ef",
+				"cssText": [
+					".playlist>li:hover { background-color: ","; }"
+				]
+			},
+			"scrollbar": { // Dull orange, the back of the scrollbar: #7f6157
+				"default": "#7f6157",
+				"set": "#7f6157",
+				"cssText": [
+
+				]
+			},
+			"loadbar": { // Dull purple, for things like timeline bg: #635d62
+				"default": "#635d62",
+				"set": "#635d62",
+				"cssText": [
+					"#loadBar { background-color: ","; transition: background-color 0.5s ease; }"
+				]
+			}
+		};
 
 		//Initalize scrollbar
 		Ps.initialize(this.playlist, {
@@ -66,6 +118,9 @@
 		addEvent(window,"resize", function() {
 			Ps.update(this.playlist);
 		}.bind(this));
+
+		//Check if the body has the touch class as given by Modernizr
+		if( hasClass(document.body,'touch') ) { this.touchLayoutEnabled = true; }
 
 		//Hook audio player
 		//This will be called whenever a song ends.
@@ -232,11 +287,27 @@
 
 			//console.log('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+height*this.curSong.index);
 
-			//Make the playlist scroll to the currently playing song.
-			scrollToSmooth(this.playlist,height * this.curSong.index, 600);
-			// this.playlist.scrollTop = height*this.curSong.index;
-			// Ps.update(this.playlist); // update the scrollbar
+			if( this.animationsEnabled )
+			{
+				//Make the playlist scroll to the currently playing song.
+				scrollToSmooth(this.playlist,height * this.curSong.index, 600);
+			}
+			else
+			{
+				this.playlist.scrollTop = height*this.curSong.index;
+				// Ps.update(this.playlist); // update the scrollbar
+			}
+		}.bind(this);
 
+		this.toggleOptionsBox = function() {
+			this.optionsBoxShown = !this.optionsBoxShown;
+		}.bind(this);
+
+		this.toggleTouchLayout = function() {
+			toggleClass(document.body,'touch');
+
+			//Trigger the playlist to scroll in case the layout is messed up
+			this.scrollToSong(this.curSong);
 		}.bind(this);
 
 		/////
@@ -297,6 +368,19 @@
 			var min = Math.floor(sec/60);
 			sec = Math.floor(sec % 60);
 			return zeroPad(min,2)+':'+zeroPad(sec,2);
+		}.bind(this);
+
+		this.styleSet = function() {
+			var string = '';
+			angular.forEach(this.styles, function(k,type) {
+				if( this.styles[type].set !== null && this.styles[type].cssText !== null )
+				{
+					string += this.styles[type].cssText.join(this.styles[type].set);
+				}
+			}.bind(this));
+
+			this.styleSheet.innerHTML = ''; // dumps memory of this object
+			this.styleSheet.innerHTML = string;
 		}.bind(this);
 
 		/////
@@ -406,6 +490,16 @@ function removeClass(el, className) {
     var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
     el.className=el.className.replace(reg, ' ');
   }
+}
+
+function toggleClass(el, className) {
+	console.log(el);
+	console.log(className);
+	if( hasClass(el,className) ) {
+		removeClass(el,className);
+	} else {
+		addClass(el,className);
+	}
 }
 
 function addEvent(object, type, callback) {

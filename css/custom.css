@@ -224,55 +224,55 @@ body {
 }
 
 /* Touch style interface */
-.touch .controls-container {
+body.touch .controls-container {
 	order:2;
 	height: 7vh;
 }
 
-.touch .controls-container>div, .touch #volumeMute {
+body.touch .controls-container>div, body.touch #volumeMute {
 	width: 7vh;
 	height: 7vh;
 }
-.touch .controls-container svg {
+body.touch .controls-container svg {
 	width: 100%;
 	height: 100%;
 }
 
-.touch .playlist-container {
+body.touch .playlist-container {
 	height: 93vh;
 }
 
-.touch .controls-container .volbox {
+body.touch .controls-container .volbox {
 	width: auto;
 }
 
-.touch #volumeMax {
+body.touch #volumeMax {
 	width: 7vh;
 	height: 7vh;
 }
 
 /* An invisible hitbox to max volume */
-.touch #volumeMax {
+body.touch #volumeMax {
 	width: 2vh;
 	height: 7vh;
 }
 
-.touch #timeline, .touch #loadBar, .touch #playedBar {
+body.touch #timeline, body.touch #loadBar, body.touch #playedBar {
 	height: 3vh;
 }
 
-.touch #volumeBar {
+body.touch #volumeBar {
 	border-width: 2vh 11vh 2vh 0;
 }
 
-.touch #playhead{
+body.touch #playhead{
 	width: 0.25vh;
 	height: 5vh;
 	top: 50%;
 	transform: translateY(-50%);
 }
 
-.touch #timeText, .touch #loadPct {
+body.touch #timeText, body.touch #loadPct {
 	font-size: 2vh;
 }
 
@@ -422,6 +422,83 @@ body {
 	height: 17px;
 }
 
+body.touch .optionsbox {
+	top: auto;
+	left: 0;
+	right: 0;
+	bottom: 1vh;
+
+	margin: 0 2.5vw;
+
+	/*flex-direction: row;*/
+}
+
+.optionsbox {
+	position: absolute;
+	z-index: 11;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+
+	right: 15px;
+	top: 5px;
+	border-radius: 10px;
+	border: 2px solid #eee;
+	background-color: rgba(0,0,0,0.8);
+
+	color: #eee;
+}
+
+body.touch .ownline label /* to expand the hitbox */
+{
+	display: flex;
+	flex: 1 1 auto;
+	justify-content: center;
+
+	padding: 2vh 0;
+}
+
+.ownline label {
+	padding: 5px 0;
+}
+
+body.touch .ownline>div {
+	margin: 0.5vh 1vw;
+}
+
+.ownline>div {
+	display: flex;
+	flex: 1 1 auto;
+
+	margin: 3px 10px;
+
+	justify-content: space-around;
+}
+
+.optionsbox .topcoat-checkbox__checkmark,
+.optionsbox input
+{ margin-right: 10px; }
+
+.ownline {
+	float:left; clear:left;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	border-top: 1px solid #eee;
+	margin: 10px;
+	margin-bottom: 0;
+	padding: 3px 10px;
+}
+
+body.touch .ownline {
+	flex-direction: row;
+}
+
+.ownline:first-of-type { border: 0; }
+
+.optionsbox span { text-align:center; }
 
 
 /* Styles for the second pane */
