@@ -270,16 +270,11 @@ module.exports = function(grunt) {
       options: {
         base: 'dist'
       },
-      forked: {
-        options: {
-          base: 'dist'
-        },
-        src: ['**/*']
-      },
-      remote: {
+      io: {
         options: {
           base: 'dist',
-          repo: 'https://github.com/tprobinson/vip.git'
+          repo: 'git@github.com:tprobinson/tprobinson.github.io.git',
+          branch: 'master'
         },
         src: ['**/*']
       }
