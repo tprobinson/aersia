@@ -98,20 +98,39 @@
 
         <div class="playlist-container hbox clearfix">
             <div class="optionsbox" ng-show="vipCtrl.optionsBoxShown">
-                <div class='ownline'><span>Options</span></div>
-                <div class='ownline'>
+                <section><span>Options</span></section>
+                <div class='sep'></div>
+                <section>
                     <div><label class="topcoat-checkbox"><input type="checkbox" name="autoplay" ng-model="vipCtrl.autoplay" /><div class="topcoat-checkbox__checkmark"></div>Autoplay</label></div>
                     <div><label class="topcoat-checkbox"><input type="checkbox" name="touch" ng-model = "vipCtrl.touchLayoutEnabled" ng-click="vipCtrl.toggleTouchLayout();" /><div class="topcoat-checkbox__checkmark"></div>Touch Layout</label></div>
                     <div><label class="topcoat-checkbox"><input type="checkbox" name="anims" ng-model="vipCtrl.animationsEnabled" /><div class="topcoat-checkbox__checkmark"></div>Scroll Smooth</label></div>
-                </div>
-                <div class="ownline">
-                    <div><label class="topcoat-checkbox"><input type="color" name="colorfocus" ng-model="vipCtrl.styles.focus.set" ng-change="vipCtrl.styleSet();" />Focus Color</label></div>
-                    <div><label class="topcoat-checkbox"><input type="color" name="colorbackground" ng-model="vipCtrl.styles.background.set" ng-change="vipCtrl.styleSet();" />Background Color</label></div>
-                    <div><label class="topcoat-checkbox"><input type="color" name="colorcontrast" ng-model="vipCtrl.styles.contrast.set" ng-change="vipCtrl.styleSet();" />Contrast Color</label></div>
-                    <div><label class="topcoat-checkbox"><input type="color" name="coloractive" ng-model="vipCtrl.styles.active.set" ng-change="vipCtrl.styleSet();" />Active Color</label></div>
-                    <div><label class="topcoat-checkbox"><input type="color" name="colorscrollbar" ng-model="vipCtrl.styles.scrollbar.set" ng-change="vipCtrl.styleSet();" />Scrollbar Color</label></div>
-                    <div><label class="topcoat-checkbox"><input type="color" name="colorloadbar" ng-model="vipCtrl.styles.loadbar.set" ng-change="vipCtrl.styleSet();" />Loadbar Color</label></div>
-                </div>
+                </section>
+                <div class='sep'></div>
+                <section><span>Colors</span></section>
+                <div></div>
+                <section>
+                    <div><label><input type="color" name="colorfocus" ng-model="vipCtrl.styles.focus.set" ng-change="vipCtrl.styleSet('focus');" />Focus</label></div>
+                    <div><label><input type="color" name="colorbackground" ng-model="vipCtrl.styles.background.set" ng-change="vipCtrl.styleSet('background');" />Background</label></div>
+                    <div><label><input type="color" name="colorcontrast" ng-model="vipCtrl.styles.contrast.set" ng-change="vipCtrl.styleSet('contrast');" />Contrast</label></div>
+                    <div><label><input type="color" name="coloractive" ng-model="vipCtrl.styles.active.set" ng-change="vipCtrl.styleSet('active');" />Active</label></div>
+                    <div><label><input type="color" name="colorscrollbar" ng-model="vipCtrl.styles.scrollbar.set" ng-change="vipCtrl.styleSet('scrollbar');" />Scrollbar</label></div>
+                    <div><label><input type="color" name="colorloadbar" ng-model="vipCtrl.styles.loadbar.set" ng-change="vipCtrl.styleSet('loadbar');" />Loadbar</label></div>
+                    <div class='sep'></div>
+                    <section>
+                        <span>Controls Border</span>
+                        <div>
+                            <input type="color" name="colorcontrolsoutstart" ng-model="vipCtrl.styles.controlsout.set['0%']" ng-change="vipCtrl.gradientSet('controlsout','0%');" />
+                            <input type="color" name="colorcontrolsoutend" ng-model="vipCtrl.styles.controlsout.set['100%']" ng-change="vipCtrl.gradientSet('controlsout','100%');" />
+                        </div>
+                    </section>
+                    <section>
+                        <span>Controls</span>
+                        <div>
+                            <input type="color" name="colorcontrolsinstart" ng-model="vipCtrl.styles.controlsin.set['0%']" ng-change="vipCtrl.gradientSet('controlsin','0%');" />
+                            <input type="color" name="colorcontrolsinend" ng-model="vipCtrl.styles.controlsin.set['100%']" ng-change="vipCtrl.gradientSet('controlsin','100%');" />
+                        </div>
+                    </section>
+                </section>
             </div>
 
             <div class="playlist vbox clearfix" id="playlist">

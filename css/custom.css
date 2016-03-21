@@ -276,47 +276,56 @@ body.touch #timeText, body.touch #loadPct {
 	font-size: 2vh;
 }
 
+body.touch .playlist>li {
+	padding: 0 1vw;
+	line-height: 3vh;
+	font-size: 2vh;
+}
+
 /* For theming, collect all items of the same color and theme them here. */
 
 /* Orange: #FF9148 */
-/* Items with fill */ g, path { fill: #FF9148; transition: fill 0.5s ease; }
-/* Items with color */ .controls-container, .playlist-container { color: #FF9148; transition: color 0.5s ease; }
-/* Items with background-color */ #playedBar, #playhead, .active-song { background-color: #FF9148; transition: background-color 0.5s ease; }
-/* Items with special triangle border color */ #volumeBar { border-color: transparent #FF9148 transparent transparent; transition: border-color 0.5s ease; }
+/* Items with fill */ g, path { fill: #FF9148; }
+/* Items with color */ .controls-container, .playlist-container, .optionsbox { color: #FF9148; }
+/* Items with background-color */ #playedBar, #playhead, .active-song { background-color: #FF9148; }
+/* Items with border color */ /*.optionsbox { border-color: #FF9148; }*/
+/* Items with special triangle border color */ #volumeBar { border-color: transparent #FF9148 transparent transparent; }
 
 /* Dark, bordery color: #036 */
-/* Items with color */ .playlist>li:hover, .active-song { color: #036; /* transition: color 0.5s ease; Transition on hover is annoying*/ }
-/* Items with border color */ .playlist>li { border-bottom: 1px solid #036; transition: border-color 0.5s ease; } /* I guess color overrides border-color if border is EVER specified without its shorthand syntax. Why. */
+/* Items with color */ .playlist>li:hover, .active-song { color: #003366; }
+/* Items with border color */ .optionsbox, .sep, .playlist>li, section, .ps-theme-vip>.ps-scrollbar-y-rail, .ps-theme-vip>.ps-scrollbar-x-rail { border-color: #003366; }
 
 /* Lighter, main blue: #183C63 */
-/* Items with background-color */ .playlist-container { background-color: #183C63; transition: background-color 0.5s ease; }
+/* Items with background-color */ .playlist-container, .optionsbox { background-color: #183C63; }
 
 /* Bright, activey blue: #4687ef */
-/* Items with background-color */ .playlist>li:hover { background-color: #4687ef; /*transition: background-color 0.5s ease; Transition on hover is annoying*/ }
+/* Items with background-color */ .playlist>li:hover { background-color: #4687ef; }
 
 
 /* Dull orange, the back of the scrollbar: #7f6157 */
 /* oh boy I get to override the scrollbar */
+/* this should be an SCSS include later */
+.ps-theme-vip.ps-active-x>.ps-scrollbar-x-rail, .ps-theme-vip.ps-active-y>.ps-scrollbar-y-rail { background-color: #7f6157; }
 
 /* Dull purple, for things like timeline bg: #635d62 */
-/* Items with background-color */ #loadBar { background-color: #635d62; transition: background-color 0.5s ease; }
+/* Items with background-color */ #loadBar { background-color: #635d62; }
 
 /* Gradients */
 .controls-container { /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#c0ccd9+1,000c19+100 */
 	background: #c0ccd9; /* Old browsers */
-	background: -moz-linear-gradient(top, #c0ccd9 1%, #000c19 100%); /* FF3.6-15 */
-	background: -webkit-linear-gradient(top, #c0ccd9 1%,#000c19 100%); /* Chrome10-25,Safari5.1-6 */
-	background: linear-gradient(to bottom, #c0ccd9 1%,#000c19 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	background: -moz-linear-gradient(top, #c0ccd9 0%, #000c19 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(top, #c0ccd9 0%, #000c19 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to bottom, #c0ccd9 0%, #000c19 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c0ccd9', endColorstr='#000c19',GradientType=0 ); /* IE6-9 */
 }
 
 .controls-container>div { /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#3d6389+0,072d53+100 */
-	background: rgb(61,99,137); /* Old browsers */
+	background: #3D6389; /* Old browsers */
 	/* IE9 SVG, needs conditional override of 'filter' to 'none' */
 	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzNkNjM4OSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwNzJkNTMiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-	background: -moz-linear-gradient(top,  rgba(61,99,137,1) 0%, rgba(7,45,83,1) 100%); /* FF3.6-15 */
-	background: -webkit-linear-gradient(top,  rgba(61,99,137,1) 0%,rgba(7,45,83,1) 100%); /* Chrome10-25,Safari5.1-6 */
-	background: linear-gradient(to bottom,  rgba(61,99,137,1) 0%,rgba(7,45,83,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	background: -moz-linear-gradient(top, #3D6389 0%, #072d53 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(top, #3D6389 0%, #072d53 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to bottom, #3D6389 0%, #072d53 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3d6389', endColorstr='#072d53',GradientType=0 ); /* IE6-8 */
 }
 
@@ -444,13 +453,13 @@ body.touch .optionsbox {
 	right: 15px;
 	top: 5px;
 	border-radius: 10px;
-	border: 2px solid #eee;
-	background-color: rgba(0,0,0,0.8);
+	border-width: 2px;
+	border-style: solid;
 
-	color: #eee;
+	box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.5)
 }
 
-body.touch .ownline label /* to expand the hitbox */
+body.touch section label /* to expand the hitbox */
 {
 	display: flex;
 	flex: 1 1 auto;
@@ -459,15 +468,15 @@ body.touch .ownline label /* to expand the hitbox */
 	padding: 2vh 0;
 }
 
-.ownline label {
+section label {
 	padding: 5px 0;
 }
 
-body.touch .ownline>div {
+body.touch section>div {
 	margin: 0.5vh 1vw;
 }
 
-.ownline>div {
+section>div {
 	display: flex;
 	flex: 1 1 auto;
 
@@ -477,29 +486,37 @@ body.touch .ownline>div {
 }
 
 .optionsbox .topcoat-checkbox__checkmark,
-.optionsbox input
+.optionsbox input:first-child
 { margin-right: 10px; }
 
-.ownline {
-	float:left; clear:left;
+section, .sep { float:left; clear:left; }
 
+section {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-around;
-	border-top: 1px solid #eee;
-	margin: 10px;
-	margin-bottom: 0;
+	flex-wrap: wrap;
+
 	padding: 3px 10px;
 }
 
-body.touch .ownline {
+body.touch section {
 	flex-direction: row;
 }
 
-.ownline:first-of-type { border: 0; }
+body.touch .sep {
+	width: 93vw;
+}
+
+.sep {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+
+	margin: 5px 10px;
+	height: 0;
+}
 
 .optionsbox span { text-align:center; }
-
 
 /* Styles for the second pane */
 
@@ -519,6 +536,9 @@ body.touch .ownline {
 	overflow: visible; /* make this one big long pane */
 
 	top:0;
+
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
 }
 
 header h1, .nav-tabs{ display: flex; flex: 1 1 auto; }

@@ -56,32 +56,31 @@
 		this.loadPct = document.getElementById("loadPct");
 		this.volumeBar = document.getElementById("volumeBar");
 
-		this.styleSheet = document.createElement('style');
-		document.head.appendChild(this.styleSheet);
 		this.styles = {
 			"focus": { // Orange: #FF9148
 				"default": "#FF9148",
 				"set": "#FF9148",
 				"cssText": [
-					"g, path { fill: ","; transition: fill 0.5s ease; }\n"+
-					".controls-container, .playlist-container { color: ","; transition: color 0.5s ease; }\n"+
-					"#playedBar, #playhead, .active-song { background-color: ","; transition: background-color 0.5s ease; }\n"+
-					"#volumeBar { border-color: transparent "," transparent transparent; transition: border-color 0.5s ease; }"
+					"g, path { fill: ","; }\n"+
+					".controls-container, .playlist-container, .optionsbox { color: ","; }\n"+
+					"#playedBar, #playhead, .active-song { background-color: ","; }\n"+
+					"#volumeBar { border-color: transparent "," transparent transparent; }"
 				]
 			},
 			"background": { // Lighter, main blue: #183C63
 				"default": "#183C63",
 				"set": "#183C63",
 				"cssText": [
-					".playlist-container { background-color: ##COLOR##; transition: background-color 0.5s ease; }"
+					".playlist-container, .optionsbox { background-color:","; }"
 				]
 			},
 			"contrast": { // Dark, bordery color: #036
 				"default": "#003366",
 				"set": "#003366",
+				"compiled": "",
 				"cssText": [
 					".playlist>li:hover, .active-song { color: ","; }\n"+
-					".playlist>li { border-bottom: 1px solid ","; transition: border-color 0.5s ease; }"
+					".optionsbox, .sep, .playlist>li, section, .ps-theme-vip>.ps-scrollbar-y-rail, .ps-theme-vip>.ps-scrollbar-x-rail { border-color: ","; }\n"
 				]
 
 			},
@@ -96,17 +95,32 @@
 				"default": "#7f6157",
 				"set": "#7f6157",
 				"cssText": [
-
+					".ps-theme-vip.ps-active-x>.ps-scrollbar-x-rail, .ps-theme-vip.ps-active-y>.ps-scrollbar-y-rail { background-color: ","; }"
 				]
 			},
 			"loadbar": { // Dull purple, for things like timeline bg: #635d62
 				"default": "#635d62",
 				"set": "#635d62",
 				"cssText": [
-					"#loadBar { background-color: ","; transition: background-color 0.5s ease; }"
+					"#loadBar { background-color: ","; }"
 				]
+			},
+			"controlsout": { // The border around the controls: start #c0ccd9, end #000c19
+				"default": {"0%": "#c0ccd9", "100%": "#000c19"},
+				"set": {"0%": "#c0ccd9", "100%": "#000c19"},
+				"cssText": ".controls-container"
+			},
+			"controlsin": { // The inside of the controls: start #3D6389, end #072d53
+				"default": {"0%": "#3D6389", "100%": "#072d53"},
+				"set": {"0%": "#3D6389", "100%": "#072d53"},
+				"cssText": ".controls-container>div"
 			}
 		};
+
+		//Give each style its own stylesheet node.
+		angular.forEach(this.styles, function(curValue,type) {
+			curValue.node = document.head.appendChild(document.createElement('style'));
+		});
 
 		//Initalize scrollbar
 		Ps.initialize(this.playlist, {
@@ -370,17 +384,22 @@
 			return zeroPad(min,2)+':'+zeroPad(sec,2);
 		}.bind(this);
 
-		this.styleSet = function() {
-			var string = '';
-			angular.forEach(this.styles, function(k,type) {
-				if( this.styles[type].set !== null && this.styles[type].cssText !== null )
-				{
-					string += this.styles[type].cssText.join(this.styles[type].set);
-				}
-			}.bind(this));
+		this.styleSet = function(type) {
+			//Recompile the selected style's node
+			this.styles[type].node.innerHTML = this.styles[type].cssText.join(this.styles[type].set);
+		}.bind(this);
 
-			this.styleSheet.innerHTML = ''; // dumps memory of this object
-			this.styleSheet.innerHTML = string;
+		this.gradientSet = function(type,stop) {
+			//This is really bad. Maybe find a library for this later.
+			var begin = this.styles[type].set["0%"];
+			var end = this.styles[type].set["100%"];
+			this.styles[type].node.innerHTML = this.styles[type].cssText + " { \n"+
+			"background: "+begin+";\n"+ //Old browsers
+			"background: -moz-linear-gradient(top, "+begin+" 0%, "+end+" 100%);\n"+ // FF3.6-15
+			"background: -webkit-linear-gradient(top, "+begin+" 0%, "+end+" 100%);\n"+ // Chrome10-25,Safari5.1-6
+			"background: linear-gradient(to bottom, "+begin+" 0%, "+end+" 100%);\n"+ // W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+
+			"filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='"+begin+"', endColorstr='"+end+"',GradientType=0 );\n"+ // IE6-9
+			"}";
 		}.bind(this);
 
 		/////
@@ -493,8 +512,6 @@ function removeClass(el, className) {
 }
 
 function toggleClass(el, className) {
-	console.log(el);
-	console.log(className);
 	if( hasClass(el,className) ) {
 		removeClass(el,className);
 	} else {
