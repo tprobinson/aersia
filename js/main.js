@@ -35,6 +35,8 @@
 		this.autoplay = true;
 		this.playing = 0;
 		this.prevVolume = 0;
+
+		// UI variables
 		this.lastTimeText = '';
 		this.lastLoadText = '';
 		this.fullyLoaded = 0;
@@ -42,6 +44,22 @@
 		this.animationsEnabled = true;
 		this.touchLayoutEnabled = false;
 
+		//js-cookie variables
+		this.cookieName = "vip";
+		this.cookieConfig = { };
+
+		//Playlists
+		this.selectedPlaylist = "VIP";
+		this.playlists = {
+			"VIP": {
+				"url": "http://vip.aersia.net/roster.xml",
+				"longName": "Vidya Intarweb Playlist",
+			},
+			"WAP": {
+				"url": "http://wap.aersia.net/roster.xml",
+				"longName": "Weeaboo Anime Playlist",
+			}
+		};
 
 		//Grab DOM elements
 		this.player = document.getElementsByTagName("audio")[0];
@@ -56,73 +74,92 @@
 		this.loadPct = document.getElementById("loadPct");
 		this.volumeBar = document.getElementById("volumeBar");
 
-		this.styles = {
-			"focus": { // Orange: #FF9148
-				"default": "#FF9148",
-				"set": "#FF9148",
-				"cssText": [
-					"g, path { fill: ","; }\n"+
-					".controls-container, .playlist-container, .optionsbox { color: ","; }\n"+
-					"#playedBar, #playhead, .active-song { background-color: ","; }\n"+
-					"#volumeBar { border-color: transparent "," transparent transparent; }"
-				]
-			},
-			"background": { // Lighter, main blue: #183C63
-				"default": "#183C63",
-				"set": "#183C63",
-				"cssText": [
-					".playlist-container, .optionsbox { background-color:","; }"
-				]
-			},
-			"contrast": { // Dark, bordery color: #036
-				"default": "#003366",
-				"set": "#003366",
-				"compiled": "",
-				"cssText": [
-					".playlist>li:hover, .active-song { color: ","; }\n"+
-					".optionsbox, .sep, .playlist>li, section, .ps-theme-vip>.ps-scrollbar-y-rail, .ps-theme-vip>.ps-scrollbar-x-rail { border-color: ","; }\n"
-				]
+		/////
+		//Styles and Presets
 
+		this.selectedPreset = "Default";
+
+		// Presets. This could be loaded from XHR later.
+		this.presetStyles = {
+			"Default": {
+				"focus": "#FF9148", // Orange
+				"background": "#183C63", // Lighter, main blue
+				"contrast": "#003366", // Dark, bordery color
+				"active": "#4687ef", // Bright, activey blue
+				"scrollbar": "#7f6157", // Dull orange, the back of the scrollbar
+				"loadbar": "#635d62", // Dull purple, for things like timeline bg
+				"controlsout": {"0%": "#c0ccd9", "100%": "#000c19"}, // The border around the controls
+				"controlsin": {"0%": "#3D6389", "100%": "#072d53"}, // The inside of the controls
 			},
-			"active": { // Bright, activey blue: #4687ef
-				"default": "#4687ef",
-				"set": "#4687ef",
-				"cssText": [
-					".playlist>li:hover { background-color: ","; }"
-				]
-			},
-			"scrollbar": { // Dull orange, the back of the scrollbar: #7f6157
-				"default": "#7f6157",
-				"set": "#7f6157",
-				"cssText": [
-					".ps-theme-vip.ps-active-x>.ps-scrollbar-x-rail, .ps-theme-vip.ps-active-y>.ps-scrollbar-y-rail { background-color: ","; }"
-				]
-			},
-			"loadbar": { // Dull purple, for things like timeline bg: #635d62
-				"default": "#635d62",
-				"set": "#635d62",
-				"cssText": [
-					"#loadBar { background-color: ","; }"
-				]
-			},
-			"controlsout": { // The border around the controls: start #c0ccd9, end #000c19
-				"default": {"0%": "#c0ccd9", "100%": "#000c19"},
-				"set": {"0%": "#c0ccd9", "100%": "#000c19"},
-				"cssText": ".controls-container"
-			},
-			"controlsin": { // The inside of the controls: start #3D6389, end #072d53
-				"default": {"0%": "#3D6389", "100%": "#072d53"},
-				"set": {"0%": "#3D6389", "100%": "#072d53"},
-				"cssText": ".controls-container>div"
+			"Cherry": {
+				"focus": "#FF9999", // Orange
+				"background": "#440000", // Lighter, main blue
+				"contrast": "#660000", // Dark, bordery color
+				"active": "#FF9999", // Bright, activey blue
+				"scrollbar": "#340505", // Dull orange, the back of the scrollbar
+				"loadbar": "#340505", // Dull purple, for things like timeline bg
+				"controlsout": {"0%": "#d9c0c6", "100%": "#19000a"}, // The border around the controls
+				"controlsin": {"0%": "#d4223a", "100%": "#530615"}, // The inside of the controls
 			}
 		};
 
-		//Give each style its own stylesheet node.
-		angular.forEach(this.styles, function(curValue,type) {
-			curValue.node = document.head.appendChild(document.createElement('style'));
-		});
+		//Currently set styles
+		this.currentStyles = {
+			"focus": "#FF9148", // Orange
+			"background": "#183C63", // Lighter, main blue
+			"contrast": "#003366", // Dark, bordery color
+			"active": "#4687ef", // Bright, activey blue
+			"scrollbar": "#7f6157", // Dull orange, the back of the scrollbar
+			"loadbar": "#635d62", // Dull purple, for things like timeline bg
+			"controlsout": {"0%": "#c0ccd9", "100%": "#000c19"}, // The border around the controls
+			"controlsin": {"0%": "#3D6389", "100%": "#072d53"}, // The inside of the controls
+		};
 
-		//Initalize scrollbar
+		// CSS definitions of where all the colors go
+		this.styleCssText = {
+			"focus": [
+				"g, path { fill: ","; }\n"+
+				".controls-container, .playlist-container, .optionsbox { color: ","; }\n"+
+				"#playedBar, #playhead, .active-song { background-color: ","; }\n"+
+				"#volumeBar { border-color: transparent "," transparent transparent; }"
+			],
+			"background": [
+				".playlist-container, .optionsbox { background-color:","; }"
+			],
+			"contrast": [
+				".playlist>li:hover, .active-song { color: ","; }\n"+
+				".optionsbox, .sep, .playlist>li, section, .ps-theme-vip>.ps-scrollbar-y-rail, .ps-theme-vip>.ps-scrollbar-x-rail { border-color: ","; }\n"
+			],
+			"active": [
+				".playlist>li:hover { background-color: ","; }"
+			],
+			"scrollbar": [
+				".ps-theme-vip.ps-active-x>.ps-scrollbar-x-rail, .ps-theme-vip.ps-active-y>.ps-scrollbar-y-rail { background-color: ","; }"
+			],
+			"loadbar": [
+				"#loadBar { background-color: ","; }"
+			],
+		};
+
+		this.styleCssGradientText = {
+			"controlsout": ".controls-container",
+			"controlsin": ".controls-container>div",
+		};
+
+		this.styleNodes = {};
+
+		//Give each style its own stylesheet node.
+		Object.keys(this.styleCssText).forEach(function(val) {
+			this.styleNodes[val] = document.head.appendChild(document.createElement('style'));
+		}.bind(this));
+
+		Object.keys(this.styleCssGradientText).forEach(function(val) {
+			this.styleNodes[val] = document.head.appendChild(document.createElement('style'));
+		}.bind(this));
+
+
+		/////
+		// Initalize scrollbar
 		Ps.initialize(this.playlist, {
 			theme: 'vip',
 			minScrollbarLength: 20
@@ -133,10 +170,16 @@
 			Ps.update(this.playlist);
 		}.bind(this));
 
+
+		/////
 		//Check if the body has the touch class as given by Modernizr
+
 		if( hasClass(document.body,'touch') ) { this.touchLayoutEnabled = true; }
 
+
+		/////
 		//Hook audio player
+
 		//This will be called whenever a song ends.
 		addEvent(this.player,"ended", function() {
 			if( this.autoplay )
@@ -244,13 +287,44 @@
 		}.bind(this);
 		addEvent(this.player,"timeupdate", this.timeUpdate);
 
-		//Other functions
+		/////
+		// Player functions
+		this.loadPlaylist = function() {
+			if( this.selectedPlaylist != null && this.selectedPlaylist != "" && this.playlists[this.selectedPlaylist] != null )
+			{
+				//Stop the song.
+				this.pause();
+
+				$http.get(this.playlists[this.selectedPlaylist].url)
+					.then(function(res) {
+						// Prepare the playlist for use
+
+						//Convert it from XML to JSON
+						var playlist = x2js.xml2js(res.data).playlist.trackList.track;
+
+						//Give the song list an index for each song.
+						playlist.forEach(function(curValue,index,array) { curValue.index = index; });
+
+						//Set the song list
+						this.songs = playlist;
+
+						// Give Angular's list a little time to update, since it's stupid.
+						window.setTimeout(function(){
+							// Then start playing, if we should do that.
+							if( this.autoplay )
+							{ this.shuffleSong(); }
+						}.bind(this),500);
+				}.bind(this));
+			}
+		}.bind(this);
+
+
 		this.playSong = function(song) {
 
 			//Stop and unregister the old song.
 			this.pause();
 			this.player.src = '';
-			if( this.curSong !== null && this.curSong !== '' )
+			if( this.curSong != null && this.curSong !== '' )
 			{ removeClass(this.playlist.children[this.curSong.index],'active-song'); }
 			this.curSong = '';
 
@@ -278,54 +352,8 @@
 			return song.index === this.curSong.index;
 		}.bind(this);
 
-		this.init = function() {
-
-			//Give the song list an index for each song.
-			this.songs.forEach(function(curValue,index,array) { curValue.index = index; });
-
-			//Assign it to the GUI list.
-			$scope.songs = this.songs;
-
-			//Make the scrollbar init happen soon
-			window.setTimeout(function(){
-				if( this.autoplay )
-				{ this.shuffleSong(); }
-			}.bind(this),1000); // scrollbar initialization
-
-		}.bind(this);
-
-		this.scrollToSong = function(song) {
-
-			//Get the elements' height, since this could change.
-			var height = this.playlist.firstElementChild.offsetHeight;
-
-			//console.log('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+height*this.curSong.index);
-
-			if( this.animationsEnabled )
-			{
-				//Make the playlist scroll to the currently playing song.
-				scrollToSmooth(this.playlist,height * this.curSong.index, 600);
-			}
-			else
-			{
-				this.playlist.scrollTop = height*this.curSong.index;
-				// Ps.update(this.playlist); // update the scrollbar
-			}
-		}.bind(this);
-
-		this.toggleOptionsBox = function() {
-			this.optionsBoxShown = !this.optionsBoxShown;
-		}.bind(this);
-
-		this.toggleTouchLayout = function() {
-			toggleClass(document.body,'touch');
-
-			//Trigger the playlist to scroll in case the layout is messed up
-			this.scrollToSong(this.curSong);
-		}.bind(this);
-
 		/////
-		// Audio player control functions, in button order, then helper function order.
+		// HTML5 audio player control functions, in button order, then helper function order.
 		// Assistance from: http://www.alexkatz.me/html5-audio/building-a-custom-html5-audio-player-with-javascript/
 
 		this.togglePlay = function(bool) {
@@ -384,16 +412,55 @@
 			return zeroPad(min,2)+':'+zeroPad(sec,2);
 		}.bind(this);
 
-		this.styleSet = function(type) {
-			//Recompile the selected style's node
-			this.styles[type].node.innerHTML = this.styles[type].cssText.join(this.styles[type].set);
+
+		/////
+		// UI Functions
+		this.scrollToSong = function(song) {
+
+			//Get the elements' height, since this could change.
+			var height = this.playlist.firstElementChild.offsetHeight;
+
+			//console.log('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+height*this.curSong.index);
+
+			if( this.animationsEnabled )
+			{
+				//Make the playlist scroll to the currently playing song.
+				scrollToSmooth(this.playlist,height * this.curSong.index, 600);
+			}
+			else
+			{
+				this.playlist.scrollTop = height*this.curSong.index;
+				// Ps.update(this.playlist); // update the scrollbar
+			}
 		}.bind(this);
 
-		this.gradientSet = function(type,stop) {
+		this.toggleOptionsBox = function() {
+			this.optionsBoxShown = !this.optionsBoxShown;
+		}.bind(this);
+
+		this.toggleTouchLayout = function() {
+			toggleClass(document.body,'touch');
+
+			//Trigger the playlist to scroll in case the layout is messed up
+			this.scrollToSong(this.curSong);
+		}.bind(this);
+
+		this.styleSet = function(type) {
+			//Recompile the selected style's node
+			this.styleNodes[type].innerHTML = this.styleCssText[type].join(this.currentStyles[type]);
+		}.bind(this);
+
+		//Wrapper that updates cookie
+		this.changeStyle = function(type) {
+			this.styleSet(type);
+			this.setCookie();
+		}.bind(this);
+
+		this.gradientSet = function(type) {
 			//This is really bad. Maybe find a library for this later.
-			var begin = this.styles[type].set["0%"];
-			var end = this.styles[type].set["100%"];
-			this.styles[type].node.innerHTML = this.styles[type].cssText + " { \n"+
+			var begin = this.currentStyles[type]["0%"];
+			var end = this.currentStyles[type]["100%"];
+			this.styleNodes[type].innerHTML = this.styleCssGradientText[type] + " { \n"+
 			"background: "+begin+";\n"+ //Old browsers
 			"background: -moz-linear-gradient(top, "+begin+" 0%, "+end+" 100%);\n"+ // FF3.6-15
 			"background: -webkit-linear-gradient(top, "+begin+" 0%, "+end+" 100%);\n"+ // Chrome10-25,Safari5.1-6
@@ -402,13 +469,88 @@
 			"}";
 		}.bind(this);
 
+		//Wrapper that updates cookie
+		this.changeGradient = function(type) {
+			this.gradientSet(type);
+			this.setCookie();
+		}.bind(this);
+
+		this.loadPreset = function() {
+			if( this.presetStyles[this.selectedPreset] != null )
+			{
+				console.log("Setting preset to "+this.selectedPreset);
+				this.currentStyles = this.presetStyles[this.selectedPreset];
+				this.reloadStyle();
+			}
+		}.bind(this);
+
+		//Wrapper that calls them all
+		this.reloadStyle = function() {
+			Object.keys(this.styleCssText).forEach(function(val) { this.changeStyle(val); }.bind(this));
+			Object.keys(this.styleCssGradientText).forEach(function(val) { this.changeGradient(val); }.bind(this));
+		}.bind(this);
+
+
 		/////
+		// Cookie functions
+
+		this.getCookie = function() {
+			var cookie = Cookies.getJSON(this.cookieName);
+			if( cookie == null ) { return 1; }
+
+			// Directly mapped properties
+			['autoplay','animationsEnabled','touchLayoutEnabled','currentStyles','selectedPreset','selectedPlaylist']
+			.forEach(function(val) {
+				if( cookie[val] != null && this[val] != null )
+				{ this[val] = cookie[val]; }
+			}.bind(this));
+
+			// Unpacked properties
+			if( cookie.lastVolume != null ) { this.player.volume = cookie.lastVolume; }
+
+			// Triggers
+			if( cookie.currentStyles != null ) { this.reloadStyle(); }
+		}.bind(this);
+
+		this.setCookie = function() {
+			Cookies.set(this.cookieName, {
+				"autoplay": this.autoplay,
+				"animationsEnabled": this.animationsEnabled,
+				"touchLayoutEnabled": this.touchLayoutEnabled,
+				"currentStyles": this.currentStyles,
+				"lastVolume": this.player.volume,
+				"selectedPreset": this.selectedPreset,
+				"selectedPlaylist": this.selectedPlaylist,
+			}, this.cookieConfig);
+		}.bind(this);
+
+		/////
+		// Initialization
+
 		// Get our list of songs and initialize.
 		$http.get('roster.xml')
 			.then(function(res) {
 				$scope.vipCtrl.songs = x2js.xml2js(res.data).playlist.trackList.track;
 				$scope.vipCtrl.init();
 		});
+
+		this.init = function() {
+
+			// Get any stored values that will influence our starting parameters.
+			this.getCookie();
+
+			//Load up our playlist, this is async and will start playing automatically.
+			this.loadPlaylist();
+
+
+
+			//Assign it to the GUI list.
+			// $scope.songs = this.songs;
+
+
+
+		}.bind(this);
+
 	}]);
 
 })();

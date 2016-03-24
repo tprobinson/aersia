@@ -99,6 +99,12 @@
         <div class="playlist-container hbox clearfix">
             <div class="optionsbox" ng-show="vipCtrl.optionsBoxShown">
                 <section><span>Options</span></section>
+                <div><label>
+                    Playlists
+                    <select name="preset" ng-model="vipCtrl.selectedPlaylist" ng-change="vipCtrl.loadPlaylist();" />
+                        <option ng-repeat="(option,style) in vipCtrl.playlists" value="{{option}}">{{option}}</option>
+                    </select>
+                </label></div>
                 <div class='sep'></div>
                 <section>
                     <div><label class="topcoat-checkbox"><input type="checkbox" name="autoplay" ng-model="vipCtrl.autoplay" /><div class="topcoat-checkbox__checkmark"></div>Autoplay</label></div>
@@ -106,28 +112,36 @@
                     <div><label class="topcoat-checkbox"><input type="checkbox" name="anims" ng-model="vipCtrl.animationsEnabled" /><div class="topcoat-checkbox__checkmark"></div>Scroll Smooth</label></div>
                 </section>
                 <div class='sep'></div>
-                <section><span>Colors</span></section>
+                <section>
+                    <div><span>Colors</span></div>
+                    <div><label>
+                        Presets
+                        <select name="preset" ng-model="vipCtrl.selectedPreset" ng-change="vipCtrl.loadPreset();" />
+                            <option ng-repeat="(option,style) in vipCtrl.presetStyles" value="{{option}}">{{option}}</option>
+                        </select>
+                    </label></div>
+                </section>
                 <div></div>
                 <section>
-                    <div><label><input type="color" name="colorfocus" ng-model="vipCtrl.styles.focus.set" ng-change="vipCtrl.styleSet('focus');" />Focus</label></div>
-                    <div><label><input type="color" name="colorbackground" ng-model="vipCtrl.styles.background.set" ng-change="vipCtrl.styleSet('background');" />Background</label></div>
-                    <div><label><input type="color" name="colorcontrast" ng-model="vipCtrl.styles.contrast.set" ng-change="vipCtrl.styleSet('contrast');" />Contrast</label></div>
-                    <div><label><input type="color" name="coloractive" ng-model="vipCtrl.styles.active.set" ng-change="vipCtrl.styleSet('active');" />Active</label></div>
-                    <div><label><input type="color" name="colorscrollbar" ng-model="vipCtrl.styles.scrollbar.set" ng-change="vipCtrl.styleSet('scrollbar');" />Scrollbar</label></div>
-                    <div><label><input type="color" name="colorloadbar" ng-model="vipCtrl.styles.loadbar.set" ng-change="vipCtrl.styleSet('loadbar');" />Loadbar</label></div>
+                    <div><label><input type="color" name="colorfocus" ng-model="vipCtrl.currentStyles.focus" ng-change="vipCtrl.changeStyle('focus');" />Focus</label></div>
+                    <div><label><input type="color" name="colorbackground" ng-model="vipCtrl.currentStyles.background" ng-change="vipCtrl.changeStyle('background');" />Background</label></div>
+                    <div><label><input type="color" name="colorcontrast" ng-model="vipCtrl.currentStyles.contrast" ng-change="vipCtrl.changeStyle('contrast');" />Contrast</label></div>
+                    <div><label><input type="color" name="coloractive" ng-model="vipCtrl.currentStyles.active" ng-change="vipCtrl.changeStyle('active');" />Active</label></div>
+                    <div><label><input type="color" name="colorscrollbar" ng-model="vipCtrl.currentStyles.scrollbar" ng-change="vipCtrl.changeStyle('scrollbar');" />Scrollbar</label></div>
+                    <div><label><input type="color" name="colorloadbar" ng-model="vipCtrl.currentStyles.loadbar" ng-change="vipCtrl.changeStyle('loadbar');" />Loadbar</label></div>
                     <div class='sep'></div>
                     <section>
                         <span>Controls Border</span>
                         <div>
-                            <input type="color" name="colorcontrolsoutstart" ng-model="vipCtrl.styles.controlsout.set['0%']" ng-change="vipCtrl.gradientSet('controlsout','0%');" />
-                            <input type="color" name="colorcontrolsoutend" ng-model="vipCtrl.styles.controlsout.set['100%']" ng-change="vipCtrl.gradientSet('controlsout','100%');" />
+                            <input type="color" name="colorcontrolsoutstart" ng-model="vipCtrl.currentStyles.controlsout['0%']" ng-change="vipCtrl.changeGradient('controlsout');" />
+                            <input type="color" name="colorcontrolsoutend" ng-model="vipCtrl.currentStyles.controlsout['100%']" ng-change="vipCtrl.changeGradient('controlsout');" />
                         </div>
                     </section>
                     <section>
                         <span>Controls</span>
                         <div>
-                            <input type="color" name="colorcontrolsinstart" ng-model="vipCtrl.styles.controlsin.set['0%']" ng-change="vipCtrl.gradientSet('controlsin','0%');" />
-                            <input type="color" name="colorcontrolsinend" ng-model="vipCtrl.styles.controlsin.set['100%']" ng-change="vipCtrl.gradientSet('controlsin','100%');" />
+                            <input type="color" name="colorcontrolsinstart" ng-model="vipCtrl.currentStyles.controlsin['0%']" ng-change="vipCtrl.changeGradient('controlsin');" />
+                            <input type="color" name="colorcontrolsinend" ng-model="vipCtrl.currentStyles.controlsin['100%']" ng-change="vipCtrl.changeGradient('controlsin');" />
                         </div>
                     </section>
                 </section>
@@ -149,6 +163,7 @@
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="assets/js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
 
+        <script src="assets/js/js.cookie.js"></script>
         <script src="assets/js/x2js.js"></script>
         <script src="assets/js/perfect-scrollbar.js"></script>
         <script src="assets/js/angular.js"></script>

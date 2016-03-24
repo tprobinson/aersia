@@ -489,6 +489,9 @@ section>div {
 .optionsbox input:first-child
 { margin-right: 10px; }
 
+.optionsbox select:first-child
+{ margin-left: 10px; }
+
 section, .sep { float:left; clear:left; }
 
 section {

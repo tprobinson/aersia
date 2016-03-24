@@ -79,9 +79,9 @@ module.exports = function(grunt) {
 		files: ['html/**/*.php'],
 		tasks: 'template-php'
 	  },
-      stuff: {
-		files: ['files/**/*.*'],
-		tasks: 'copy:stuff'
+      root: {
+		files: ['files/**/*.xml','files/**/*.txt','files/**/*.ico'],
+		tasks: 'copy:root'
 	  },
       svgs: {
 		files: ['icons/*.svg'],
@@ -182,9 +182,9 @@ module.exports = function(grunt) {
     },
 
     copy: {
-      stuff: {
+      root: {
         files: [
-          { expand: true, cwd: './files', src: ['./**/*.*'], dest: '<%= dirs.output %>' }
+          { expand: true, flatten: true, cwd: './files', src: ['./**/*.xml','./**/*.txt','./**/*.ico'], dest: '<%= dirs.output %>' }
         ]
       },
       html: {
@@ -212,6 +212,7 @@ module.exports = function(grunt) {
           { expand: true, flatten:true, src: [
               './js/main.js',
               'node_modules/angular/angular.js',
+              'node_modules/js-cookie/src/js.cookie.js',
               'node_modules/x2js/x2js.js',
               'node_modules/perfect-scrollbar/dist/js/perfect-scrollbar.js'
           ], dest: '<%= dirs.output %>assets/js' }
@@ -355,26 +356,47 @@ module.exports = function(grunt) {
 	},
 
     image: {
-      test: {
-		 options: {
-          pngquant: true,
-          optipng: true,
-          advpng: true,
-          zopflipng: true,
-          pngcrush: true,
-          pngout: true,
-          mozjpeg: true,
-          jpegRecompress: true,
-          jpegoptim: true,
-          gifsicle: true,
-          svgo: true
+        img: {
+            options: {
+            pngquant: true,
+            optipng: true,
+            advpng: true,
+            zopflipng: true,
+            pngcrush: true,
+            pngout: true,
+            mozjpeg: true,
+            jpegRecompress: true,
+            jpegoptim: true,
+            gifsicle: true,
+            svgo: true
         },
         files: [{
-          expand: true,
-          src: ['img/**/*.*'],
-          dest: '<%= dirs.output %>assets/'
+            expand: true,
+            src: ['img/**/*.*'],
+            dest: '<%= dirs.output %>assets/'
         }]
-      }
+        },
+        root: {
+            options: {
+                pngquant: true,
+                optipng: true,
+                advpng: true,
+                zopflipng: true,
+                pngcrush: true,
+                pngout: true,
+                mozjpeg: true,
+                jpegRecompress: true,
+                jpegoptim: true,
+                gifsicle: true,
+                svgo: true
+            },
+            files: [{
+                expand: true,
+                flatten: true,
+                src: ['files/**/*.svg','files/**/*.png'],
+                dest: '<%= dirs.output %>'
+            }]
+        }
     },
 
     svgstore: {
@@ -429,7 +451,7 @@ grunt.registerTask('old-js', ['concat:js','copy:js','template-js']);
   grunt.registerTask('dev', ['connect', 'watch']);
   grunt.registerTask('watchnow', ['watch']);
 
-  grunt.registerTask('full-deploy', ['sass','css','js','template-all','copy:stuff','copy:font','copy:js','image:test']);
+  grunt.registerTask('full-deploy', ['sass','css','js','template-all','copy:root','copy:font','copy:js','image:img','image:root']);
   grunt.registerTask('full-development-deploy', ['set-development','full-deploy']);
 
   grunt.registerTask('template-all', ['prepare-variables','template:html']);
