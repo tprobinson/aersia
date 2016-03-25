@@ -258,7 +258,7 @@
 		//This will be called as the song progresses.
 		this.timeUpdate = function(e,amt) {
 
-			if( e !== null )
+			if( e != null && e !== '' )
 			// { amt = 100 * (this.player.currentTime / this.player.duration); }
 			{ amt = this.player.currentTime / this.player.duration; }
 
@@ -294,6 +294,7 @@
 			{
 				//Stop the song.
 				this.pause();
+				this.resetControls();
 
 				$http.get(this.playlists[this.selectedPlaylist].url)
 					.then(function(res) {
@@ -318,13 +319,19 @@
 			}
 		}.bind(this);
 
+		// Wrapper that updates cookie
+		this.changePlaylist = function() {
+			this.loadPlaylist();
+			this.setCookie();
+		}.bind(this);
+
 
 		this.playSong = function(song) {
 
 			//Stop and unregister the old song.
 			this.pause();
 			this.player.src = '';
-			if( this.curSong != null && this.curSong !== '' )
+			if( this.curSong != null && this.curSong !== '' && this.playlist.children[this.curSong.index] != null )
 			{ removeClass(this.playlist.children[this.curSong.index],'active-song'); }
 			this.curSong = '';
 
@@ -365,8 +372,7 @@
 
 		this.play = function() {
 			//Reset the readouts
-			this.timeUpdate('',0);
-			this.progressUpdate('',0);
+			this.resetControls();
 
 			this.player.play();
 			this.playing = 1;
@@ -415,6 +421,11 @@
 
 		/////
 		// UI Functions
+		this.resetControls = function() {
+			this.timeUpdate('',0);
+			this.progressUpdate('',0);
+		}.bind(this);
+
 		this.scrollToSong = function(song) {
 
 			//Get the elements' height, since this could change.
@@ -527,13 +538,6 @@
 		/////
 		// Initialization
 
-		// Get our list of songs and initialize.
-		$http.get('roster.xml')
-			.then(function(res) {
-				$scope.vipCtrl.songs = x2js.xml2js(res.data).playlist.trackList.track;
-				$scope.vipCtrl.init();
-		});
-
 		this.init = function() {
 
 			// Get any stored values that will influence our starting parameters.
@@ -542,14 +546,9 @@
 			//Load up our playlist, this is async and will start playing automatically.
 			this.loadPlaylist();
 
-
-
-			//Assign it to the GUI list.
-			// $scope.songs = this.songs;
-
-
-
 		}.bind(this);
+
+		this.init();
 
 	}]);
 

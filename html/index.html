@@ -98,13 +98,15 @@
 
         <div class="playlist-container hbox clearfix">
             <div class="optionsbox" ng-show="vipCtrl.optionsBoxShown">
-                <section><span>Options</span></section>
-                <div><label>
-                    Playlists
-                    <select name="preset" ng-model="vipCtrl.selectedPlaylist" ng-change="vipCtrl.loadPlaylist();" />
-                        <option ng-repeat="(option,style) in vipCtrl.playlists" value="{{option}}">{{option}}</option>
-                    </select>
-                </label></div>
+                <section>
+                    <div><span>Options</span></div>
+                    <div><label>
+                        Playlists
+                        <select name="preset" ng-model="vipCtrl.selectedPlaylist" ng-change="vipCtrl.changePlaylist();" />
+                            <option ng-repeat="(option,style) in vipCtrl.playlists" value="{{option}}">{{option}}</option>
+                        </select>
+                    </label></div>
+                </section>
                 <div class='sep'></div>
                 <section>
                     <div><label class="topcoat-checkbox"><input type="checkbox" name="autoplay" ng-model="vipCtrl.autoplay" /><div class="topcoat-checkbox__checkmark"></div>Autoplay</label></div>
