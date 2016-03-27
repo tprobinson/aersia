@@ -100,20 +100,26 @@ module.exports = function(grunt) {
     },
 
     sass: {
-      build: {
-        files : [
-          {
-            src : ['*.scss', 'effeckts/*.scss','modules/*.scss'],
-            cwd : 'scss',
-            dest : '<%= dirs.generated %>',
-            ext : '.css',
-            expand : true
-          }
-        ],
-        options : {
-          style : 'expanded'
+        build: {
+            files : [{
+                src : ['*.scss', 'effeckts/*.scss','modules/*.scss'],
+                cwd : 'scss',
+                dest : '<%= dirs.generated %>',
+                ext : '.css',
+                expand : true
+            }],
+            options : {
+                style : 'expanded'
+            }
+        },
+        ps: {
+            files : {
+                '<%= dirs.generated %>perfect-scrollbar.css': 'node_modules/perfect-scrollbar/src/css/main.scss',
+            },
+            options: {
+                style: 'compressed'
+            }
         }
-    }
     },
 
     template: {
@@ -287,7 +293,7 @@ module.exports = function(grunt) {
     autoprefixer: {
       build: {
         options: {
-          browsers: ['last 2 versions', '> 1%', 'Safari >= 6']
+          browsers: ['last 3 versions', '> 1%', 'Safari >= 6']
         },
         files: [
           {
@@ -295,12 +301,19 @@ module.exports = function(grunt) {
             cwd : '',
             dest : '<%= dirs.output %>assets/',
             expand : true
-          }
+          },
+          {
+            src : ['css/effeckt.css','css/main.css','<%= dirs.generated %>simptip.css','<%= dirs.generated %>perfect-scrollbar.css','css/topcoat-desktop-dark.css'],
+            cwd : '',
+            dest : '<%= dirs.output %>assets/',
+            expand : true
+          },
+
         ]
     },
     tidy: {
       options: {
-        browsers: ['last 2 versions', '> 1%', 'Safari >= 6']
+        browsers: ['last 3 versions', '> 1%', 'Safari >= 6']
       },
       files: [
         {
@@ -441,6 +454,13 @@ module.exports = function(grunt) {
 			]}
 		}
     },
+
+    shell: {
+        ps: {
+            command: '/home/micheal/Filing Cabinet/Projects/vip/node_modules/perfect-scrollbar/node_modules/.bin/gulp js'
+        }
+    }
+
   });
 
   grunt.registerTask('scss', ['sass','concat:effeckt']);
@@ -451,7 +471,7 @@ grunt.registerTask('old-js', ['concat:js','copy:js','template-js']);
   grunt.registerTask('dev', ['connect', 'watch']);
   grunt.registerTask('watchnow', ['watch']);
 
-  grunt.registerTask('full-deploy', ['sass','css','js','template-all','copy:root','copy:font','copy:js','image:img','image:root']);
+  grunt.registerTask('full-deploy', ['shell:ps','scss','css','js','svgstore','copy:root','copy:font','copy:js','template-all','image:img','image:root']);
   grunt.registerTask('full-development-deploy', ['set-development','full-deploy']);
 
   grunt.registerTask('template-all', ['prepare-variables','template:html']);

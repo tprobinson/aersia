@@ -24,6 +24,7 @@
     "grunt-preprocess": "^5.0.1",
     "grunt-processhtml": "^0.3.8",
     "grunt-sass": "^1.1.0",
+    "grunt-shell": "^1.2.1",
     "grunt-svgstore": "^1.0.0",
     "grunt-template": "^0.2.3",
     "grunt-uncss": "^0.4.3",
