@@ -224,59 +224,59 @@ body {
 }
 
 /* Touch style interface */
-body.touch .controls-container {
+html.touch .controls-container {
 	order:2;
 	height: 7vh;
 }
 
-body.touch .controls-container>div, body.touch #volumeMute {
+html.touch .controls-container>div, html.touch #volumeMute {
 	width: 7vh;
 	height: 7vh;
 }
-body.touch .controls-container svg {
+html.touch .controls-container svg {
 	width: 100%;
 	height: 100%;
 }
 
-body.touch .playlist-container {
+html.touch .playlist-container {
 	height: 93vh;
 }
 
-body.touch .controls-container .volbox {
+html.touch .controls-container .volbox {
 	width: auto;
 }
 
-body.touch #volumeMax {
+html.touch #volumeMax {
 	width: 7vh;
 	height: 7vh;
 }
 
 /* An invisible hitbox to max volume */
-body.touch #volumeMax {
+html.touch #volumeMax {
 	width: 2vh;
 	height: 7vh;
 }
 
-body.touch #timeline, body.touch #loadBar, body.touch #playedBar {
+html.touch #timeline, html.touch #loadBar, html.touch #playedBar {
 	height: 3vh;
 }
 
-body.touch #volumeBar {
+html.touch #volumeBar {
 	border-width: 2vh 11vh 2vh 0;
 }
 
-body.touch #playhead{
+html.touch #playhead{
 	width: 0.25vh;
 	height: 5vh;
 	top: 50%;
 	transform: translateY(-50%);
 }
 
-body.touch #timeText, body.touch #loadPct {
+html.touch #timeText, html.touch #loadPct {
 	font-size: 2vh;
 }
 
-body.touch .playlist>li {
+html.touch .playlist>li {
 	padding: 0 1vw;
 	line-height: 3vh;
 	font-size: 2vh;
@@ -431,7 +431,7 @@ body.touch .playlist>li {
 	height: 17px;
 }
 
-body.touch .optionsbox {
+html.touch .optionsbox {
 	top: auto;
 	left: 0;
 	right: 0;
@@ -459,7 +459,7 @@ body.touch .optionsbox {
 	box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.5)
 }
 
-body.touch section label /* to expand the hitbox */
+html.touch section label /* to expand the hitbox */
 {
 	display: flex;
 	flex: 1 1 auto;
@@ -472,7 +472,7 @@ section label {
 	padding: 5px 0;
 }
 
-body.touch section>div {
+html.touch section>div {
 	margin: 0.5vh 1vw;
 }
 
@@ -503,11 +503,11 @@ section {
 	padding: 3px 10px;
 }
 
-body.touch section {
+html.touch section {
 	flex-direction: row;
 }
 
-body.touch .sep {
+html.touch .sep {
 	width: 93vw;
 }
 

@@ -33,8 +33,10 @@
 		this.songs = '';
 		this.curSong = '';
 		this.autoplay = true;
-		this.playing = 0;
+		this.playing = false;
 		this.prevVolume = 0;
+		this.history = [];
+		this.historyPosition = 0;
 
 		// UI variables
 		this.lastTimeText = '';
@@ -77,11 +79,11 @@
 		/////
 		//Styles and Presets
 
-		this.selectedPreset = "Default";
+		this.selectedPreset = "Aersia";
 
 		// Presets. This could be loaded from XHR later.
 		this.presetStyles = {
-			"Default": {
+			"Aersia": {
 				"focus": "#FF9148", // Orange
 				"background": "#183C63", // Lighter, main blue
 				"contrast": "#003366", // Dark, bordery color
@@ -172,9 +174,8 @@
 
 
 		/////
-		//Check if the body has the touch class as given by Modernizr
-
-		if( hasClass(document.body,'touch') ) { this.touchLayoutEnabled = true; }
+		//Check if the document has the touch class as given by Modernizr
+		if( hasClass(document.documentElement,'touch') ) { this.touchLayoutEnabled = true; }
 
 
 		/////
@@ -325,6 +326,26 @@
 			this.setCookie();
 		}.bind(this);
 
+		// Keeps a list of previously played songs, up to 100.
+		this.historyTrack = function(idx) {
+console.log(this.history+'@'+this.historyPosition);
+			if( this.historyPosition < 0 )
+			{
+				if( this.history[(this.history.length-1) + this.historyPosition] !== idx )
+				{
+					//I think this wipes too many things?
+					//We're backed up in the queue, but we're being asked to play a different song. Wipe out the queue so we can store the new one.
+					while( this.historyPosition < 0 ) { this.history.pop(); this.historyPosition++; console.log("wipe"+this.history);}
+				}
+			}
+			else
+			{
+				// Cut the history list down if it's at capacity
+				while( this.history.length > 99 ) { this.history.shift(); }
+				this.history.push(idx);
+			}
+		}.bind(this);
+
 
 		this.playSong = function(song) {
 
@@ -333,15 +354,16 @@
 			this.player.src = '';
 			if( this.curSong != null && this.curSong !== '' && this.playlist.children[this.curSong.index] != null )
 			{ removeClass(this.playlist.children[this.curSong.index],'active-song'); }
-			this.curSong = '';
+			// this.curSong = '';
+
 
 			//log
 			console.log("Playing song: "+song.title);
 
-			//Start the new song.
 			this.fullyLoaded = 0;
 			this.curSong = song;
 			addClass(this.playlist.children[this.curSong.index],'active-song');
+			this.historyTrack(song.index); //Put this song in history
 			this.player.src = song.location;
 			this.play();
 
@@ -375,21 +397,52 @@
 			this.resetControls();
 
 			this.player.play();
-			this.playing = 1;
+
+			this.playing = true;
 
 			addClass(this.playpause,"controlsPlaying");
 		}.bind(this);
 
 		this.pause = function() {
 			this.player.pause();
-			this.playing = 0;
+			this.playing = false;
 			removeClass(this.playpause,"controlsPlaying");
 		}.bind(this);
 
 		this.seek = function(amt) {
-			var index = this.curSong.index + amt;
-			if( index >= 0 && index <= this.songs.length )
-			{ this.playSong(this.songs[index]); }
+			// var index = this.curSong.index + amt;
+			// if( index >= 0 && index <= this.songs.length )
+			// { this.playSong(this.songs[index]); }
+			if( amt < 0 )
+			{
+				if( (this.history.length-1) >= 0 -(this.historyPosition + amt)  )
+				{
+					this.historyPosition += amt;
+					this.playSong( // Play the song...
+						this.songs[ // in the playlist...
+							this.history[ // at history position...
+								(this.history.length-1) + this.historyPosition // offset by the end of the history queue.
+							]
+						]
+					);
+				}
+			}
+			else {
+				if( this.historyPosition === 0 )
+				{
+					this.shuffleSong();
+				}
+				else {
+					this.historyPosition += amt;
+					this.playSong( // Play the song...
+						this.songs[ // in the playlist...
+							this.history[ // at history position...
+								(this.history.length-1) + this.historyPosition // offset by the end of the history queue.
+							]
+						]
+					);
+				}
+			}
 		}.bind(this);
 
 		this.toggleFullscreen = function() {
@@ -450,7 +503,7 @@
 		}.bind(this);
 
 		this.toggleTouchLayout = function() {
-			toggleClass(document.body,'touch');
+			toggleClass(document.documentElement,'touch');
 
 			//Trigger the playlist to scroll in case the layout is messed up
 			this.scrollToSong(this.curSong);
@@ -518,6 +571,8 @@
 
 			// Unpacked properties
 			if( cookie.lastVolume != null ) { this.player.volume = cookie.lastVolume; }
+
+			if( cookie.touchLayoutEnabled != null ) { toggleClass(document.documentElement,"touch",cookie.touchLayoutEnabled); }
 
 			// Triggers
 			if( cookie.currentStyles != null ) { this.reloadStyle(); }
@@ -652,8 +707,8 @@ function removeClass(el, className) {
   }
 }
 
-function toggleClass(el, className) {
-	if( hasClass(el,className) ) {
+function toggleClass(el, className, bool) {
+	if( (bool != null && bool) || hasClass(el,className) ) {
 		removeClass(el,className);
 	} else {
 		addClass(el,className);
