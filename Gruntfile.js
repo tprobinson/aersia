@@ -15,6 +15,7 @@ module.exports = function(grunt) {
     var dirs = {
         output: "dist/",
         generated: "generated/",
+        themes: "themes/",
     };
 
     grunt.template.addDelimiters('html-comments-delimiters', '<!--%', '-->');
@@ -64,6 +65,7 @@ module.exports = function(grunt) {
             },
             mainjs: {
                 files: [
+                    'themes/*.json',
                     'js/main.js'
                 ],
                 tasks: ['template:js']
@@ -162,10 +164,17 @@ module.exports = function(grunt) {
         data: function() {
 
             //moar stuff here
+            var themestring = '';
+            grunt.file.recurse(dirs.themes, function callback(abspath, rootdir, subdir, filename) {
+                var themename = filename.replace(new RegExp('\.json'),'');
+                var contents = grunt.file.read(abspath);
+                themestring += '"'+themename+'": ' + contents + ',\n';
+            });
 
             return {
                 version: pkg.version,
                 friendlyname: pkg.friendlyname,
+                includedstyles: themestring,
             };
         }
     }

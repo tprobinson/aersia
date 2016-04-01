@@ -61,6 +61,8 @@ body:-webkit-full-screen {
 
 li { list-style: none; }
 
+input, select { color: #333; }
+
 /* Modal dialog */
 
 .effeckt-modal-confirm,
@@ -272,25 +274,50 @@ html.touch .playlist>li {
 /* Orange: #FF9148 */
 /* Items with fill */ g, path { fill: #FF9148; }
 /* Items with color */ .controls-container, .playlist-container, .optionsbox { color: #FF9148; }
-/* Items with background-color */ #playedBar, #playhead, .active-song { background-color: #FF9148; }
+/* Items with background-color */
+#playedBar,
+#playhead,
+.active-song,
+.ps-theme-vip>.ps-scrollbar-y-rail>.ps-scrollbar-y,
+.ps-theme-vip>.ps-scrollbar-x-rail>.ps-scrollbar-x
+{ background-color: #FF9148; }
+
 /* Items with border color */ /*.optionsbox { border-color: #FF9148; }*/
 /* Items with special triangle border color */ #volumeBar { border-color: transparent #FF9148 transparent transparent; }
 
 /* Dark, bordery color: #036 */
 /* Items with color */ .playlist>li:hover, .active-song { color: #003366; }
-/* Items with border color */ .optionsbox, .sep, .playlist>li, section, .ps-theme-vip>.ps-scrollbar-y-rail, .ps-theme-vip>.ps-scrollbar-x-rail { border-color: #003366; }
+/* Items with border color */
+.optionsbox,
+.sep,
+.playlist>li,
+section,
+.ps-theme-vip>.ps-scrollbar-y-rail,
+.ps-theme-vip>.ps-scrollbar-x-rail
+{ border-color: #003366; }
 
 /* Lighter, main blue: #183C63 */
 /* Items with background-color */ .playlist-container, .optionsbox { background-color: #183C63; }
 
 /* Bright, activey blue: #4687ef */
-/* Items with background-color */ .playlist>li:hover { background-color: #4687ef; }
+/* Items with background-color */
+.playlist>li:hover,
+.ps-theme-vip:hover>.ps-scrollbar-y-rail:hover>.ps-scrollbar-y,
+.ps-theme-vip.ps-in-scrolling>.ps-scrollbar-y-rail>.ps-scrollbar-y,
+.ps-theme-vip:hover>.ps-scrollbar-x-rail:hover>.ps-scrollbar-x,
+.ps-theme-vip.ps-in-scrolling>.ps-scrollbar-x-rail:hover>.ps-scrollbar-x
+{ background-color: #4687ef; }
 
 
 /* Dull orange, the back of the scrollbar: #7f6157 */
-/* oh boy I get to override the scrollbar */
 /* this should be an SCSS include later */
-.ps-theme-vip.ps-active-x>.ps-scrollbar-x-rail, .ps-theme-vip.ps-active-y>.ps-scrollbar-y-rail { background-color: #7f6157; }
+.ps-theme-vip>.ps-scrollbar-x-rail,
+.ps-theme-vip>.ps-scrollbar-y-rail,
+.ps-theme-vip.ps-in-scrolling>.ps-scrollbar-x-rail,
+.ps-theme-vip.ps-in-scrolling>.ps-scrollbar-y-rail,
+.ps-theme-vip:hover>.ps-scrollbar-y-rail:hover,
+.ps-theme-vip:hover>.ps-scrollbar-x-rail:hover
+{ background-color: #7f6157; }
 
 /* Dull purple, for things like timeline bg: #635d62 */
 /* Items with background-color */ #loadBar { background-color: #635d62; }

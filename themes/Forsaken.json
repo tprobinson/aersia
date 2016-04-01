@@ -1,0 +1,16 @@
+{
+	"focus": "#c0a7a4",
+	"background": "#1d0402",
+	"contrast": "#4b0707",
+	"active": "#ef150e",
+	"scrollbar": "#523330",
+	"loadbar": "#952a23",
+	"controlsout": {
+		"0%": "#0b0000",
+		"100%": "#5d0a01"
+	},
+	"controlsin": {
+		"0%": "#872307",
+		"100%": "#150402"
+	}
+}

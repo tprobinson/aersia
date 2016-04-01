@@ -96,8 +96,9 @@
 
 		/////
 		//Styles and Presets
-
 		this.selectedPreset = "Aersia";
+		this.currentStyles = {};
+		this.styleNodes = {};
 
 		// Presets. This could be loaded from XHR later.
 		this.presetStyles = {
@@ -111,28 +112,8 @@
 				"controlsout": {"0%": "#c0ccd9", "100%": "#000c19"}, // The border around the controls
 				"controlsin": {"0%": "#3D6389", "100%": "#072d53"}, // The inside of the controls
 			},
-			"Cherry": {
-				"focus": "#FF9999", // Orange
-				"background": "#440000", // Lighter, main blue
-				"contrast": "#660000", // Dark, bordery color
-				"active": "#FF9999", // Bright, activey blue
-				"scrollbar": "#340505", // Dull orange, the back of the scrollbar
-				"loadbar": "#340505", // Dull purple, for things like timeline bg
-				"controlsout": {"0%": "#d9c0c6", "100%": "#19000a"}, // The border around the controls
-				"controlsin": {"0%": "#d4223a", "100%": "#530615"}, // The inside of the controls
-			}
-		};
-
-		//Currently set styles
-		this.currentStyles = {
-			"focus": "#FF9148", // Orange
-			"background": "#183C63", // Lighter, main blue
-			"contrast": "#003366", // Dark, bordery color
-			"active": "#4687ef", // Bright, activey blue
-			"scrollbar": "#7f6157", // Dull orange, the back of the scrollbar
-			"loadbar": "#635d62", // Dull purple, for things like timeline bg
-			"controlsout": {"0%": "#c0ccd9", "100%": "#000c19"}, // The border around the controls
-			"controlsin": {"0%": "#3D6389", "100%": "#072d53"}, // The inside of the controls
+			//Styles from JSON files
+/*%= includedstyles */
 		};
 
 		// CSS definitions of where all the colors go
@@ -140,7 +121,7 @@
 			"focus": [
 				"g, path { fill: ","; }\n"+
 				".controls-container, .playlist-container, .optionsbox { color: ","; }\n"+
-				"#playedBar, #playhead, .active-song { background-color: ","; }\n"+
+				"#playedBar, #playhead,	.active-song, .ps-theme-vip>.ps-scrollbar-y-rail>.ps-scrollbar-y, .ps-theme-vip>.ps-scrollbar-x-rail>.ps-scrollbar-x { background-color: ","; }\n"+
 				"#volumeBar { border-color: transparent "," transparent transparent; }"
 			],
 			"background": [
@@ -151,22 +132,21 @@
 				".optionsbox, .sep, .playlist>li, section, .ps-theme-vip>.ps-scrollbar-y-rail, .ps-theme-vip>.ps-scrollbar-x-rail { border-color: ","; }\n"
 			],
 			"active": [
-				".playlist>li:hover { background-color: ","; }"
+				".playlist>li:hover, .ps-theme-vip:hover>.ps-scrollbar-y-rail:hover>.ps-scrollbar-y, .ps-theme-vip.ps-in-scrolling>.ps-scrollbar-y-rail>.ps-scrollbar-y, .ps-theme-vip:hover>.ps-scrollbar-x-rail:hover>.ps-scrollbar-x, .ps-theme-vip.ps-in-scrolling>.ps-scrollbar-x-rail:hover>.ps-scrollbar-x { background-color: ","; }"
 			],
 			"scrollbar": [
-				".ps-theme-vip.ps-active-x>.ps-scrollbar-x-rail, .ps-theme-vip.ps-active-y>.ps-scrollbar-y-rail { background-color: ","; }"
-			],
+				".ps-theme-vip>.ps-scrollbar-x-rail, .ps-theme-vip>.ps-scrollbar-y-rail { background-color: ","!important; }"
+			], //  .ps-theme-vip.ps-in-scrolling>.ps-scrollbar-x-rail, .ps-theme-vip.ps-in-scrolling>.ps-scrollbar-y-rail, .ps-theme-vip:hover>.ps-scrollbar-y-rail:hover, .ps-theme-vip:hover>.ps-scrollbar-x-rail:hover
 			"loadbar": [
 				"#loadBar { background-color: ","; }"
 			],
 		};
 
+
 		this.styleCssGradientText = {
 			"controlsout": ".controls-container, .effeckt-tabs",
 			"controlsin": ".controls-container>div, .effeckt-tabs>li",
 		};
-
-		this.styleNodes = {};
 
 		//Give each style its own stylesheet node.
 		Object.keys(this.styleCssText).forEach(function(val) {
@@ -522,10 +502,13 @@
 
 		this.toggleOptionsBox = function() {
 			this.optionsBoxShown = !this.optionsBoxShown;
+
+			//Trigger the scrollbar to fix itself.
+			Ps.update(this.playlist);
 		}.bind(this);
 
 		this.toggleTouchLayout = function() {
-			toggleClass(document.documentElement,'touch');
+			 classie.hasClass(document.documentElement,'touch') ? classie.removeClass(document.documentElement,'touch') : classie.addClass(document.documentElement,'touch');
 
 			//Trigger the playlist to scroll in case the layout is messed up
 			this.scrollToSong(this.curSong);
@@ -667,6 +650,9 @@
 		// Initialization
 
 		this.init = function() {
+
+			//Assign the default preset to the "current style";
+			this.currentStyles = this.presetStyles[this.selectedPreset];
 
 			// Get any stored values that will influence our starting parameters.
 			this.getCookie();
