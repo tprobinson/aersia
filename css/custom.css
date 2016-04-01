@@ -1,8 +1,3 @@
-.foot-text {
-	margin: 0 auto;
-	text-align: center;
-}
-
 /* Overlays */
 .loading {
 	position: absolute;
@@ -52,48 +47,6 @@ z-index:3;
 	0% { transform: translateX(0); }
 	100% { transform: translateX(-50%); }
 }
-
-/* Status indicators */
-.statusbox {
-	position:absolute;
-	height: 10px;
-	left: 0; bottom: 0;
-	background-color: #DDD;
-	border-top: 5px solid #999;
-	overflow: hidden;
-	padding: 5px;
-
-	display: flex;
-	justify-content: flex-start;
-}
-
-/* The foldy button */
-.statustext {
-	margin-right: 3px;
-	padding-right: 3px;
-}
-
-.statustext>span {
-	color: #666;
-	text-align: center;
-	font-size: 80%;
-	line-height: 13px;
-}
-
-.statusbox:hover {
-	height: 45px;
-}
-
-.statusbox:hover>.statustext>span {
-	line-height:45px;
-}
-
-/* Colors */
-.status-bad { background: #B00; }
-
-.status-good { background: #0B0; }
-
-.status-dev { background: #66B; }
 
 body
 {
@@ -213,6 +166,35 @@ li { list-style: none; }
   opacity: 1;
 }
 
+.hbox, .vbox {
+	flex: 1 1 auto;
+	display: flex;
+	justify-content:space-between;
+	position:relative;
+}
+.vbox { flex-direction: column; }
+.hbox { flex-direction: row; }
+
+.center { justify-content: center; }
+.end { justify-content: flex-end; }
+.aend { align-items: flex-end; }
+
+.centertext { text-align: center; }
+
+.nogrow { flex-grow: 0; }
+.noshrink { flex-shrink: 0; }
+.wrap { flex-wrap: wrap; }
+.nowrap { flex-wrap: nowrap; }
+
+.margins-tb { margin-top: 0.75rem; margin-bottom: 0.75rem; }
+.margins-lr { margin-left: 0.75rem; margin-right: 0.75rem; }
+
+.halfview { max-width: 49.5%; } .mh100 { max-height: 100%; }/* REWORK: Why does output put so much pressure? */
+.fullview { max-width: 90%; }
+.minimized { background-color: #222; width: 50px; flex: 0 0 auto; }
+
+.halfview, .fullview { justify-content: flex-start; }
+
 
 /* Flexbox layout! */
 /* Main layouts */
@@ -224,8 +206,11 @@ body {
 }
 
 /* Touch style interface */
+html.touch body {
+	flex-direction: column-reverse;
+}
+
 html.touch .controls-container {
-	order:2;
 	height: 7vh;
 }
 
@@ -311,7 +296,7 @@ html.touch .playlist>li {
 /* Items with background-color */ #loadBar { background-color: #635d62; }
 
 /* Gradients */
-.controls-container { /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#c0ccd9+1,000c19+100 */
+.controls-container, .effeckt-tabs { /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#c0ccd9+1,000c19+100 */
 	background: #c0ccd9; /* Old browsers */
 	background: -moz-linear-gradient(top, #c0ccd9 0%, #000c19 100%); /* FF3.6-15 */
 	background: -webkit-linear-gradient(top, #c0ccd9 0%, #000c19 100%); /* Chrome10-25,Safari5.1-6 */
@@ -319,7 +304,7 @@ html.touch .playlist>li {
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c0ccd9', endColorstr='#000c19',GradientType=0 ); /* IE6-9 */
 }
 
-.controls-container>div { /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#3d6389+0,072d53+100 */
+.controls-container>div, .effeckt-tabs>li { /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#3d6389+0,072d53+100 */
 	background: #3D6389; /* Old browsers */
 	/* IE9 SVG, needs conditional override of 'filter' to 'none' */
 	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzNkNjM4OSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwNzJkNTMiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
@@ -330,11 +315,41 @@ html.touch .playlist>li {
 }
 
 
+/* Styles for the options menu */
+.effeckt-tabs {
+	display: flex;
+}
+
+.effeckt-tabs>li {
+	text-align: center;
+	flex: 1 1 auto;
+}
+
+.effeckt-tabs>li>a {
+	display: block;
+	padding: 0.5vh 0.5vw;
+}
+
+.effeckt-tab-content {
+	display: flex;
+	justify-content: space-around;
+	width: 100vw;
+	box-sizing: border-box;
+}
+
+.effeckt-tabs-container {
+	padding: 1vh 0;
+}
+
+
 /* Styles for the player controls */
 .controls-container {
 	width: 100vw;
 	height: 19px;
 	display: flex;
+	flex: 0 0 auto;
+
+	box-shadow: -5px -5px 10px 0 rgba(0,0,0,0.2) inset;
 }
 
 .controls-container div {
@@ -344,12 +359,12 @@ html.touch .playlist>li {
 }
 
 /* Give a one-pixel gap to show the gradient border through */
-.controls-container>div {
+.controls-container>div, .effeckt-tabs>li {
 	margin: 1px;
 	margin-right: 0;
 }
 
-.controls-container>div:last-of-type {
+.controls-container>div:last-of-type, .effeckt-tabs>li:last-of-type {
 	margin-right: 1px;
 }
 
@@ -431,7 +446,7 @@ html.touch .playlist>li {
 	height: 17px;
 }
 
-html.touch .optionsbox {
+/*html.touch .optionsbox {
 	top: auto;
 	left: 0;
 	right: 0;
@@ -440,23 +455,15 @@ html.touch .optionsbox {
 	margin: 0 2.5vw;
 
 	/*flex-direction: row;*/
-}
+/*}*/
 
 .optionsbox {
-	position: absolute;
-	z-index: 11;
-
 	display: flex;
 	flex-direction: column;
 	justify-content: space-around;
-
-	right: 15px;
-	top: 5px;
-	border-radius: 10px;
+/*
 	border-width: 2px;
-	border-style: solid;
-
-	box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.5)
+	border-style: solid;*/
 }
 
 html.touch section label /* to expand the hitbox */
@@ -492,11 +499,10 @@ section>div {
 .optionsbox select:first-child
 { margin-left: 10px; }
 
-section, .sep { float:left; clear:left; }
+section, .sep { /* width big when horizontal, some amount of separation when vertical, change border edge */ }
 
 section {
 	display: flex;
-	flex-direction: column;
 	justify-content: space-around;
 	flex-wrap: wrap;
 
@@ -544,100 +550,15 @@ html.touch .sep {
 	border-bottom-style: solid;
 }
 
-header h1, .nav-tabs{ display: flex; flex: 1 1 auto; }
+header h1 { display: flex; flex: 1 1 auto; }
 
-/* Container list */
-.nav-tabs ul {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-    position: relative;
-
-	display: flex;
-	flex: 1;
-	align-self: flex-end;
-	justify-content: flex-end;
-}
-
-/* Each list item */
-.nav-tabs li {
-	flex: 0 1 auto;
-	margin: 0 0.5rem;
-}
-
-/* Text/link in each item */
-.nav-tabs a {
-    display: block;
-    padding: 15px 1rem;
-
-    text-align: center;
-    text-decoration: none;
-    font-weight: bold;
-
-    color: white;
-    background: #2368BC; /*#e44d26; */
-}
-
-.nav-tabs a:hover,
-.nav-tabs a:visited {
-    color: white;
-}
-
-.nav-tabs a:hover {
-    text-decoration: underline;
-}
-
-
-.main-container, .wrapper {
-	position: relative;
-	display: flex;
-	justify-content: inherit; /* for the tabs who cannot have display:flex */
-	max-height: 100%;
-}
-
-/* Items that do not grow or shrink */
-.controls-container, .footer-container {
-	flex: 0 0;
-}
 
 /* Items that do grow and shrink */
-.playlist-container, .wrapper, #tab-panels {
+.playlist-container {
 	flex: 1 1 0;
 }
 
-/* Tab layouts */
-#tab-panels { position: relative; }
-.tab-panel { position: absolute; width: 100%; height: 100%; justify-content: space-between; }
 
-/* Tab 503 layouts */
-.hbox, .vbox {
-	flex: 1 1 auto;
-	display: flex;
-	justify-content:space-between;
-	position:relative;
-}
-.vbox { flex-direction: column; }
-.hbox { flex-direction: row; }
-
-.center { justify-content: center; }
-.end { justify-content: flex-end; }
-.aend { align-items: flex-end; }
-
-.centertext { text-align: center; }
-
-.nogrow { flex-grow: 0; }
-.noshrink { flex-shrink: 0; }
-.wrap { flex-wrap: wrap; }
-.nowrap { flex-wrap: nowrap; }
-
-.margins-tb { margin-top: 0.75rem; margin-bottom: 0.75rem; }
-.margins-lr { margin-left: 0.75rem; margin-right: 0.75rem; }
-
-.halfview { max-width: 49.5%; } .mh100 { max-height: 100%; }/* REWORK: Why does output put so much pressure? */
-.fullview { max-width: 90%; }
-.minimized { background-color: #222; width: 50px; flex: 0 0 auto; }
-
-.halfview, .fullview { justify-content: flex-start; }
 
 #messagebox {
 	position: absolute;
@@ -711,30 +632,6 @@ pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
 .null { color: magenta; }
 .key { color: red; }
 
-/* buttons */
-.add, .remove, .reload { flex: 0 0 auto; }
-.spacer { flex: 1 1 auto; }
-.togglesimple { flex: 0 0 auto; }
-.output-button { height: 2rem; flex: 1 0 auto; margin: 0 15px; }
-#commit { flex: 2 1 auto; }
-
-.remove, .shade
-{ margin-left: 5px; margin-right: 5px; }
-
-/* show remove and shade when you hover the element */
-.remove,
-.shade
-{ opacity: 0; }
-
-ul:hover .remove,
-ul:hover .shade
-{ opacity:0.5; }
-
-ul:hover .remove:hover,
-ul:hover .shade:hover
-{ opacity:1; }
-
-
 /* Cordon overlay */
 .cordon { position: relative; }
 .cordon:before {
@@ -749,19 +646,6 @@ ul:hover .shade:hover
 	text-align: center;
 	font-weight: bolder;
 }
-
-/* Normal elements */
-.separator:last-of-type, .separatorlight:last-of-type {
-	border-right: none;
-	margin-right: inherit;
-	padding-right: inherit;
-}
-.separator, .separatorlight, .separator:only-of-type, .separatorlight:only-of-type {
-	padding-right: 7px;
-	margin-right: 7px;
-}
-.separator { border-right: 1px solid #222; }
-.separatorlight { border-right: 1px solid #C5C3C2; }
 
 span.label { font-weight: bold; }
 span.value { font-style: italic; }

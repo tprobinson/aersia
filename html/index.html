@@ -2,7 +2,7 @@
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="" ng-app="vip"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang="" ng-app="vip"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9" lang="" ng-app="vip"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="" ng-app="vip"> <!--<![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="" ng-app="aersia"> <!--<![endif]-->
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -18,7 +18,7 @@
 
         <script src="assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
     </head>
-    <body ng-controller="vipController as vipCtrl">
+    <body ng-controller="aersiaController as aersiaCtrl">
         <!--%= compiledsvg -->
         <!--[if lt IE 8]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -55,22 +55,106 @@
             </header>
         </div> -->
 
+        <div class="optionsbox" ng-show="aersiaCtrl.optionsBoxShown">
+            <div class="effeckt-tabs-wrap" data-effeckt-type="slide-left">
+                <div class="effeckt-tabs">
+                    <li><a data-tab-id="#tab-songinfo" class="effeckt-tab">Current Song</a></li>
+                    <li><a data-tab-id="#tab-layout" class="effeckt-tab">Layout</a></li>
+                    <li><a data-tab-id="#tab-player" class="effeckt-tab">Player</a></li>
+                    <li><a data-tab-id="#tab-theme" class="effeckt-tab">Theme</a></li>
+                    <li><a data-tab-id="#tab-question" class="effeckt-tab">???????</a></li>
+                </div>
+                <div class="effeckt-tabs-container">
+
+                    <div id="tab-songinfo" class="effeckt-tab-content">
+                        <div style="font-size:48px;text-align:center">¯\_(ツ)_/¯</div>
+                    </div>
+
+                    <div id="tab-layout" class="effeckt-tab-content">
+                        <div><label class="topcoat-checkbox"><input type="checkbox" name="touch" ng-model = "aersiaCtrl.touchLayoutEnabled" ng-click="aersiaCtrl.toggleTouchLayout();" /><div class="topcoat-checkbox__checkmark"></div>Touch Layout</label></div>
+                        <div style="font-size:48px;text-align:center">¯\_(ツ)_/¯</div>
+                    </div>
+
+                    <div id="tab-player" class="effeckt-tab-content">
+                        <section>
+                            <div><label>
+                                Playlists
+                                <select name="preset" ng-model="aersiaCtrl.selectedPlaylist" ng-change="aersiaCtrl.changePlaylist();" />
+                                    <option ng-repeat="(option,style) in aersiaCtrl.playlists" value="{{option}}">{{option}}</option>
+                                </select>
+                            </label></div>
+                        </section>
+                        <div class='sep'></div>
+                        <section>
+                            <div><label class="topcoat-checkbox"><input type="checkbox" name="autoplay" ng-model="aersiaCtrl.autoplay" /><div class="topcoat-checkbox__checkmark"></div>Autoplay</label></div>
+                            <div><label class="topcoat-checkbox"><input type="checkbox" name="anims" ng-model="aersiaCtrl.animationsEnabled" /><div class="topcoat-checkbox__checkmark"></div>Scroll Smooth</label></div>
+                        </section>
+                    </div>
+
+                    <div id="tab-theme" class="effeckt-tab-content">
+                        <section>
+                            <div><label>
+                                Presets
+                                <select name="preset" ng-model="aersiaCtrl.selectedPreset" ng-change="aersiaCtrl.loadPreset();" />
+                                    <option ng-repeat="(option,style) in aersiaCtrl.presetStyles" value="{{option}}">{{option}}</option>
+                                </select>
+                            </label></div>
+                        </section>
+                        <div class="sep"></div>
+                        <section>
+                            <div><label><input type="color" name="colorfocus" ng-model="aersiaCtrl.currentStyles.focus" ng-change="aersiaCtrl.changeStyle('focus');" />Focus</label></div>
+                            <div><label><input type="color" name="colorbackground" ng-model="aersiaCtrl.currentStyles.background" ng-change="aersiaCtrl.changeStyle('background');" />Background</label></div>
+                            <div><label><input type="color" name="colorcontrast" ng-model="aersiaCtrl.currentStyles.contrast" ng-change="aersiaCtrl.changeStyle('contrast');" />Contrast</label></div>
+                            <div><label><input type="color" name="coloractive" ng-model="aersiaCtrl.currentStyles.active" ng-change="aersiaCtrl.changeStyle('active');" />Active</label></div>
+                            <div><label><input type="color" name="colorscrollbar" ng-model="aersiaCtrl.currentStyles.scrollbar" ng-change="aersiaCtrl.changeStyle('scrollbar');" />Scrollbar</label></div>
+                            <div><label><input type="color" name="colorloadbar" ng-model="aersiaCtrl.currentStyles.loadbar" ng-change="aersiaCtrl.changeStyle('loadbar');" />Loadbar</label></div>
+                            <div class='sep'></div>
+                            <section>
+                                <span>Controls Border</span>
+                                <div>
+                                    <input type="color" name="colorcontrolsoutstart" ng-model="aersiaCtrl.currentStyles.controlsout['0%']" ng-change="aersiaCtrl.changeGradient('controlsout');" />
+                                    <input type="color" name="colorcontrolsoutend" ng-model="aersiaCtrl.currentStyles.controlsout['100%']" ng-change="aersiaCtrl.changeGradient('controlsout');" />
+                                </div>
+                            </section>
+                            <section>
+                                <span>Controls</span>
+                                <div>
+                                    <input type="color" name="colorcontrolsinstart" ng-model="aersiaCtrl.currentStyles.controlsin['0%']" ng-change="aersiaCtrl.changeGradient('controlsin');" />
+                                    <input type="color" name="colorcontrolsinend" ng-model="aersiaCtrl.currentStyles.controlsin['100%']" ng-change="aersiaCtrl.changeGradient('controlsin');" />
+                                </div>
+                            </section>
+                            <div class="sep"></div>
+                            <section>
+                                <button class="topcoat-button" ng-click="aersiaCtrl.triggerUpload()">Import</button>
+                                <button class="topcoat-button" ng-click="aersiaCtrl.exportStyles()">Export</button>
+                            </section>
+                        </section>
+                    </div>
+
+                    <div id="tab-question" class="effeckt-tab-content">
+                        <div style="font-size:48px;text-align:center">????????????</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
         <div class="controls-container hbox">
 			<audio> <!--<script type="text/javascript">location.href='vip.swf';</script>--> <p>Your browser does not support the <code>audio</code> element.</p> </audio>
-            <div id="playpause" ng-click="vipCtrl.togglePlay();">
+            <div id="playpause" ng-click="aersiaCtrl.togglePlay();">
                 <svg width="17px" height="17px" ><use xlink:href="#icon-play" /></svg>
                 <svg width="17px" height="17px" ><use xlink:href="#icon-pause" /></svg>
             </div>
-            <div id="prev" ng-click="vipCtrl.seek(-1);">
+            <div id="prev" ng-click="aersiaCtrl.seek(-1);">
                 <svg width="17px" height="17px" ><use xlink:href="#icon-prev" /></svg>
             </div>
-            <div id="next" ng-click="vipCtrl.seek(1);">
+            <div id="next" ng-click="aersiaCtrl.seek(1);">
                 <svg width="17px" height="17px" ><use xlink:href="#icon-next" /></svg>
             </div>
             <div class="timebox">
                 <div id="timeText">00:00</div>
                 <div class="vbox">
-                    <div id="timeline" ng-click="vipCtrl.seekBar($event);">
+                    <div id="timeline" ng-click="aersiaCtrl.seekBar($event);">
                         <div id="loadBar"></div>
                         <div id="playedBar"></div>
                     </div>
@@ -78,82 +162,30 @@
                 </div>
                 <div id="loadPct">0%</div>
             </div>
-            <div id="gear" ng-click="vipCtrl.toggleOptionsBox();">
+            <div id="gear" ng-click="aersiaCtrl.toggleOptionsBox();">
             <svg width="17px" height="17px" ><use xlink:href="#icon-gear" /></svg>
             </div>
-            <div id="fullscreen" ng-click="vipCtrl.toggleFullscreen();">
+            <div id="fullscreen" ng-click="aersiaCtrl.toggleFullscreen();">
             <svg width="17px" height="17px" ><use xlink:href="#icon-fullscreen" /></svg>
             </div>
             <div class="volbox hbox">
-                <div id="volumeMute" ng-click="vipCtrl.toggleMute();" ng-class="{ controlsMuted: vipCtrl.prevVolume > 0 }">
+                <div id="volumeMute" ng-click="aersiaCtrl.toggleMute();" ng-class="{ controlsMuted: aersiaCtrl.prevVolume > 0 }">
                     <svg width="17px" height="17px" ><use xlink:href="#icon-vol" /></svg>
                     <svg width="17px" height="17px" ><use xlink:href="#icon-volMute" /></svg>
                 </div>
-                <div id="volumeBar" ng-click="vipCtrl.volume($event);">
+                <div id="volumeBar" ng-click="aersiaCtrl.volume($event);">
                 </div>
-                <div id="volumeMax" ng-click="vipCtrl.volume('',1);">
+                <div id="volumeMax" ng-click="aersiaCtrl.volume('',1);">
                 </div>
             </div>
         </div>
 
         <div class="playlist-container hbox clearfix">
-            <div class="optionsbox" ng-show="vipCtrl.optionsBoxShown">
-                <section>
-                    <div><span>Options</span></div>
-                    <div><label>
-                        Playlists
-                        <select name="preset" ng-model="vipCtrl.selectedPlaylist" ng-change="vipCtrl.changePlaylist();" />
-                            <option ng-repeat="(option,style) in vipCtrl.playlists" value="{{option}}">{{option}}</option>
-                        </select>
-                    </label></div>
-                </section>
-                <div class='sep'></div>
-                <section>
-                    <div><label class="topcoat-checkbox"><input type="checkbox" name="autoplay" ng-model="vipCtrl.autoplay" /><div class="topcoat-checkbox__checkmark"></div>Autoplay</label></div>
-                    <div><label class="topcoat-checkbox"><input type="checkbox" name="touch" ng-model = "vipCtrl.touchLayoutEnabled" ng-click="vipCtrl.toggleTouchLayout();" /><div class="topcoat-checkbox__checkmark"></div>Touch Layout</label></div>
-                    <div><label class="topcoat-checkbox"><input type="checkbox" name="anims" ng-model="vipCtrl.animationsEnabled" /><div class="topcoat-checkbox__checkmark"></div>Scroll Smooth</label></div>
-                </section>
-                <div class='sep'></div>
-                <section>
-                    <div><span>Colors</span></div>
-                    <div><label>
-                        Presets
-                        <select name="preset" ng-model="vipCtrl.selectedPreset" ng-change="vipCtrl.loadPreset();" />
-                            <option ng-repeat="(option,style) in vipCtrl.presetStyles" value="{{option}}">{{option}}</option>
-                        </select>
-                    </label></div>
-                </section>
-                <div></div>
-                <section>
-                    <div><label><input type="color" name="colorfocus" ng-model="vipCtrl.currentStyles.focus" ng-change="vipCtrl.changeStyle('focus');" />Focus</label></div>
-                    <div><label><input type="color" name="colorbackground" ng-model="vipCtrl.currentStyles.background" ng-change="vipCtrl.changeStyle('background');" />Background</label></div>
-                    <div><label><input type="color" name="colorcontrast" ng-model="vipCtrl.currentStyles.contrast" ng-change="vipCtrl.changeStyle('contrast');" />Contrast</label></div>
-                    <div><label><input type="color" name="coloractive" ng-model="vipCtrl.currentStyles.active" ng-change="vipCtrl.changeStyle('active');" />Active</label></div>
-                    <div><label><input type="color" name="colorscrollbar" ng-model="vipCtrl.currentStyles.scrollbar" ng-change="vipCtrl.changeStyle('scrollbar');" />Scrollbar</label></div>
-                    <div><label><input type="color" name="colorloadbar" ng-model="vipCtrl.currentStyles.loadbar" ng-change="vipCtrl.changeStyle('loadbar');" />Loadbar</label></div>
-                    <div class='sep'></div>
-                    <section>
-                        <span>Controls Border</span>
-                        <div>
-                            <input type="color" name="colorcontrolsoutstart" ng-model="vipCtrl.currentStyles.controlsout['0%']" ng-change="vipCtrl.changeGradient('controlsout');" />
-                            <input type="color" name="colorcontrolsoutend" ng-model="vipCtrl.currentStyles.controlsout['100%']" ng-change="vipCtrl.changeGradient('controlsout');" />
-                        </div>
-                    </section>
-                    <section>
-                        <span>Controls</span>
-                        <div>
-                            <input type="color" name="colorcontrolsinstart" ng-model="vipCtrl.currentStyles.controlsin['0%']" ng-change="vipCtrl.changeGradient('controlsin');" />
-                            <input type="color" name="colorcontrolsinend" ng-model="vipCtrl.currentStyles.controlsin['100%']" ng-change="vipCtrl.changeGradient('controlsin');" />
-                        </div>
-                    </section>
-                </section>
-            </div>
-
             <div class="playlist vbox clearfix" id="playlist">
-                <li ng-click="vipCtrl.playSong(song)"
-                    ng-repeat="song in vipCtrl.songs track by song.index">{{song.creator}} - {{song.title}}</li>
-            </div> <!-- main -->
-        </div> <!-- main-container -->
+                <li ng-click="aersiaCtrl.playSong(song)"
+                    ng-repeat="song in aersiaCtrl.songs track by song.index">{{song.creator}} - {{song.title}}</li>
+            </div>
+        </div>
 
         <!-- <div class="footer-container">
         <div class="statusbox"><div class="statustext"><span>Status</span></div></div>
@@ -166,6 +198,7 @@
         <script>window.jQuery || document.write('<script src="assets/js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
 
         <script src="assets/js/js.cookie.js"></script>
+        <script src="assets/js/logger.js"></script>
         <script src="assets/js/x2js.js"></script>
         <script src="assets/js/perfect-scrollbar.js"></script>
         <script src="assets/js/angular.js"></script>

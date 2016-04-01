@@ -1,13 +1,5 @@
 /////
-//Vidya Intarweb Playlist
-//Version 0.0.1
-//Last updated Feb 22, 2016
-//
-//To do:
-//
-//  everything
-//
-//Future:
+// /*%= friendlyname */ v/*%= version */
 //
 //To do tags:
 //	CSS: Ongoing changes to the CSS.
@@ -22,12 +14,38 @@
 /* jshint -W116 */
 (function() {
 	//Initialize Angular app
-	var app = angular.module("vip", [ ]);
+	var app = angular.module("aersia", [ ]);
 
-	app.controller("vipController", ['$scope','$http', function($scope,$http) {
+	app.controller("aersiaController", ['$scope','$http', function($scope,$http) {
+		this.friendlyname = "/*%= friendlyname */";
+		this.version = "/*%= version */";
+
+		// Create a bogus link to download stuff with
+		this.download = document.head.appendChild(document.createElement('a'));
+		this.download.style = "display:none;visibility:hidden;";
+		this.download.download = "aersiaStyle.json";
+
+		//Create a bogus file input to upload stuff with
+		this.upload = document.head.appendChild(document.createElement('input'));
+		this.upload.style = "display:none;visibility:hidden;";
+		this.upload.type = "file";
+		this.styleReader = new FileReader();
+
 
 		// Create x2js instance with default config
 		var x2js = new X2JS();
+
+		//Init logger
+		Logger.useDefaults({
+		    logLevel: Logger.WARN,
+		    formatter: function (messages, context) {
+		        messages.unshift('[Aersia]');
+		        if (context.name) messages.unshift('[' + context.name + ']');
+		    }
+		});
+		Logger.get('internals').setLevel(Logger.INFO);
+		Logger.get('player').setLevel(Logger.WARN);
+		Logger.get('animation').setLevel(Logger.ERROR);
 
 		//Initialize variables
 		this.songs = '';
@@ -47,7 +65,7 @@
 		this.touchLayoutEnabled = false;
 
 		//js-cookie variables
-		this.cookieName = "vip";
+		this.cookieName = "aersia";
 		this.cookieConfig = { };
 
 		//Playlists
@@ -144,8 +162,8 @@
 		};
 
 		this.styleCssGradientText = {
-			"controlsout": ".controls-container",
-			"controlsin": ".controls-container>div",
+			"controlsout": ".controls-container, .effeckt-tabs",
+			"controlsin": ".controls-container>div, .effeckt-tabs>li",
 		};
 
 		this.styleNodes = {};
@@ -175,7 +193,7 @@
 
 		/////
 		//Check if the document has the touch class as given by Modernizr
-		if( hasClass(document.documentElement,'touch') ) { this.touchLayoutEnabled = true; }
+		if( classie.hasClass(document.documentElement,'touch') ) { this.touchLayoutEnabled = true; }
 
 
 		/////
@@ -189,7 +207,7 @@
 
 		//This will be called every time a new song loads, and when the song is seeked and begins playing?
 		// addEvent(this.player,"canplaythrough", function () {
-		// 	console.log('canplaythrough');
+		// 	Logger.get("internals").info('canplaythrough');
 		// }.bind(this));
 
 		//Makes timeline clickable
@@ -199,7 +217,7 @@
 			if( e !== '' )
 			{ amt = clickPercent(e,this.timeline); }
 
-			// console.log('Timeline seek: '+amt);
+			Logger.get("player").debug('Timeline seek: '+amt);
 			this.player.currentTime = this.player.duration * amt;
 			this.timeUpdate(e);
 
@@ -240,7 +258,7 @@
 				newText = Math.round(amt) + '%';
 			}
 
-			// console.log('Progress update: '+amt);
+			Logger.get("player").debug('Progress update: '+amt);
 
 			//Don't update the progress if it will look the same.
 			if( this.lastLoadText !== newText )
@@ -263,7 +281,7 @@
 			// { amt = 100 * (this.player.currentTime / this.player.duration); }
 			{ amt = this.player.currentTime / this.player.duration; }
 
-			// console.log('Time update: '+amt);
+			Logger.get("player").debug('Time update: '+amt);
 
 			// //Move the playhead
 			// this.playhead.style.left = amt + "%";
@@ -312,6 +330,9 @@
 
 						// Give Angular's list a little time to update, since it's stupid.
 						window.setTimeout(function(){
+							// Update the window's title.
+							document.title = this.playlists[this.selectedPlaylist].longName + ' - ' + this.friendlyname + ' v' + this.version;
+
 							// Then start playing, if we should do that.
 							if( this.autoplay )
 							{ this.shuffleSong(); }
@@ -328,21 +349,21 @@
 
 		// Keeps a list of previously played songs, up to 100.
 		this.historyTrack = function(idx) {
-console.log(this.history+'@'+this.historyPosition);
-			if( this.historyPosition < 0 )
+			if( this.historyPosition < 0 && this.history[(this.history.length-1) + this.historyPosition] !== idx )
 			{
-				if( this.history[(this.history.length-1) + this.historyPosition] !== idx )
-				{
-					//I think this wipes too many things?
-					//We're backed up in the queue, but we're being asked to play a different song. Wipe out the queue so we can store the new one.
-					while( this.historyPosition < 0 ) { this.history.pop(); this.historyPosition++; console.log("wipe"+this.history);}
-				}
+				//I think this wipes too many things?
+				//We're backed up in the queue, but we're being asked to play a different song. Wipe out the queue so we can store the new one.
+				Logger.get("internals").info("History undo stack burst: "+this.history+" @ "+this.historyPosition);
+				while( this.historyPosition < 0 ) { this.history.pop(); this.historyPosition++; }
+				Logger.get("internals").info("History undo stack end: "+this.history+" @ "+this.historyPosition);
 			}
-			else
+
+			if( this.historyPosition === 0 )
 			{
 				// Cut the history list down if it's at capacity
 				while( this.history.length > 99 ) { this.history.shift(); }
 				this.history.push(idx);
+				Logger.get("internals").info("History queue: "+this.history+" @ "+this.historyPosition);
 			}
 		}.bind(this);
 
@@ -353,16 +374,16 @@ console.log(this.history+'@'+this.historyPosition);
 			this.pause();
 			this.player.src = '';
 			if( this.curSong != null && this.curSong !== '' && this.playlist.children[this.curSong.index] != null )
-			{ removeClass(this.playlist.children[this.curSong.index],'active-song'); }
+			{ classie.removeClass(this.playlist.children[this.curSong.index],'active-song'); }
 			// this.curSong = '';
 
 
 			//log
-			console.log("Playing song: "+song.title);
+			Logger.info("Playing song: "+song.title);
 
 			this.fullyLoaded = 0;
 			this.curSong = song;
-			addClass(this.playlist.children[this.curSong.index],'active-song');
+			classie.addClass(this.playlist.children[this.curSong.index],'active-song');
 			this.historyTrack(song.index); //Put this song in history
 			this.player.src = song.location;
 			this.play();
@@ -400,13 +421,13 @@ console.log(this.history+'@'+this.historyPosition);
 
 			this.playing = true;
 
-			addClass(this.playpause,"controlsPlaying");
+			classie.addClass(this.playpause,"controlsPlaying");
 		}.bind(this);
 
 		this.pause = function() {
 			this.player.pause();
 			this.playing = false;
-			removeClass(this.playpause,"controlsPlaying");
+			classie.removeClass(this.playpause,"controlsPlaying");
 		}.bind(this);
 
 		this.seek = function(amt) {
@@ -418,6 +439,7 @@ console.log(this.history+'@'+this.historyPosition);
 				if( (this.history.length-1) >= 0 -(this.historyPosition + amt)  )
 				{
 					this.historyPosition += amt;
+					Logger.get("internals").debug("History rewind: "+this.history+" @ "+this.historyPosition);
 					this.playSong( // Play the song...
 						this.songs[ // in the playlist...
 							this.history[ // at history position...
@@ -461,7 +483,7 @@ console.log(this.history+'@'+this.historyPosition);
 			if( e !== '' ) { amt = clickPercent(e,this.volumeBar); }
 
 			amt = Math.pow(amt,2); //Human perception of volume is inverse-square.
-			console.log("Volume change: "+amt);
+			Logger.get("player").info("Volume change: "+amt);
 			this.player.volume = amt;
 		}.bind(this);
 
@@ -484,7 +506,7 @@ console.log(this.history+'@'+this.historyPosition);
 			//Get the elements' height, since this could change.
 			var height = this.playlist.firstElementChild.offsetHeight;
 
-			//console.log('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+height*this.curSong.index);
+			Logger.get("animation").debug('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+height*this.curSong.index);
 
 			if( this.animationsEnabled )
 			{
@@ -542,7 +564,7 @@ console.log(this.history+'@'+this.historyPosition);
 		this.loadPreset = function() {
 			if( this.presetStyles[this.selectedPreset] != null )
 			{
-				console.log("Setting preset to "+this.selectedPreset);
+				Logger.get("internals").info("Setting preset to "+this.selectedPreset);
 				this.currentStyles = this.presetStyles[this.selectedPreset];
 				this.reloadStyle();
 			}
@@ -572,7 +594,7 @@ console.log(this.history+'@'+this.historyPosition);
 			// Unpacked properties
 			if( cookie.lastVolume != null ) { this.player.volume = cookie.lastVolume; }
 
-			if( cookie.touchLayoutEnabled != null ) { toggleClass(document.documentElement,"touch",cookie.touchLayoutEnabled); }
+			if( cookie.touchLayoutEnabled != null ) { cookie.touchLayoutEnabled ? classie.addClass(document.documentElement,"touch") : classie.removeClass(document.documentElement,"touch"); }
 
 			// Triggers
 			if( cookie.currentStyles != null ) { this.reloadStyle(); }
@@ -588,6 +610,57 @@ console.log(this.history+'@'+this.historyPosition);
 				"selectedPreset": this.selectedPreset,
 				"selectedPlaylist": this.selectedPlaylist,
 			}, this.cookieConfig);
+		}.bind(this);
+
+		this.exportStyles = function() {
+			this.triggerDownload(this.currentStyles);
+		}.bind(this);
+
+		//This function is called when the FileReader loads, which is called when the file input changes, which is called when user picks file.
+		this.importStyles = function(event) {
+			Logger.get('internals').info('FileReader loaded file.');
+			var result;
+
+			try { result = JSON.parse(event.target.result) }
+			catch ( e ) { alert("File does not contain a valid style structure."); }
+
+			if( result != null )
+			{
+				// Check that all the right things are defined
+				try {
+					Object.keys(this.currentStyles).forEach(function(key) {
+						Logger.get('internals').debug(key);
+						if( result[key] == null ) { throw BreakException; }
+					}.bind(this));
+
+					this.currentStyles = result;
+					this.reloadStyle();
+					Logger.get('internals').info('Style imported successfully.');
+				} catch(e) { // alert for now, use a message box later
+					if (e!==BreakException) throw e;
+					alert("Imported style was not formatted correctly.");
+				}
+			}
+		}.bind(this);
+
+		this.upload.onchange = function() {
+			Logger.get('internals').info('File input changed.');
+			this.styleReader.readAsText(this.upload.files[0]);
+		}.bind(this);
+
+		this.styleReader.onload = this.importStyles;
+
+		this.triggerDownload = function(data) {
+			if( typeof data === "object" )
+			{ data = JSON.stringify(data,null,'\t'); }
+
+			this.download.href = 'data:application/octet-stream;charset=utf-16le;base64,' + btoa(data);
+			this.download.dispatchEvent(new MouseEvent('click'));
+			Logger.get('internals').info('File download triggered.');
+		}.bind(this);
+
+		this.triggerUpload = function() {
+			this.upload.dispatchEvent(new MouseEvent('click'));
 		}.bind(this);
 
 		/////
@@ -615,7 +688,7 @@ function scrollToSmooth(el,targetScroll,duration) {
 	var		beginScroll = el.scrollTop,
 			beginTime = Date.now();
 
-	// console.log('Beginning animation: '+beginTime+' '+beginScroll+' to '+targetScroll);
+	Logger.get('animation').info('Beginning animation: '+beginTime+' '+beginScroll+' to '+targetScroll);
     requestAnimationFrame(step);
     function step () {
         setTimeout(function() {
@@ -644,7 +717,7 @@ function scrollToSmooth(el,targetScroll,duration) {
 					* (Math.abs(targetScroll-beginScroll));						// scaled up to the amount that we need to move.
 
 
-				//  console.log('anim: '+ (now-beginTime) +' + '+mod);
+				Logger.get("animation").debug('anim: '+ (now-beginTime) +' + '+mod);
 
 				//Set the scroll
 				if( beginScroll < targetScroll ) { el.scrollTop = beginScroll + mod; }
@@ -652,7 +725,7 @@ function scrollToSmooth(el,targetScroll,duration) {
 
             } else {
 				//Final frame, don't schedule another.
-				// console.log('Ending animation: d:'+deadlock+' end:'+ (now > (beginTime + duration))+' s:'+el.scrollTop);
+				Logger.get("animation").debug('Ending animation: end:'+ (now > (beginTime + duration))+' s:'+el.scrollTop);
             	el.scrollTop = targetScroll;
             }
         }, 15 );
@@ -683,37 +756,6 @@ function scrollToSmooth(el,targetScroll,duration) {
 // 			if( now  >= end ) { done = 1; }
 // 	}
 // }
-
-//Class manipulation convenience functions
-function hasClass(el, className) {
-  if (el.classList)
-    return el.classList.contains(className);
-  else
-    return !!el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
-}
-
-function addClass(el, className) {
-  if (el.classList)
-    el.classList.add(className);
-  else if (!hasClass(el, className)) el.className += " " + className;
-}
-
-function removeClass(el, className) {
-  if (el.classList)
-    el.classList.remove(className);
-  else if (hasClass(el, className)) {
-    var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-    el.className=el.className.replace(reg, ' ');
-  }
-}
-
-function toggleClass(el, className, bool) {
-	if( (bool != null && bool) || hasClass(el,className) ) {
-		removeClass(el,className);
-	} else {
-		addClass(el,className);
-	}
-}
 
 function addEvent(object, type, callback) {
     if (object == null || typeof(object) == 'undefined') return;

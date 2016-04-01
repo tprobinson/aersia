@@ -21,7 +21,7 @@ var Tabs = {
   },
 
   initComponent: function() {
-    
+
     //keep a reference to this (Tabs) object.
     var self = this;
 
@@ -62,12 +62,12 @@ var Tabs = {
     var tabs        = tabsWrap.find(this.tabsClass);
     var tabContents = tabsWrap.find(this.tabContentClass);
     var effect      = tabsWrap.data('effeckt-type');
-    
+
     //set active to this current clicked tab
     tabs.removeClass('active');
     tab.addClass('active');
 
-    var tabID = tab.attr('href');
+    var tabID = tab.data('tab-id');
     var tabContent = tabContents.filter(tabID);
 
     tabContents.removeClass('effeckt-show').addClass('effeckt-hide');
