@@ -1,7 +1,7 @@
 {
   "name": "aersia",
   "friendlyname": "Aersia Player",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "repository": "https://github.com/tprobinson/vip.git",
   "devDependencies": {
@@ -23,6 +23,7 @@
     "grunt-phplint": "0.0.8",
     "grunt-preprocess": "^5.0.1",
     "grunt-processhtml": "^0.3.8",
+    "grunt-real-favicon": "^0.1.6",
     "grunt-sass": "^1.1.0",
     "grunt-sass-globbing": "^1.4.0",
     "grunt-shell": "^1.2.1",
@@ -38,7 +39,9 @@
   },
   "dependencies": {
     "angular": "^1.5.0",
+    "clipboard": "^1.5.10",
     "desandro-classie": "^1.0.1",
+    "grunt-modernizr": "^1.0.2",
     "js-cookie": "^2.1.0",
     "js-logger": "^1.2.0",
     "multiline": "^1.0.2",

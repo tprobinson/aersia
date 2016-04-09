@@ -16,6 +16,5 @@
 !/css/boilerplate.css
 !/css/custom.css
 
-/js/plugins.js
-
 npm-debug.log
+.grunt/

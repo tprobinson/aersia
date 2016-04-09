@@ -1,6 +1,32 @@
 Replacing Aersia's Flash-based player, for fun and ~~profit~~!
 
-#Done in version 0.0.4:
+#Done in version 0.0.5:
+* Song information panel
+ * Toggle shuffling to current song
+ * Direct download
+ * Sharing links, which can share just a playlist or playlist+song
+* Layouts panel
+* Internals
+ * Updated Modernizr to 3, now supporting Opus detection.
+ * Check available filetypes for each song and choose best available
+ * Generated favicons for every platform
+
+
+
+#Planned for the next version:
+* More interface reworks
+* Song information panel
+ * Cover art or other art of song
+ * Selection of original/remixes
+* More layouts
+* Revamp playlist structure to support all of this relational information.
+
+#Planned for the future:
+* Mobile support?
+* Compile the JS
+
+##Previous Versions
+###0.0.4
 * Rebranding from VIP to Aersia
 * Play history
  * Player tracks up to 100 songs of history, and Prev button will go back in this list.
@@ -17,22 +43,6 @@ Replacing Aersia's Flash-based player, for fun and ~~profit~~!
  * Partially rewrote modules/tabs.js to use data tags instead of href, as that can interfere with link sharing
 * Updated robots.txt and humans.txt
 
-#Planned for the next version:
-* Cleaning out junk
-* Directly linking to songs
-* Song information panel
- * Cover art or other art of song
- * Direct download link
- * Selection of original/remixes
- * Disallow shuffling to current song
-* More layouts
-* Revamp playlist structure to support all of this relational information.
-
-#Planned for the future:
-* Mobile support?
-* Compile the JS
-
-##Previous Versions
 ###0.0.3
 * Increase the size of the playlist items on the touch interface
 * Add some support for saving/loading/remembering themes, so if a user sets it the app will read a cookie to get their preferences, or presets.

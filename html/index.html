@@ -9,17 +9,18 @@
         <title><!--%= friendlyname --> v<!--%= version --></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="apple-touch-icon" href="apple-touch-icon.png">
-		<link rel="shortcut icon" href="favicon.ico">
-		<link rel="icon" type="image/png" href="favicon.png">
+
+        <!-- Generated favicons -->
+        <!--%= favicons -->
 
         <link href='https://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="assets/css/tidy.min.css">
 
-        <script src="assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+        <script src="assets/js/modernizr.js"></script>
     </head>
     <body ng-controller="aersiaController as aersiaCtrl">
-        <!--%= compiledsvg -->
+        <!--%= compiledicons -->
+        <!--%= compiledlayouts -->
         <!--[if lt IE 8]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
@@ -67,28 +68,85 @@
                 <div class="effeckt-tabs-container">
 
                     <div id="tab-songinfo" class="effeckt-tab-content">
-                        <div style="font-size:48px;text-align:center">¯\_(ツ)_/¯</div>
+                        <div class="hbox nogrow"> <!-- Image and controls near image -->
+                            <div class="vbox"><img id="songimg" src="assets/img/placeholder.png" /></div>
+                        </div>
+
+                        <!-- Song information, links, etc. -->
+                        <div class="infopane-h">
+                            <div class="vbox">
+                                <li id="curSongTitle">Loading...</li>
+                                <li id="curSongCreator">Loading...</li>
+                                <li><strike>album name?</strike></li>
+                                <div class="controls-container">
+                                    <div id="toggleShuffle" class="controlsToggle" ng-click="aersiaCtrl.toggleShuffle();">
+                                        <svg width="17px" height="17px" ><use xlink:href="#icon-poweron" /></svg>
+                                        <svg width="17px" height="17px" ><use xlink:href="#icon-poweroff" /></svg>
+                                    </div>
+
+                                    <div style="display:none;">
+                                        <div class="spacer"></div>
+                                        <div id="rateup" ng-click="aersiaCtrl.rateUp();">
+                                            <svg width="17px" height="17px" ><use xlink:href="#icon-rateup" /></svg>
+                                        </div>
+                                        <div id="ratedown" ng-click="aersiaCtrl.rateDown();">
+                                            <svg width="17px" height="17px" ><use xlink:href="#icon-ratedown" /></svg>
+                                        </div>
+                                        <div class="controls-text" id="curSongRating" >0</div>
+                                    </div>
+                                    <div class="spacer"></div>
+                                    <div ng-click="aersiaCtrl.triggerLinkDownload(aersiaCtrl.songs[aersiaCtrl.curSong].location)" >
+                                        <svg width="17px" height="17px" ><use xlink:href="#icon-download" /></svg>
+                                    </div>
+                                    <div id="copyBtn" >
+                                        <svg width="17px" height="17px" ><use xlink:href="#icon-share" /></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vbox">
+                                <section>
+                                    <div><label>
+                                        Playlists
+                                        <select name="preset" ng-model="aersiaCtrl.selectedPlaylist" ng-change="aersiaCtrl.changePlaylist();" />
+                                            <option ng-repeat="(option,null) in aersiaCtrl.playlists" value="{{option}}">{{aersiaCtrl.playlists[option].longName}}</option>
+                                        </select>
+                                    </label></div>
+                                </section>
+                                <div class='sep'></div>
+                                <section>
+                                    <div><label class="topcoat-checkbox"><input type="checkbox" name="autoplay" ng-model="aersiaCtrl.autoplay" /><div class="topcoat-checkbox__checkmark"></div>Autoplay</label></div>
+                                    <div><label class="topcoat-checkbox"><input type="checkbox" name="anims" ng-model="aersiaCtrl.animationsEnabled" /><div class="topcoat-checkbox__checkmark"></div>Scroll Smooth</label></div>
+                                </section>
+                            </div>
+                            <!-- Song remix information -->
+                            <div class="infopane-v space" ng-show="aersiaCtrl.songs[aersiaCtrl.curSong].remixes.length >= 0">
+                                <div>Remixes
+                                    <div class="playlist">
+                                        <li ng-click="aersiaCtrl.playSong($index)"
+                                            ng-repeat="song in aersiaCtrl.songs[aersiaCtrl.curSong].remixes track by $index">{{song.creator}} - {{song.title}}</li>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="tab-layout" class="effeckt-tab-content">
-                        <div><label class="topcoat-checkbox"><input type="checkbox" name="touch" ng-model = "aersiaCtrl.touchLayoutEnabled" ng-click="aersiaCtrl.toggleTouchLayout();" /><div class="topcoat-checkbox__checkmark"></div>Touch Layout</label></div>
-                        <div style="font-size:48px;text-align:center">¯\_(ツ)_/¯</div>
+                        <div class="infopane-h space">
+
+                            <!-- put boxes here for each layout, create switcher method in js -->
+                            <div class="vbox centertext" ng-repeat="(name,obj) in aersiaCtrl.layouts" ng-click="aersiaCtrl.switchLayout(name)">
+                                <div>
+                                    <svg width="120px" height="120px" ><use xlink:href="{{'#' + obj.href}}" /></svg>
+                                </div>
+                                <div>{{name}}</div>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="tab-player" class="effeckt-tab-content">
-                        <section>
-                            <div><label>
-                                Playlists
-                                <select name="preset" ng-model="aersiaCtrl.selectedPlaylist" ng-change="aersiaCtrl.changePlaylist();" />
-                                    <option ng-repeat="(option,style) in aersiaCtrl.playlists" value="{{option}}">{{option}}</option>
-                                </select>
-                            </label></div>
-                        </section>
-                        <div class='sep'></div>
-                        <section>
-                            <div><label class="topcoat-checkbox"><input type="checkbox" name="autoplay" ng-model="aersiaCtrl.autoplay" /><div class="topcoat-checkbox__checkmark"></div>Autoplay</label></div>
-                            <div><label class="topcoat-checkbox"><input type="checkbox" name="anims" ng-model="aersiaCtrl.animationsEnabled" /><div class="topcoat-checkbox__checkmark"></div>Scroll Smooth</label></div>
-                        </section>
+                        <div class="infopane-h">
+
+                        </div>
                     </div>
 
                     <div id="tab-theme" class="effeckt-tab-content">
@@ -138,55 +196,55 @@
                 </div>
             </div>
         </div>
-
-        <div class="controls-container hbox">
-			<audio> <!--<script type="text/javascript">location.href='vip.swf';</script>--> <p>Your browser does not support the <code>audio</code> element.</p> </audio>
-            <div id="playpause" ng-click="aersiaCtrl.togglePlay();">
-                <svg width="17px" height="17px" ><use xlink:href="#icon-play" /></svg>
-                <svg width="17px" height="17px" ><use xlink:href="#icon-pause" /></svg>
-            </div>
-            <div id="prev" ng-click="aersiaCtrl.seek(-1);">
-                <svg width="17px" height="17px" ><use xlink:href="#icon-prev" /></svg>
-            </div>
-            <div id="next" ng-click="aersiaCtrl.seek(1);">
-                <svg width="17px" height="17px" ><use xlink:href="#icon-next" /></svg>
-            </div>
-            <div class="timebox">
-                <div id="timeText">00:00</div>
-                <div class="vbox">
-                    <div id="timeline" ng-click="aersiaCtrl.seekBar($event);">
-                        <div id="loadBar"></div>
-                        <div id="playedBar"></div>
+        <div class="vbox">
+            <div class="controls-container fullwidth">
+    			<audio> <!--<script type="text/javascript">location.href='vip.swf';</script>--> <p>Your browser does not support the <code>audio</code> element.</p> </audio>
+                <div id="playpause" class="controlsToggle" ng-click="aersiaCtrl.togglePlay();">
+                    <svg width="17px" height="17px" ><use xlink:href="#icon-play" /></svg>
+                    <svg width="17px" height="17px" ><use xlink:href="#icon-pause" /></svg>
+                </div>
+                <div id="prev" ng-click="aersiaCtrl.seek(-1);">
+                    <svg width="17px" height="17px" ><use xlink:href="#icon-prev" /></svg>
+                </div>
+                <div id="next" ng-click="aersiaCtrl.seek(1);">
+                    <svg width="17px" height="17px" ><use xlink:href="#icon-next" /></svg>
+                </div>
+                <div class="timebox">
+                    <div class="controls-text" id="timeText">00:00</div>
+                    <div class="vbox">
+                        <div id="timeline" ng-click="aersiaCtrl.seekBar($event);">
+                            <div id="loadBar"></div>
+                            <div id="playedBar"></div>
+                        </div>
+                        <div id="playhead"></div>
                     </div>
-                    <div id="playhead"></div>
+                    <div class="controls-text" id="loadPct">0%</div>
                 </div>
-                <div id="loadPct">0%</div>
-            </div>
-            <div id="gear" ng-click="aersiaCtrl.toggleOptionsBox();">
-            <svg width="17px" height="17px" ><use xlink:href="#icon-gear" /></svg>
-            </div>
-            <div id="fullscreen" ng-click="aersiaCtrl.toggleFullscreen();">
-            <svg width="17px" height="17px" ><use xlink:href="#icon-fullscreen" /></svg>
-            </div>
-            <div class="volbox hbox">
-                <div id="volumeMute" ng-click="aersiaCtrl.toggleMute();" ng-class="{ controlsMuted: aersiaCtrl.prevVolume > 0 }">
-                    <svg width="17px" height="17px" ><use xlink:href="#icon-vol" /></svg>
-                    <svg width="17px" height="17px" ><use xlink:href="#icon-volMute" /></svg>
+                <div id="gear" ng-click="aersiaCtrl.toggleOptionsBox();">
+                <svg width="17px" height="17px" ><use xlink:href="#icon-gear" /></svg>
                 </div>
-                <div id="volumeBar" ng-click="aersiaCtrl.volume($event);">
+                <div id="fullscreen" ng-click="aersiaCtrl.toggleFullscreen();">
+                <svg width="17px" height="17px" ><use xlink:href="#icon-fullscreen" /></svg>
                 </div>
-                <div id="volumeMax" ng-click="aersiaCtrl.volume('',1);">
+                <div class="volbox hbox">
+                    <div id="volumeMute" class="controlsToggle" ng-click="aersiaCtrl.toggleMute();" ng-class="{ toggled: aersiaCtrl.prevVolume === 0 }">
+                        <svg width="17px" height="17px" ><use xlink:href="#icon-vol" /></svg>
+                        <svg width="17px" height="17px" ><use xlink:href="#icon-volMute" /></svg>
+                    </div>
+                    <div id="volumeBar" ng-click="aersiaCtrl.volume($event);">
+                    </div>
+                    <div id="volumeMax" ng-click="aersiaCtrl.volume('',1);">
+                    </div>
+                </div>
+            </div>
+
+            <div class="playlist-container hbox">
+                <div class="playlist vbox" id="playlist">
+                    <li ng-click="aersiaCtrl.playSong($index)"
+                        ng-repeat="song in aersiaCtrl.songs track by $index">{{song.creator}} - {{song.title}}</li>
                 </div>
             </div>
         </div>
-
-        <div class="playlist-container hbox clearfix">
-            <div class="playlist vbox clearfix" id="playlist">
-                <li ng-click="aersiaCtrl.playSong(song)"
-                    ng-repeat="song in aersiaCtrl.songs track by song.index">{{song.creator}} - {{song.title}}</li>
-            </div>
-        </div>
-
         <!-- <div class="footer-container">
         <div class="statusbox"><div class="statustext"><span>Status</span></div></div>
             <footer class="wrapper hbox">

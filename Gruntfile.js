@@ -42,6 +42,28 @@ module.exports = function(grunt) {
             }
         },
 
+        modernizr: {
+            dist: {
+                "crawl": false,
+                "customTests": [],
+                "dest": "<%= dirs.output %>assets/js/modernizr.js",
+                "tests": [
+                    "audio",
+                    "cookies",
+                    "eventlistener",
+                    "forcetouch",
+                    "fullscreen",
+                    "hashchange",
+                    "audiopreload"
+                ],
+                "options": [
+                    "setClasses"
+                ],
+                "uglify": true
+            }
+        },
+
+
         watch: {
             scss: {
                 files: ['scss/**/*.scss'],
@@ -60,7 +82,7 @@ module.exports = function(grunt) {
                 tasks: ['css']
             },
             js: {
-                files: ['js/modules/*.js','node_modules/desandro-classie/classie.js'],
+                files: ['js/modules/*.js','node_modules/desandro-classie/classie.js','node_modules/clipboard/dist/clipboard.js'],
                 tasks: ['concat:js','copy:js']
             },
             mainjs: {
@@ -91,9 +113,17 @@ module.exports = function(grunt) {
                 files: ['files/**/*.xml','files/**/*.txt','files/**/*.ico'],
                 tasks: 'copy:root'
             },
-            svgs: {
-                files: ['icons/*.svg'],
-                tasks: ['svgstore','template:html']
+            icons: {
+                files: ['svg/icons/*.svg'],
+                tasks: ['svgstore:icons','template:html']
+            },
+            layouts: {
+                files: ['svg/layouts/*.svg'],
+                tasks: ['svgstore:layouts','template:html']
+            },
+            img: {
+                files: ['img/**/*.*'],
+                tasks: ['image:img']
             },
             livereload: {
                 options: {
@@ -136,14 +166,21 @@ module.exports = function(grunt) {
                 delimiters: 'html-comments-delimiters',
                 data: function() {
                     //Provide the generated SVGSTORE file
-                    var svg = grunt.file.read(dirs.generated+'icons.include');
+                    var iconstring = grunt.file.read(dirs.generated+'icons.include');
+                    iconstring = iconstring.replace(new RegExp('viewBox'),'style="visibility:hidden;width:0;height:0;" viewBox');
 
-                    svg = svg.replace(new RegExp('viewBox'),'style="visibility:hidden;width:0;height:0;" viewBox');
+                    var layoutstring = grunt.file.read(dirs.generated+'layouts.include');
+                    layoutstring = layoutstring.replace(new RegExp('viewBox'),'style="visibility:hidden;width:0;height:0;" viewBox');
+
+                    //Provide the generated favicon markup
+                    var favicon = grunt.file.read(dirs.generated+'favicon.html');
 
                     return {
                         version: pkg.version,
                         friendlyname: pkg.friendlyname,
-                        compiledsvg: svg
+                        compiledicons: iconstring,
+                        compiledlayouts: layoutstring,
+                        favicons: favicon,
                     };
                 }
             }
@@ -227,7 +264,7 @@ copy: {
     },
     js: {
         files: [
-            { expand: true, cwd: './js', src: ['*.js','!main.js','vendor/**'], dest: '<%= dirs.output %>assets/js' }
+            { expand: true, cwd: './js', src: ['vendor/**', '../<%= dirs.generated %>plugins.js'], dest: '<%= dirs.output %>assets/js' }
         ]
     },
     nodeModules: {
@@ -257,6 +294,7 @@ concat: {
             'js/modules/list-scroll.js',
 
             'node_modules/desandro-classie/classie.js',
+            'node_modules/clipboard/dist/clipboard.js',
             'js/modules/js.cookie.js',
             'js/modules/jquery.hashchange.js',
             'js/modules/jquery.timeago.js',
@@ -264,7 +302,7 @@ concat: {
             //My libraries
             'js/modules/library.js',
         ],
-        dest: 'js/plugins.js'
+        dest: '<%= dirs.generated %>plugins.js'
     },
     tidycss: {
         src: [
@@ -386,43 +424,35 @@ image: {
             src: ['img/**/*.*'],
             dest: '<%= dirs.output %>assets/'
         }]
-    },
-    root: {
-        options: {
-            pngquant: true,
-            optipng: true,
-            advpng: true,
-            zopflipng: true,
-            pngcrush: true,
-            pngout: true,
-            mozjpeg: true,
-            jpegRecompress: true,
-            jpegoptim: true,
-            gifsicle: true,
-            svgo: true
-        },
-        files: [{
-            expand: true,
-            flatten: true,
-            src: ['files/**/*.svg','files/**/*.png'],
-            dest: '<%= dirs.output %>'
-        }]
     }
 },
 
 svgstore: {
-    options: {
-        prefix : 'icon-', // This will prefix each <g> ID
-        inheritviewbox: true,
-        includedemo: true,
-        svg: {
-            viewBox : '0 0 17 17',
-            xmlns: 'http://www.w3.org/2000/svg'
+    icons: {
+        options: {
+            prefix : 'icon-', // This will prefix each <g> ID
+            inheritviewbox: true,
+            // includedemo: true,
+            svg: {
+                viewBox : '0 0 17 17',
+                xmlns: 'http://www.w3.org/2000/svg'
+            }
+        },
+        files: {
+            '<%= dirs.generated %>icons.include': ['svg/icons/*.svg'],
         }
     },
-    default : {
+    layouts: {
+        options: {
+            inheritviewbox: true,
+            // includedemo: true,
+            svg: {
+                viewBox : '0 0 120 120',
+                xmlns: 'http://www.w3.org/2000/svg'
+            }
+        },
         files: {
-            '<%= dirs.generated %>icons.include': ['icons/*.svg'],
+            '<%= dirs.generated %>layouts.include': ['svg/layouts/*.svg'],
         }
     }
 },
@@ -455,7 +485,7 @@ uglify: {
         files: {
             '<%= dirs.output %>assets/js/main.js': [
                 'node_modules/angular/angular.js',
-                'js/plugins.js',
+                '<%= dirs.generated %>plugins.js',
                 'js/main.js'
             ]}
         }
@@ -468,18 +498,88 @@ uglify: {
         logger: {
             command: '/home/micheal/Filing Cabinet/Projects/vip/node_modules/js-logger/node_modules/.bin/gulp'
         }
-    }
+    },
+
+	realFavicon: {
+		favicons: {
+			src: 'files/aersia.svg',
+			dest: '<%= dirs.output %>',
+			options: {
+				iconsPath: '/',
+				html: [ '<%= dirs.generated %>favicon.html' ],
+				design: {
+					ios: {
+						pictureAspect: 'backgroundAndMargin',
+						backgroundColor: '#ff9148',
+						margin: '11%',
+						appName: 'Aersia Player'
+					},
+					desktopBrowser: {},
+					windows: {
+						masterPicture: {
+							type: 'inline',
+							content: 'files/aersia-silhouette.svg',
+						},
+						pictureAspect: 'whiteSilhouette',
+						backgroundColor: '#da532c',
+						onConflict: 'override',
+						appName: 'Aersia Player'
+					},
+					androidChrome: {
+						pictureAspect: 'noChange',
+						themeColor: '#ffffff',
+						manifest: {
+							name: 'Aersia Player',
+							display: 'browser',
+							orientation: 'notSet',
+							onConflict: 'override',
+							declared: true
+						}
+					},
+					safariPinnedTab: {
+						masterPicture: {
+							type: 'inline',
+							content: 'files/aersia-silhouette.svg',
+						},
+						pictureAspect: 'silhouette',
+						themeColor: '#183C63'
+					}
+				},
+				settings: {
+					compression: 2,
+					scalingAlgorithm: 'Mitchell',
+					errorOnImageTooSmall: false
+				}
+			}
+		}
+	}
 
 });
 
-grunt.registerTask('scss', ['sass_globbing:effeckt','sass'/*,'concat:effeckt'*/]);
+grunt.registerTask('scss', ['sass_globbing:effeckt','sass']);
 grunt.registerTask('css', ['uncss:tidy','concat:tidycss','autoprefixer:tidy','cssmin:tidy']);
 
 grunt.registerTask('js', ['concat:js','copy:js','copy:nodeModules','template-js']);
 grunt.registerTask('dev', ['connect', 'watch']);
 grunt.registerTask('watchnow', ['watch']);
 
-grunt.registerTask('full-deploy', ['shell:ps','shell:logger','scss','css','js','svgstore','copy:root','copy:font','template:html','image:img','image:root']);
+grunt.registerTask('full-deploy', [
+    // Build node-modules
+    'shell:ps','shell:logger',
+
+    // Compile CSS files
+    'scss','css',
+
+    // Put together the JS files
+    'js','modernizr',
+
+    // Prepare static resources
+    'svgstore:icons','svgstore:layouts','realFavicon','copy:root','copy:font','image:img','image:root',
+
+    // Template files
+    'template:html'
+]);
+
 grunt.registerTask('full-development-deploy', ['set-development','full-deploy']);
 
 grunt.registerTask('template-all', ['prepare-variables','template:html','template:js']);
@@ -497,8 +597,6 @@ grunt.registerTask('set-development','Sets a variable',function() { development 
 
 grunt.registerTask('prepare-variables','Reads config vars and parses them',function() {
     //Build the string blocks
-
-
 });
 
 };

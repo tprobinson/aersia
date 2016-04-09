@@ -179,6 +179,8 @@ input, select { color: #333; }
 
 .center { justify-content: center; }
 .end { justify-content: flex-end; }
+.space { justify-content: space-around; }
+.spread { justify-content: space-between; }
 .aend { align-items: flex-end; }
 
 .centertext { text-align: center; }
@@ -190,6 +192,8 @@ input, select { color: #333; }
 
 .margins-tb { margin-top: 0.75rem; margin-bottom: 0.75rem; }
 .margins-lr { margin-left: 0.75rem; margin-right: 0.75rem; }
+
+.fullwidth { width: 100%; }
 
 .halfview { max-width: 49.5%; } .mh100 { max-height: 100%; }/* REWORK: Why does output put so much pressure? */
 .fullview { max-width: 90%; }
@@ -208,62 +212,62 @@ body {
 }
 
 /* Touch style interface */
-html.touch body {
+html.touchevents body {
 	flex-direction: column-reverse;
 }
 
-html.touch .controls-container {
+html.touchevents .controls-container {
 	height: 7vh;
 }
 
-html.touch .controls-container>div, html.touch #volumeMute {
+html.touchevents .controls-container>div, html.touchevents #volumeMute {
 	width: 7vh;
 	height: 7vh;
 }
-html.touch .controls-container svg {
+html.touchevents .controls-container svg {
 	width: 100%;
 	height: 100%;
 }
 
-html.touch .playlist-container {
+html.touchevents .playlist-container {
 	height: 93vh;
 }
 
-html.touch .controls-container .volbox {
+html.touchevents .controls-container .volbox {
 	width: auto;
 }
 
-html.touch #volumeMax {
+html.touchevents #volumeMax {
 	width: 7vh;
 	height: 7vh;
 }
 
 /* An invisible hitbox to max volume */
-html.touch #volumeMax {
+html.touchevents #volumeMax {
 	width: 2vh;
 	height: 7vh;
 }
 
-html.touch #timeline, html.touch #loadBar, html.touch #playedBar {
+html.touchevents #timeline, html.touchevents #loadBar, html.touchevents #playedBar {
 	height: 3vh;
 }
 
-html.touch #volumeBar {
+html.touchevents #volumeBar {
 	border-width: 2vh 11vh 2vh 0;
 }
 
-html.touch #playhead{
+html.touchevents #playhead{
 	width: 0.25vh;
 	height: 5vh;
 	top: 50%;
 	transform: translateY(-50%);
 }
 
-html.touch #timeText, html.touch #loadPct {
+html.touchevents .controls-text {
 	font-size: 2vh;
 }
 
-html.touch .playlist>li {
+html.touchevents .playlist>li {
 	padding: 0 1vw;
 	line-height: 3vh;
 	font-size: 2vh;
@@ -272,7 +276,7 @@ html.touch .playlist>li {
 /* For theming, collect all items of the same color and theme them here. */
 
 /* Orange: #FF9148 */
-/* Items with fill */ g, path { fill: #FF9148; }
+/* Items with fill */ g, rect, path { fill: #FF9148; }
 /* Items with color */ .controls-container, .playlist-container, .optionsbox { color: #FF9148; }
 /* Items with background-color */
 #playedBar,
@@ -362,27 +366,46 @@ section,
 	justify-content: space-around;
 	width: 100vw;
 	box-sizing: border-box;
-}
-
-.effeckt-tabs-container {
-	padding: 1vh 0;
-}
-
-
-/* Styles for the player controls */
-.controls-container {
-	width: 100vw;
-	height: 19px;
-	display: flex;
-	flex: 0 0 auto;
 
 	box-shadow: -5px -5px 10px 0 rgba(0,0,0,0.2) inset;
 }
 
+#tab-songinfo>.infopane-h {
+	background: -moz-linear-gradient(-45deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 30%);
+	background: -webkit-linear-gradient(-45deg, rgba(0,0,0,0.6) 0%,rgba(0,0,0,0) 30%);
+	background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%,rgba(0,0,0,0) 30%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#99000000', endColorstr='#00000000',GradientType=1 );
+}
+
+#curSongTitle, #curSongCreator {
+	text-shadow: 1px 1px 2px #222, 2px 0 1px #222;
+}
+
+
+
+
+/* Styles for the player controls */
+.controls-container {
+	height: 19px;
+	display: flex;
+	flex: 0 0 auto;
+	align-self: flex-start;
+	overflow:hidden;
+}
+
+.vbox.controls-container {
+	height: auto;
+	width: 19px;
+}
+
 .controls-container div {
 	display: flex;
-	flex: 0 1 auto;
+	flex: 0 0 auto;
 	vertical-align:middle;
+}
+
+.spacer {
+	width: 25px;
 }
 
 /* Give a one-pixel gap to show the gradient border through */
@@ -391,8 +414,17 @@ section,
 	margin-right: 0;
 }
 
+.vbox.controls-container>div {
+	margin: 1px;
+	margin-bottom: 0;
+}
+
 .controls-container>div:last-of-type, .effeckt-tabs>li:last-of-type {
 	margin-right: 1px;
+}
+
+.vbox.controls-container>div:last-of-type, {
+	margin-bottom: 1px;
 }
 
 .controls-container svg {
@@ -400,19 +432,22 @@ section,
 	width: 17px;
 }
 
-#playpause>svg:last-child { display:none; }
-#playpause.controlsPlaying>svg:first-child {display:none;}
-#playpause.controlsPlaying>svg:last-child {display:flex;}
+.controlsToggle>svg:last-child {display:none; }
+.controlsToggle.toggled>svg:first-child {display:none;}
+.controlsToggle.toggled>svg:last-child {display:flex;}
+
 
 #timeText, #loadPct {
 	margin-left: 5px;
 	margin-right: 15px;
+}
+
+.controls-text {
+	line-height: 0;
+	transform:translateY(50%); /* vertical centering on responsive display */
 	font-size: 10px;
 	text-align:center;
 	font-weight: bold;
-
-	line-height: 0;
-	transform:translateY(50%); /* vertical centering on responsive display */
 }
 
 .controls-container>.timebox, .timebox>.vbox{
@@ -473,7 +508,7 @@ section,
 	height: 17px;
 }
 
-/*html.touch .optionsbox {
+/*html.touchevents .optionsbox {
 	top: auto;
 	left: 0;
 	right: 0;
@@ -493,7 +528,7 @@ section,
 	border-style: solid;*/
 }
 
-html.touch section label /* to expand the hitbox */
+html.touchevents section label /* to expand the hitbox */
 {
 	display: flex;
 	flex: 1 1 auto;
@@ -506,7 +541,7 @@ section label {
 	padding: 5px 0;
 }
 
-html.touch section>div {
+html.touchevents section>div {
 	margin: 0.5vh 1vw;
 }
 
@@ -536,13 +571,13 @@ section {
 	padding: 3px 10px;
 }
 
-html.touch section {
+html.touchevents section {
 	flex-direction: row;
 }
 
-html.touch .sep {
+/*html.touchevents .sep {
 	width: 93vw;
-}
+}*/
 
 .sep {
 	border-bottom-width: 1px;
@@ -563,7 +598,7 @@ html.touch .sep {
 	overflow:hidden;
 }
 
-.playlist {  position: relative; overflow:hidden; height: 100%;}
+.playlist {  position: relative; overflow:hidden; height: 100%; }
 
 .playlist>li {
 	padding: 0 10px;
@@ -583,6 +618,21 @@ header h1 { display: flex; flex: 1 1 auto; }
 /* Items that do grow and shrink */
 .playlist-container {
 	flex: 1 1 0;
+}
+
+.infopane-h, .infopane-v {
+	display: flex;
+	flex: 1 1 auto;
+}
+
+.infopane-h {
+	flex-direction: row;
+	padding: 0.5vh 1vw;
+}
+
+.infopane-v {
+	flex-direction: column;
+	padding: 1vh 0.5vw;
 }
 
 

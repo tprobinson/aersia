@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="120"
+   height="120"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="layout-touch.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.959798"
+     inkscape:cx="33.555711"
+     inkscape:cy="44.045165"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="1600"
+     inkscape:window-height="843"
+     inkscape:window-x="0"
+     inkscape:window-y="33"
+     inkscape:window-maximized="1"
+     inkscape:snap-bbox="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2985"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-932.36218)">
+    <rect
+       style="color:#000000;fill:#000000;fill-opacity:0.14925376;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3843"
+       width="114"
+       height="1"
+       x="3"
+       y="7"
+       transform="translate(0,932.36218)"
+       inkscape:tile-cx="60"
+       inkscape:tile-cy="7.5"
+       inkscape:tile-w="116"
+       inkscape:tile-h="1"
+       inkscape:tile-x0="2"
+       inkscape:tile-y0="7" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,6)"
+       id="use4123"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,12)"
+       id="use4125"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,18)"
+       id="use4127"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,24)"
+       id="use4129"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,30)"
+       id="use4131"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,36)"
+       id="use4133"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,42)"
+       id="use4135"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,48)"
+       id="use4137"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,54)"
+       id="use4139"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,60)"
+       id="use4141"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,66)"
+       id="use4143"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,72)"
+       id="use4145"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,78)"
+       id="use4147"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,84)"
+       id="use4149"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,90)"
+       id="use4151"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,96)"
+       id="use4153"
+       width="120"
+       height="120" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#rect3843"
+       xlink:href="#rect3843"
+       transform="translate(0,102)"
+       id="use4155"
+       width="120"
+       height="120" />
+    <path
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#000000;fill-opacity:0.56218902;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+       d="m 1,933.36218 0,1 0,116.00002 0,1 1,0 116,0 1,0 0,-1 0,-116.00002 0,-1 -1,0 -116,0 -1,0 z m 2,2 114,0 0,114.00002 -114,0 0,-114.00002 z"
+       id="rect2987"
+       inkscape:connector-curvature="0" />
+    <rect
+       style="color:#000000;fill:#000000;fill-opacity:0.13930347;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3845"
+       width="114"
+       height="107"
+       x="3"
+       y="935.36218" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="controls">
+    <rect
+       style="color:#000000;fill:#000000;fill-opacity:0.84577116;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3763"
+       width="5"
+       height="5"
+       x="4"
+       y="111" />
+    <path
+       style="color:#000000;fill:#000000;fill-opacity:0.84577116;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       d="m 15,111 -5,2.5 5,2.5 z"
+       id="path3783"
+       inkscape:connector-curvature="0" />
+    <path
+       style="color:#000000;fill:#000000;fill-opacity:0.84577116;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       d="m 16,111 0,5 5,-2.5 z"
+       id="path3785"
+       inkscape:connector-curvature="0" />
+    <rect
+       style="color:#000000;fill:#000000;fill-opacity:0.84577116;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3810"
+       width="3"
+       height="2"
+       x="22"
+       y="113" />
+    <rect
+       style="color:#000000;fill:#000000;fill-opacity:0.84577116;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3812"
+       width="59"
+       height="3"
+       x="26"
+       y="112" />
+    <rect
+       style="color:#000000;fill:#000000;fill-opacity:0.84577116;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3816"
+       width="1"
+       height="5"
+       x="29"
+       y="111" />
+    <rect
+       style="color:#000000;fill:#000000;fill-opacity:0.84577116;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3814"
+       width="3"
+       height="2"
+       x="87"
+       y="112" />
+    <rect
+       style="color:#000000;fill:#000000;fill-opacity:0.84577116;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3824"
+       width="5"
+       height="5"
+       x="92"
+       y="111" />
+    <rect
+       style="color:#000000;fill:#000000;fill-opacity:0.84577116;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3826"
+       width="5"
+       height="5"
+       x="98"
+       y="111" />
+    <rect
+       style="color:#000000;fill:#000000;fill-opacity:0.84577116;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3828"
+       width="2"
+       height="5"
+       x="104"
+       y="111" />
+    <path
+       style="color:#000000;fill:#000000;fill-opacity:0.84577116;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       d="m 106,113.5 10,-2.5 0,5 z"
+       id="path3833"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

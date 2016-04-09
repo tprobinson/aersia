@@ -25,7 +25,7 @@
 		this.download.style = "display:none;visibility:hidden;";
 		this.download.download = "aersiaStyle.json";
 
-		//Create a bogus file input to upload stuff with
+		// Create a bogus file input to upload stuff with
 		this.upload = document.head.appendChild(document.createElement('input'));
 		this.upload.style = "display:none;visibility:hidden;";
 		this.upload.type = "file";
@@ -34,6 +34,13 @@
 
 		// Create x2js instance with default config
 		var x2js = new X2JS();
+
+		// Initialize the share button
+		var clipboard = new Clipboard(document.getElementById('copyBtn'), {
+			text: function(btn) {
+				return window.location.href + '#' + encodeURIComponent( this.selectedPlaylist + '|' + this.curSong );
+			}.bind(this)
+		});
 
 		//Init logger
 		Logger.useDefaults({
@@ -44,17 +51,19 @@
 		    }
 		});
 		Logger.get('internals').setLevel(Logger.INFO);
-		Logger.get('player').setLevel(Logger.WARN);
+		Logger.get('player').setLevel(Logger.INFO);
 		Logger.get('animation').setLevel(Logger.ERROR);
 
 		//Initialize variables
-		this.songs = '';
-		this.curSong = '';
+		this.songs = [];
+		this.noShuffles = {};
+		this.curSong = 0;
 		this.autoplay = true;
 		this.playing = false;
 		this.prevVolume = 0;
 		this.history = [];
 		this.historyPosition = 0;
+		this.preferredFormats = [ "opus","ogg","m4a","mp3" ];
 
 		// UI variables
 		this.lastTimeText = '';
@@ -62,18 +71,42 @@
 		this.fullyLoaded = 0;
 		this.optionsBoxShown = false;
 		this.animationsEnabled = true;
-		this.touchLayoutEnabled = false;
+		this.selectedLayout = "Classic";
+
+		this.layouts = {
+			"Classic": {
+				"class": "layout-classic",
+				"href": "layout-classic"
+			},
+			"Touch": {
+				"class": "touchevents",
+				"href": "layout-touch"
+			}
+		};
 
 		//js-cookie variables
 		this.cookieName = "aersia";
 		this.cookieConfig = { };
 
 		//Playlists
+		this.lastPlaylist = "";
 		this.selectedPlaylist = "VIP";
 		this.playlists = {
 			"VIP": {
 				"url": "http://vip.aersia.net/roster.xml",
 				"longName": "Vidya Intarweb Playlist",
+			},
+			"VIP - Source": {
+				"url": "http://vip.aersia.net/roster-source.xml",
+				"longName": "Vidya Intarweb Playlist - Source Edition",
+			},
+			"VIP - Exiled": {
+				"url": "http://vip.aersia.net/roster-exiled.xml",
+				"longName": "Vidya Intarweb Playlist - Exiled Edition",
+			},
+			"VIP - Mellow": {
+				"url": "http://vip.aersia.net/roster-mellow.xml",
+				"longName": "Vidya Intarweb Playlist - Mellow Edition",
 			},
 			"WAP": {
 				"url": "http://wap.aersia.net/roster.xml",
@@ -93,6 +126,11 @@
 		this.playhead = document.getElementById("playhead");
 		this.loadPct = document.getElementById("loadPct");
 		this.volumeBar = document.getElementById("volumeBar");
+
+		this.toggleShuffleBtn = document.getElementById("toggleShuffle");
+		this.curSongTitle = document.getElementById("curSongTitle");
+		this.curSongCreator = document.getElementById("curSongCreator");
+		this.curSongRating = document.getElementById("curSongRating");
 
 		/////
 		//Styles and Presets
@@ -119,7 +157,7 @@
 		// CSS definitions of where all the colors go
 		this.styleCssText = {
 			"focus": [
-				"g, path { fill: ","; }\n"+
+				"g, rect, path { fill: ","; }\n"+
 				".controls-container, .playlist-container, .optionsbox { color: ","; }\n"+
 				"#playedBar, #playhead,	.active-song, .ps-theme-vip>.ps-scrollbar-y-rail>.ps-scrollbar-y, .ps-theme-vip>.ps-scrollbar-x-rail>.ps-scrollbar-x { background-color: ","; }\n"+
 				"#volumeBar { border-color: transparent "," transparent transparent; }"
@@ -170,11 +208,20 @@
 			Ps.update(this.playlist);
 		}.bind(this));
 
-
 		/////
-		//Check if the document has the touch class as given by Modernizr
-		if( classie.hasClass(document.documentElement,'touch') ) { this.touchLayoutEnabled = true; }
+		// Bind to check the hash when it updates
+		window.onhashchange = function() {
+			var hash = this.decodeHash();
+			if( hash[0] !== false ) {
+				this.loadPlaylist(hash[1]);
+			} else {
+				this.playSong(hash[1]);
+			}
 
+			// Consume the hash so it won't screw up reloads.
+			window.location.hash = '';
+
+		}.bind(this);
 
 		/////
 		//Hook audio player
@@ -288,9 +335,15 @@
 
 		/////
 		// Player functions
-		this.loadPlaylist = function() {
-			if( this.selectedPlaylist != null && this.selectedPlaylist != "" && this.playlists[this.selectedPlaylist] != null )
+		this.loadPlaylist = function(start) {
+
+			if( this.selectedPlaylist == null || this.selectedPlaylist == "" ) { return; }
+			if( this.playlists[this.selectedPlaylist] == null ) { Logger.get("player").error("Playlist "+this.selectedPlaylist+" is invalid."); return; }
+
+			if( this.selectedPlaylist !== this.lastPlaylist )
 			{
+				// Loading a new playlist
+
 				//Stop the song.
 				this.pause();
 				this.resetControls();
@@ -302,22 +355,33 @@
 						//Convert it from XML to JSON
 						var playlist = x2js.xml2js(res.data).playlist.trackList.track;
 
-						//Give the song list an index for each song.
-						playlist.forEach(function(curValue,index,array) { curValue.index = index; });
-
 						//Set the song list
 						this.songs = playlist;
 
-						// Give Angular's list a little time to update, since it's stupid.
-						window.setTimeout(function(){
-							// Update the window's title.
-							document.title = this.playlists[this.selectedPlaylist].longName + ' - ' + this.friendlyname + ' v' + this.version;
+						this.lastPlaylist = this.selectedPlaylist;
 
-							// Then start playing, if we should do that.
-							if( this.autoplay )
-							{ this.shuffleSong(); }
-						}.bind(this),500);
-				}.bind(this));
+						// Update the window's title.
+						document.title = this.playlists[this.selectedPlaylist].longName + ' - ' + this.friendlyname + ' v' + this.version;
+
+						// If we're allowed, start playing.
+						if( this.autoplay )
+						{
+							// If we're supposed to start somewhere, do that. Otherwise, shuffle.
+							if( start != null && start !== false )
+							{ window.setTimeout(function() { this.playSong(start); }.bind(this),500); }
+							else
+							{ window.setTimeout(this.shuffleSong,500); }
+							// But give Angular's list a little time to update, since it's stupid.
+						}
+					}.bind(this));
+			}
+			else if( start != null && start !== false )
+			{
+				// Starting a song on this playlist without loading.
+
+				if( this.songs[start] == null ) { Logger.get("player").error("Requested song "+start+" is invalid."); return; }
+
+				this.playSong(start);
 			}
 		}.bind(this);
 
@@ -343,43 +407,124 @@
 				// Cut the history list down if it's at capacity
 				while( this.history.length > 99 ) { this.history.shift(); }
 				this.history.push(idx);
-				Logger.get("internals").info("History queue: "+this.history+" @ "+this.historyPosition);
+				Logger.get("internals").debug("History queue: "+this.history+" @ "+this.historyPosition);
 			}
 		}.bind(this);
 
 
-		this.playSong = function(song) {
+		this.playSong = function(index) {
+			if( index == null || index === false ) { return; }
+			index = parseInt(index);
+			if( index === this.curSong ) { return; }
 
 			//Stop and unregister the old song.
 			this.pause();
 			this.player.src = '';
-			if( this.curSong != null && this.curSong !== '' && this.playlist.children[this.curSong.index] != null )
-			{ classie.removeClass(this.playlist.children[this.curSong.index],'active-song'); }
-			// this.curSong = '';
-
+			if( this.curSong != null && this.playlist.children[this.curSong] != null )
+			{ classie.removeClass(this.playlist.children[this.curSong],'active-song'); }
 
 			//log
-			Logger.info("Playing song: "+song.title);
+			Logger.info("Playing song: "+this.songs[index].title);
+
+			// Set the interface for the new song
+			this.curSong = index;
+			this.updateCurSongInfo();
 
 			this.fullyLoaded = 0;
-			this.curSong = song;
-			classie.addClass(this.playlist.children[this.curSong.index],'active-song');
-			this.historyTrack(song.index); //Put this song in history
-			this.player.src = song.location;
+
+			// Set the shuffle control to reflect the disabled state
+			if( this.noShuffles[this.selectedPlaylist] != null && this.noShuffles[this.selectedPlaylist].indexOf(this.curSong) > -1 )
+			{ classie.addClass(this.toggleShuffleBtn, "toggled"); }
+			else
+			{ classie.removeClass(this.toggleShuffleBtn, "toggled"); }
+
+			// Highlight the active song
+			if( this.curSong != null && this.playlist.children[this.curSong] != null )
+			{ classie.addClass(this.playlist.children[this.curSong],'active-song'); }
+
+			// Put this song in history
+			this.historyTrack(this.curSong);
+
+			// Play
+			if( this.songs[this.curSong].formats != null )
+			{
+				var selFormat = '';
+				try {
+					this.preferredFormats.forEach(function(format) {
+						if( this.songs[this.curSong].formats[format] != null )
+						{ selFormat = format; throw BreakException; }
+					});
+				} catch(e) { // alert for now, use a message box later
+					if (e!==BreakException) throw e;
+				}
+
+				if( selFormat === '' )
+				{
+					Logger.get("player").error("Unable to use any of the provided file formats. Trying location.");
+					this.player.src = this.songs[this.curSong].location;
+				}
+				else {
+					Logger.get("player").debug("Selected format "+selFormat);
+					this.player.src = this.songs[this.curSong].formats[format];
+				}
+
+			}
+			else {
+				this.player.src = this.songs[this.curSong].location;
+			}
+
 			this.play();
 
 			//Trigger the playlist to scroll.
-			this.scrollToSong(song);
+			this.scrollToSong(index);
 
 		}.bind(this);
 
 		this.shuffleSong = function() {
-			//Start a random song.
-			this.playSong(this.songs[Math.floor(Math.random() * this.songs.length)]);
+			Logger.time('Shuffle');
+			var list = this.songs;
+			if( this.noShuffles[this.selectedPlaylist] != null )
+			{
+				//Generate a list of songs we're allowed to play.
+				list = clone(this.songs);
+
+				this.noShuffles[this.selectedPlaylist].forEach(function(val){ list.splice(list.indexOf(val),1); }.bind(this));
+			}
+			Logger.time('Shuffle');
+
+			//Start a random song that we're allowed to play.
+			this.playSong(Math.floor(Math.random() * list.length));
 		}.bind(this);
 
-		this.isCurrentSong = function(song) {
-			return song.index === this.curSong.index;
+		this.isCurrentSong = function(index) {
+			return index === this.curSong;
+		}.bind(this);
+
+		this.rateUp = function() {
+			Logger.get("player").info("RateUp");
+		};
+
+		this.rateDown = function() {
+			Logger.get("player").info("RateDown");
+		};
+
+		this.toggleShuffle = function() {
+			//If we haven't blocked anything on this playlist yet, give it the structure.
+			if( this.noShuffles[this.selectedPlaylist] == null ) { this.noShuffles[this.selectedPlaylist] = []; }
+
+			var pos = this.noShuffles[this.selectedPlaylist].indexOf(this.curSong);
+			if( pos === -1 )
+			{
+				Logger.get("player").info("Disabled shuffle for "+this.curSong);
+				this.noShuffles[this.selectedPlaylist].push(this.curSong);
+				classie.addClass(this.toggleShuffleBtn,"toggled");
+			} else {
+				Logger.get("player").info("Enabled shuffle for "+this.curSong);
+				this.noShuffles[this.selectedPlaylist].splice(pos,1);
+				classie.removeClass(this.toggleShuffleBtn,"toggled");
+			}
+
+			this.setCookie();
 		}.bind(this);
 
 		/////
@@ -401,19 +546,19 @@
 
 			this.playing = true;
 
-			classie.addClass(this.playpause,"controlsPlaying");
+			classie.addClass(this.playpause,"toggled");
 		}.bind(this);
 
 		this.pause = function() {
 			this.player.pause();
 			this.playing = false;
-			classie.removeClass(this.playpause,"controlsPlaying");
+			classie.removeClass(this.playpause,"toggled");
 		}.bind(this);
 
 		this.seek = function(amt) {
-			// var index = this.curSong.index + amt;
+			// var index = this.curSong + amt;
 			// if( index >= 0 && index <= this.songs.length )
-			// { this.playSong(this.songs[index]); }
+			// { this.playSong(index); }
 			if( amt < 0 )
 			{
 				if( (this.history.length-1) >= 0 -(this.historyPosition + amt)  )
@@ -421,10 +566,8 @@
 					this.historyPosition += amt;
 					Logger.get("internals").debug("History rewind: "+this.history+" @ "+this.historyPosition);
 					this.playSong( // Play the song...
-						this.songs[ // in the playlist...
-							this.history[ // at history position...
-								(this.history.length-1) + this.historyPosition // offset by the end of the history queue.
-							]
+						this.history[ // at history position...
+							(this.history.length-1) + this.historyPosition // offset by the end of the history queue.
 						]
 					);
 				}
@@ -437,10 +580,8 @@
 				else {
 					this.historyPosition += amt;
 					this.playSong( // Play the song...
-						this.songs[ // in the playlist...
-							this.history[ // at history position...
-								(this.history.length-1) + this.historyPosition // offset by the end of the history queue.
-							]
+						this.history[ // at history position...
+							(this.history.length-1) + this.historyPosition // offset by the end of the history queue.
 						]
 					);
 				}
@@ -481,38 +622,51 @@
 			this.progressUpdate('',0);
 		}.bind(this);
 
-		this.scrollToSong = function(song) {
+		this.scrollToSong = function(index) {
 
 			//Get the elements' height, since this could change.
 			var height = this.playlist.firstElementChild.offsetHeight;
 
-			Logger.get("animation").debug('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+height*this.curSong.index);
+			Logger.get("animation").debug('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+height*index);
 
 			if( this.animationsEnabled )
 			{
 				//Make the playlist scroll to the currently playing song.
-				scrollToSmooth(this.playlist,height * this.curSong.index, 600);
+				scrollToSmooth(this.playlist,height * index, 600);
 			}
 			else
 			{
-				this.playlist.scrollTop = height*this.curSong.index;
-				// Ps.update(this.playlist); // update the scrollbar
+				this.playlist.scrollTop = height * index;
 			}
 		}.bind(this);
 
 		this.toggleOptionsBox = function() {
 			this.optionsBoxShown = !this.optionsBoxShown;
 
+			this.updateCurSongInfo();
+
 			//Trigger the scrollbar to fix itself.
 			Ps.update(this.playlist);
 		}.bind(this);
 
-		this.toggleTouchLayout = function() {
-			 classie.hasClass(document.documentElement,'touch') ? classie.removeClass(document.documentElement,'touch') : classie.addClass(document.documentElement,'touch');
+		this.setLayout = function(l) {
+			this.selectedLayout = l;
+
+			// uuugh this sucks
+			Object.keys(this.layouts).forEach(function(layout) { classie.removeClass(document.documentElement,this.layouts[layout].class); }.bind(this));
+
+			classie.addClass(document.documentElement,this.layouts[this.selectedLayout].class);
 
 			//Trigger the playlist to scroll in case the layout is messed up
 			this.scrollToSong(this.curSong);
+
 		}.bind(this);
+
+		// Wrapper that updates cookie
+		this.switchLayout = function(l) {
+			this.setLayout(l);
+			this.setCookie();
+		}
 
 		this.styleSet = function(type) {
 			//Recompile the selected style's node
@@ -550,13 +704,14 @@
 				Logger.get("internals").info("Setting preset to "+this.selectedPreset);
 				this.currentStyles = this.presetStyles[this.selectedPreset];
 				this.reloadStyle();
+				this.setCookie();
 			}
 		}.bind(this);
 
 		//Wrapper that calls them all
 		this.reloadStyle = function() {
-			Object.keys(this.styleCssText).forEach(function(val) { this.changeStyle(val); }.bind(this));
-			Object.keys(this.styleCssGradientText).forEach(function(val) { this.changeGradient(val); }.bind(this));
+			Object.keys(this.styleCssText).forEach(function(val) { this.styleSet(val); }.bind(this));
+			Object.keys(this.styleCssGradientText).forEach(function(val) { this.gradientSet(val); }.bind(this));
 		}.bind(this);
 
 
@@ -568,7 +723,7 @@
 			if( cookie == null ) { return 1; }
 
 			// Directly mapped properties
-			['autoplay','animationsEnabled','touchLayoutEnabled','currentStyles','selectedPreset','selectedPlaylist']
+			['autoplay','animationsEnabled','selectedLayout','currentStyles','selectedPreset','selectedPlaylist','noShuffles']
 			.forEach(function(val) {
 				if( cookie[val] != null && this[val] != null )
 				{ this[val] = cookie[val]; }
@@ -577,22 +732,31 @@
 			// Unpacked properties
 			if( cookie.lastVolume != null ) { this.player.volume = cookie.lastVolume; }
 
-			if( cookie.touchLayoutEnabled != null ) { cookie.touchLayoutEnabled ? classie.addClass(document.documentElement,"touch") : classie.removeClass(document.documentElement,"touch"); }
+			if( cookie.selectedLayout == null ) {
+				// First launch, if this is a touch device, put it into touch mode by default.
+				if( classie.hasClass(document.documentElement,'touchevents') ) { this.switchLayout("Touch"); }
+			} else {
+				this.setLayout(this.selectedLayout);
+			}
 
 			// Triggers
 			if( cookie.currentStyles != null ) { this.reloadStyle(); }
+
+			Logger.get("internals").info("Cookie read.");
 		}.bind(this);
 
 		this.setCookie = function() {
 			Cookies.set(this.cookieName, {
 				"autoplay": this.autoplay,
 				"animationsEnabled": this.animationsEnabled,
-				"touchLayoutEnabled": this.touchLayoutEnabled,
+				"selectedLayout": this.selectedLayout,
 				"currentStyles": this.currentStyles,
 				"lastVolume": this.player.volume,
 				"selectedPreset": this.selectedPreset,
 				"selectedPlaylist": this.selectedPlaylist,
+				"noShuffles": this.noShuffles,
 			}, this.cookieConfig);
+			Logger.get("internals").info("Cookie written.");
 		}.bind(this);
 
 		this.exportStyles = function() {
@@ -604,7 +768,7 @@
 			Logger.get('internals').info('FileReader loaded file.');
 			var result;
 
-			try { result = JSON.parse(event.target.result) }
+			try { result = JSON.parse(event.target.result); }
 			catch ( e ) { alert("File does not contain a valid style structure."); }
 
 			if( result != null )
@@ -619,6 +783,7 @@
 					this.currentStyles = result;
 					this.reloadStyle();
 					Logger.get('internals').info('Style imported successfully.');
+					this.setCookie();
 				} catch(e) { // alert for now, use a message box later
 					if (e!==BreakException) throw e;
 					alert("Imported style was not formatted correctly.");
@@ -642,9 +807,44 @@
 			Logger.get('internals').info('File download triggered.');
 		}.bind(this);
 
+		this.triggerLinkDownload = function(uri) {
+			this.download.href = uri;
+			this.download.dispatchEvent(new MouseEvent('click'));
+			Logger.get('internals').info('Link download triggered.');
+		}.bind(this);
+
 		this.triggerUpload = function() {
 			this.upload.dispatchEvent(new MouseEvent('click'));
 		}.bind(this);
+
+		this.decodeHash = function() {
+			var newPlaylist = false;
+			var newSong = false;
+			if( window.location.hash != null && window.location.hash !== '#' )
+			{
+				var bits = decodeURIComponent(window.location.hash).substr(1);
+				bits = bits.split('|');
+				if( this.playlists[bits[0]] != null )
+				{
+					newPlaylist = bits[0];
+
+					if( bits[1] != null )
+					{ newSong = bits[1]; }
+				}
+			}
+			Logger.get("internals").info("Hash decoded: "+newPlaylist+", "+newSong);
+			return [newPlaylist,newSong];
+		}.bind(this);
+
+		this.updateCurSongInfo = function() {
+			//Update the song panel
+			if( this.optionsBoxShown )
+			{
+				this.curSongTitle.innerHTML = this.songs[this.curSong].title;
+				this.curSongCreator.innerHTML = this.songs[this.curSong].creator;
+				this.curSongRating.innerHTML = "0"; //this.songs[this.curSong].rating;
+			}
+		};
 
 		/////
 		// Initialization
@@ -654,11 +854,23 @@
 			//Assign the default preset to the "current style";
 			this.currentStyles = this.presetStyles[this.selectedPreset];
 
-			// Get any stored values that will influence our starting parameters.
+			// Get any stored values that will override our defaults.
 			this.getCookie();
 
+			// Detect browser support for file formats and remove any formats that are not supported
+			var formats = [];
+			this.preferredFormats.forEach(function(format) {
+				if( Modernizr.audio[format] != null && Modernizr.audio[format] !== "" )
+				{ formats.push(format); }
+			}.bind(this));
+			this.preferredFormats = formats;
+
+			// Check the window location for a share link. This overrides our starting playlist and song.
+			var hash = this.decodeHash();
+			if( hash[0] !== false ) { this.selectedPlaylist = hash[0]; }
+
 			//Load up our playlist, this is async and will start playing automatically.
-			this.loadPlaylist();
+			this.loadPlaylist(hash[1]);
 
 		}.bind(this);
 

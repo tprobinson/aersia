@@ -37,7 +37,7 @@ var Tabs = {
       tabContents.not(':eq(0)').addClass('effeckt-hide');
 
       firstTabContent.addClass('effeckt-show');
-      tabContents.parent().height(firstTabContent.height());
+      tabContents.parent().height(firstTabContent[0].clientHeight);
 
     });
 
@@ -74,7 +74,7 @@ var Tabs = {
     tabContent.addClass('effeckt-show');
 
     //add parent height, just because of position: absolute;
-    tabContents.parent().height(tabContent.height());
+    tabContents.parent().height(tabContent[0].clientHeight);
   }
 
 };
