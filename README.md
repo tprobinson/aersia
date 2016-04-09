@@ -12,7 +12,6 @@ Replacing Aersia's Flash-based player, for fun and ~~profit~~!
  * Generated favicons for every platform
 
 
-
 #Planned for the next version:
 * More interface reworks
 * Song information panel
