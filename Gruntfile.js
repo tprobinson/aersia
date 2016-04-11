@@ -264,7 +264,7 @@ copy: {
     },
     js: {
         files: [
-            { expand: true, cwd: './js', src: ['vendor/**', '../<%= dirs.generated %>plugins.js'], dest: '<%= dirs.output %>assets/js' }
+            { expand: true, flatten: true, src: ['<%= dirs.generated %>plugins.js'], dest: '<%= dirs.output %>assets/js/' }
         ]
     },
     nodeModules: {
@@ -493,10 +493,10 @@ uglify: {
 
     shell: {
         ps: {
-            command: '/home/micheal/Filing Cabinet/Projects/vip/node_modules/perfect-scrollbar/node_modules/.bin/gulp js'
+            command: 'cd node_modules/perfect-scrollbar && node_modules/.bin/gulp js'
         },
         logger: {
-            command: '/home/micheal/Filing Cabinet/Projects/vip/node_modules/js-logger/node_modules/.bin/gulp'
+            command: 'cd node_modules/js-logger && node_modules/.bin/gulp'
         }
     },
 
@@ -574,7 +574,7 @@ grunt.registerTask('full-deploy', [
     'js','modernizr',
 
     // Prepare static resources
-    'svgstore:icons','svgstore:layouts','realFavicon','copy:root','copy:font','image:img','image:root',
+    'svgstore:icons','svgstore:layouts','realFavicon','copy:root','copy:font','image:img',
 
     // Template files
     'template:html'
