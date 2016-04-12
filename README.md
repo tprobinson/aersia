@@ -1,15 +1,9 @@
 Replacing Aersia's Flash-based player, for fun and ~~profit~~!
 
-#Done in version 0.0.5:
-* Song information panel
- * Toggle shuffling to current song
- * Direct download
- * Sharing links, which can share just a playlist or playlist+song
-* Layouts panel
+#Done in version 0.0.6:
 * Internals
- * Updated Modernizr to 3, now supporting Opus detection.
- * Check available filetypes for each song and choose best available
- * Generated favicons for every platform
+ * Removed more broken Angular code
+ * Layout fixes and automatic correction of when the layout changes.
 
 
 #Planned for the next version:
@@ -25,6 +19,17 @@ Replacing Aersia's Flash-based player, for fun and ~~profit~~!
 * Compile the JS
 
 ##Previous Versions
+###0.0.5
+* Song information panel
+ * Toggle shuffling to current song
+ * Direct download
+ * Sharing links, which can share just a playlist or playlist+song
+* Layouts panel
+* Internals
+ * Updated Modernizr to 3, now supporting Opus detection.
+ * Check available filetypes for each song and choose best available
+ * Generated favicons for every platform
+
 ###0.0.4
 * Rebranding from VIP to Aersia
 * Play history
