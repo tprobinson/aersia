@@ -212,7 +212,7 @@ body {
 }
 
 /* Touch style interface */
-html.touchevents body {
+html.touchevents body, html.touchevents>body>.vbox {
 	flex-direction: column-reverse;
 }
 
@@ -797,4 +797,9 @@ span.value { font-style: italic; }
 
 .no-animation {
 	animation: none;
+}
+
+.hidden {
+	display: none;
+	visibility: hidden;
 }

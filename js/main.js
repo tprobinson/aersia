@@ -127,10 +127,14 @@
 		this.loadPct = document.getElementById("loadPct");
 		this.volumeBar = document.getElementById("volumeBar");
 
+		this.optionsbox = document.getElementsByClassName("optionsbox")[0];
+
 		this.toggleShuffleBtn = document.getElementById("toggleShuffle");
 		this.curSongTitle = document.getElementById("curSongTitle");
 		this.curSongCreator = document.getElementById("curSongCreator");
 		this.curSongRating = document.getElementById("curSongRating");
+
+		this.layoutbox = document.getElementById("layoutbox");
 
 		/////
 		//Styles and Presets
@@ -195,6 +199,36 @@
 			this.styleNodes[val] = document.head.appendChild(document.createElement('style'));
 		}.bind(this));
 
+
+		// Add a box for each layout in the layoutsbox.
+		Object.keys(this.layouts).forEach(function(key) {
+			var container = document.createElement("div");
+			classie.addClass(container,"vbox");
+			classie.addClass(container,"centertext");
+
+			var div = document.createElement("div");
+			container.appendChild(div);
+
+			//Why do I need a namespace for this, what is even the difference in the markup??
+			var svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+			svg.setAttribute("height","120px");
+			svg.setAttribute("width","120px");
+			div.appendChild(svg);
+
+			//Why do I need a namespace for this, what is even the difference in the markup??
+			var use = document.createElementNS("http://www.w3.org/2000/svg","use");
+			use.setAttributeNS('http://www.w3.org/1999/xlink', 'href',"#"+this.layouts[key].href);
+			svg.appendChild(use);
+
+			var name = document.createElement("div");
+			name.innerHTML = key;
+			container.appendChild(name);
+
+			this.layoutbox.appendChild(container);
+			container.onclick = function() {
+				this.switchLayout(key);
+			}.bind(this);
+		}.bind(this));
 
 		/////
 		// Initalize scrollbar
@@ -640,10 +674,15 @@
 			}
 		}.bind(this);
 
-		this.toggleOptionsBox = function() {
-			this.optionsBoxShown = !this.optionsBoxShown;
+		this.toggleOptionsBox = function(bool) {
+			if( bool == null ) { bool = !this.optionsBoxShown; }
+			this.optionsBoxShown = bool;
 
+			// Update the song info before we show the box, just in case
 			this.updateCurSongInfo();
+
+			// Toggle hidden class.
+			if( this.optionsBoxShown ) { classie.removeClass(this.optionsbox,"hidden"); } else { classie.addClass(this.optionsbox,"hidden"); }
 
 			//Trigger the scrollbar to fix itself.
 			Ps.update(this.playlist);
@@ -652,13 +691,28 @@
 		this.setLayout = function(l) {
 			this.selectedLayout = l;
 
-			// uuugh this sucks
+			// Remove all the layouts
 			Object.keys(this.layouts).forEach(function(layout) { classie.removeClass(document.documentElement,this.layouts[layout].class); }.bind(this));
 
+			// Add the one we want.
 			classie.addClass(document.documentElement,this.layouts[this.selectedLayout].class);
 
 			//Trigger the playlist to scroll in case the layout is messed up
 			this.scrollToSong(this.curSong);
+
+			// Open the optionsbox if it's hidden, re-adjust the tab, and set the optionsbox back the way it was.
+			// This is done because the tab height will probably have changed when the layout changes.
+			var orig = this.optionsBoxShown;
+			this.toggleOptionsBox(true);
+
+			var tab = document.getElementsByClassName("effeckt-tab active")[0];
+			if( tab != null )
+			{
+				window.setTimeout( function() {
+					Tabs.showTab(tab);
+					this.toggleOptionsBox(orig);
+				}.bind(this), 500 );
+			}
 
 		}.bind(this);
 
@@ -666,7 +720,7 @@
 		this.switchLayout = function(l) {
 			this.setLayout(l);
 			this.setCookie();
-		}
+		}.bind(this);
 
 		this.styleSet = function(type) {
 			//Recompile the selected style's node
@@ -720,7 +774,11 @@
 
 		this.getCookie = function() {
 			var cookie = Cookies.getJSON(this.cookieName);
-			if( cookie == null ) { return 1; }
+			if( cookie == null ) {
+				// First launch, if this is a touch device, put it into touch mode by default.
+				if( isMobile.any() ) { this.switchLayout("Touch"); }
+				return 1;
+			}
 
 			// Directly mapped properties
 			['autoplay','animationsEnabled','selectedLayout','currentStyles','selectedPreset','selectedPlaylist','noShuffles']
@@ -732,12 +790,7 @@
 			// Unpacked properties
 			if( cookie.lastVolume != null ) { this.player.volume = cookie.lastVolume; }
 
-			if( cookie.selectedLayout == null ) {
-				// First launch, if this is a touch device, put it into touch mode by default.
-				if( classie.hasClass(document.documentElement,'touchevents') ) { this.switchLayout("Touch"); }
-			} else {
-				this.setLayout(this.selectedLayout);
-			}
+			if( cookie.selectedLayout != null ) { this.setLayout(this.selectedLayout); }
 
 			// Triggers
 			if( cookie.currentStyles != null ) { this.reloadStyle(); }
@@ -838,7 +891,7 @@
 
 		this.updateCurSongInfo = function() {
 			//Update the song panel
-			if( this.optionsBoxShown )
+			if( this.optionsBoxShown && this.curSong != null && this.songs[this.curSong] != null )
 			{
 				this.curSongTitle.innerHTML = this.songs[this.curSong].title;
 				this.curSongCreator.innerHTML = this.songs[this.curSong].creator;
@@ -950,7 +1003,7 @@ function scrollToSmooth(el,targetScroll,duration) {
 // 		;
 // 		var delta =
 // 		now += mod;
-// 			console.log('pct: '+pct+', now: '+now+', mod: '+mod);
+// 			Logger.get('animations').debug('pct: '+pct+', now: '+now+', mod: '+mod);
 // 			if( now  >= end ) { done = 1; }
 // 	}
 // }
@@ -1046,3 +1099,23 @@ function zeroPadNonLog(num, numZeros) {
 // 		return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
 // 	}
 // }
+
+
+// http://stackoverflow.com/questions/12606245/detect-if-browser-is-running-on-an-android-or-ios-device
+var isMobile = {
+    Windows: function() {
+        return /IEMobile/i.test(navigator.userAgent);
+    },
+    Android: function() {
+        return /Android/i.test(navigator.userAgent);
+    },
+    BlackBerry: function() {
+        return /BlackBerry/i.test(navigator.userAgent);
+    },
+    iOS: function() {
+        return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    },
+    any: function() {
+        return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Windows());
+    }
+};

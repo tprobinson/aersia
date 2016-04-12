@@ -56,7 +56,7 @@
             </header>
         </div> -->
 
-        <div class="optionsbox" ng-show="aersiaCtrl.optionsBoxShown">
+        <div class="optionsbox hidden">
             <div class="effeckt-tabs-wrap" data-effeckt-type="slide-left">
                 <div class="effeckt-tabs">
                     <li><a data-tab-id="#tab-songinfo" class="effeckt-tab">Current Song</a></li>
@@ -131,15 +131,8 @@
                     </div>
 
                     <div id="tab-layout" class="effeckt-tab-content">
-                        <div class="infopane-h space">
-
-                            <!-- put boxes here for each layout, create switcher method in js -->
-                            <div class="vbox centertext" ng-repeat="(name,obj) in aersiaCtrl.layouts" ng-click="aersiaCtrl.switchLayout(name)">
-                                <div>
-                                    <svg width="120px" height="120px" ><use xlink:href="{{'#' + obj.href}}" /></svg>
-                                </div>
-                                <div>{{name}}</div>
-                            </div>
+                        <div id="layoutbox" class="infopane-h space">
+                            <!-- boxes aare created here for each layout -->
                         </div>
                     </div>
 <!--
