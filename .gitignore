@@ -8,13 +8,5 @@
 /generated
 /generated/*
 
-/css/modules/*
-/css/*
-!/css/disabled/*
-!/css/main.css
-!/css/topcoat-desktop-dark.css
-!/css/boilerplate.css
-!/css/custom.css
-
 npm-debug.log
 .grunt/

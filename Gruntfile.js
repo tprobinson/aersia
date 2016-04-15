@@ -76,7 +76,7 @@ module.exports = function(grunt) {
                     '<%= dirs.generated %>effeckt.css',
                     'css/boilerplate.css',
                     '<%= dirs.generated %>simptip.css',
-                    'node_modules/perfect-scrollbar/dist/css/perfect-scrollbar.css',
+                    '<%= dirs.generated %>perfect-scrollbar.css',
                     'css/custom.css'
                 ],
                 tasks: ['css']
@@ -309,7 +309,7 @@ concat: {
             '<%= dirs.generated %>tidy.css',
             '<%= dirs.generated %>effeckt.css',
             '<%= dirs.generated %>simptip.css',
-            'node_modules/perfect-scrollbar/dist/css/perfect-scrollbar.css',
+            '<%= dirs.generated %>perfect-scrollbar.css',
             'css/custom.css'
         ],
         dest: '<%= dirs.generated %>tidy.concat.css'

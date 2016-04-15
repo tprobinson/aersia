@@ -593,12 +593,17 @@ html.touchevents section {
 
 .playlist-container {
 	flex: 1 1 auto;
+	flex-direction: column;
 	position:relative;
 	height: 100%;
 	overflow:hidden;
 }
 
-.playlist {  position: relative; overflow:hidden; height: 100%; }
+.playlist {
+	position: relative;
+	overflow:hidden;
+	height: 100%;
+}
 
 .playlist>li {
 	padding: 0 10px;
