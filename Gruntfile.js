@@ -372,6 +372,7 @@ uncss: {
                 '../node_modules/normalize.css/normalize.css',
                 '../css/boilerplate.css',
                 '../css/topcoat-desktop-dark.css',
+                '../css/jqui-icons.css',
                 /*'../<%= dirs.generated %>effeckt.css'*/
             ],
             ignore: [

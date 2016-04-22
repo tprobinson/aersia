@@ -2,17 +2,20 @@ Replacing Aersia's Flash-based player, for fun and ~~profit~~!
 
 #Done in version 0.0.6:
 * Internals
- * Removed more broken Angular code
- * Layout fixes and automatic correction of when the layout changes.
+    * Removed more broken Angular code
+    * Layout fixes and automatic correction of when the layout changes.
+* Player
+    * Fixed a rare case where the shuffle would pick the same song twice and stop playing.
+* Layouts
+    * Streambox, a stubby version of the Current Song tab.
+    * Streambar, the top controls bar and nothing else.
 
 
 #Planned for the next version:
-* More interface reworks
 * Song information panel
  * Cover art or other art of song
  * Selection of original/remixes
-* More layouts
-* Revamp playlist structure to support all of this relational information.
+* Revamp playlist structure to support relational information.
 
 #Planned for the future:
 * Mobile support?

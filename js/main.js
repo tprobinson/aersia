@@ -38,6 +38,8 @@
 		// Initialize the share button
 		var clipboard = new Clipboard(document.getElementById('copyBtn'), {
 			text: function(btn) {
+				this.success("Share link copied to clipboard.");
+
 				return window.location.href + '#' + encodeURIComponent( this.selectedPlaylist + '|' + this.curSong );
 			}.bind(this)
 		});
@@ -76,12 +78,24 @@
 		this.layouts = {
 			"Classic": {
 				"class": "layout-classic",
-				"href": "layout-classic"
+				"href": "layout-classic",
+				"features": ["controls","timeline","timeTextUpdate","progressUpdate","playlist","animations","options"]
 			},
 			"Touch": {
-				"class": "touchevents",
-				"href": "layout-touch"
-			}
+				"class": "layout-touch",
+				"href": "layout-touch",
+				"features": ["controls","timeline","timeTextUpdate","progressUpdate","playlist","animations","options"]
+			},
+			"Streambox": {
+				"class": "layout-streambox",
+				"href": "layout-streambox",
+				"features": ["timeTextUpdate", "progressUpdate", "streambox","options"]
+			},
+			"Streambar": {
+				"class": "layout-streambar",
+				"href": "layout-streambar",
+				"features": ["controls","timeTextUpdate","progressUpdate","options"]
+			},
 		};
 
 		//js-cookie variables
@@ -118,23 +132,32 @@
 		this.player = document.getElementsByTagName("audio")[0];
 		this.playlist = document.getElementById("playlist");
 
+		this.tabs = document.getElementsByClassName("effeckt-tabs")[0];
+		this.optionsbox = document.getElementsByClassName("optionsbox")[0];
+		this.layoutbox = document.getElementById("layoutbox");
+
+		this.streambox = document.getElementById("streambox");
+
+		this.mainControls = document.getElementById("mainControls");
 		this.playpause = document.getElementById("playpause");
 		this.timeText = document.getElementById("timeText");
 		this.timeline = document.getElementById("timeline");
+		this.timebox = document.getElementById("timebox");
+		this.controlsInfoBox = document.getElementById("controlsInfoBox");
 		this.loadBar = document.getElementById("loadBar");
 		this.playedBar = document.getElementById("playedBar");
 		this.playhead = document.getElementById("playhead");
 		this.loadPct = document.getElementById("loadPct");
 		this.volumeBar = document.getElementById("volumeBar");
 
-		this.optionsbox = document.getElementsByClassName("optionsbox")[0];
+		this.messagebox = document.getElementById("messagebox");
 
 		this.toggleShuffleBtn = document.getElementById("toggleShuffle");
-		this.curSongTitle = document.getElementById("curSongTitle");
-		this.curSongCreator = document.getElementById("curSongCreator");
-		this.curSongRating = document.getElementById("curSongRating");
 
-		this.layoutbox = document.getElementById("layoutbox");
+		this.curSongTitle = document.getElementById("oboxSongTitle");
+		this.curSongCreator = document.getElementById("oboxSongCreator");
+		// this.curSongRating = document.getElementById("oboxSongRating");
+
 
 		/////
 		//Styles and Presets
@@ -162,7 +185,7 @@
 		this.styleCssText = {
 			"focus": [
 				"g, rect, path { fill: ","; }\n"+
-				".controls-container, .playlist-container, .optionsbox { color: ","; }\n"+
+				".controls-container, .playlist-container, .optionsbox, #streambox { color: ","; }\n"+
 				"#playedBar, #playhead,	.active-song, .ps-theme-vip>.ps-scrollbar-y-rail>.ps-scrollbar-y, .ps-theme-vip>.ps-scrollbar-x-rail>.ps-scrollbar-x { background-color: ","; }\n"+
 				"#volumeBar { border-color: transparent "," transparent transparent; }"
 			],
@@ -187,7 +210,7 @@
 
 		this.styleCssGradientText = {
 			"controlsout": ".controls-container, .effeckt-tabs",
-			"controlsin": ".controls-container>div, .effeckt-tabs>li",
+			"controlsin": ".controls-container>div, .effeckt-tabs>li, #streambox",
 		};
 
 		//Give each style its own stylesheet node.
@@ -256,6 +279,162 @@
 			window.location.hash = '';
 
 		}.bind(this);
+
+		/////
+		// Mbox functions
+		this.closembox = function () { classie.addClass(this.messagebox,"hidden"); }.bind(this);
+		this.internalerror = function (str) { this.error("Internal error: "+str+" Please report this along with a screenshot to the webmaster."); }.bind(this);
+		this.success = function (str) { this._mbox_manip('mboxsuccess',str); }.bind(this);
+		this.error = function (str) { this._mbox_manip('mboxerror',str); }.bind(this);
+		this.info = function (str) { this._mbox_manip('mboxinfo',str); }.bind(this);
+		this._mbox_manip = function (destclass,str) {
+			classie.removeClass(this.messagebox,"hidden");
+			classie.removeClass(this.messagebox,"mboxerror");
+			classie.removeClass(this.messagebox,"mboxsuccess");
+			classie.removeClass(this.messagebox,"mboxinfo");
+
+			classie.addClass(this.messagebox,destclass);
+
+			this.messagebox.children[0].innerHTML = str;
+		}.bind(this);
+
+
+		/////
+		// To enable layouts to swap functions on and off, here is an object of status and hooks.
+		this.features = {
+			"controls": {
+				"enable": function() {
+					classie.removeClass(this.mainControls,"hidden");
+				},
+				"disable": function() {
+					classie.addClass(this.mainControls,"hidden");
+				},
+			},
+			"timeline": {
+				"enable": function() {
+					classie.removeClass(this.timebox,"hidden");
+					classie.addClass(this.controlsInfoBox,"hidden");
+
+					this.curSongTitle = document.getElementById("oboxSongTitle");
+					this.curSongCreator = document.getElementById("oboxSongCreator");
+
+					this.timeText = document.getElementById("timeProgText");
+					this.loadPct = document.getElementById("timeLoadPct");
+
+					addEvent(this.player,"timeupdate", this.timelineUpdate);
+					this.timelineUpdate();
+
+					this.updateCurSongInfo();
+				},
+				"disable": function() {
+					classie.addClass(this.timebox,"hidden");
+					classie.removeClass(this.controlsInfoBox,"hidden");
+
+					this.curSongTitle = document.getElementById("controlsSongTitle");
+					this.curSongCreator = document.getElementById("controlsSongCreator");
+
+					this.timeText = document.getElementById("controlsProgText");
+					this.loadPct = document.getElementById("controlsLoadPct");
+
+					removeEvent(this.player,"timeupdate", this.timelineUpdate);
+
+					this.updateCurSongInfo();
+				},
+			},
+			"playlist": {
+				"enable": function() {
+					classie.removeClass(this.playlist,"hidden");
+				},
+				"disable": function() {
+					//here's where I would prevent a new playlist from loading up while this is disabled.
+					classie.addClass(this.playlist,"hidden");
+				},
+			},
+			"options": {
+				"enable": function() {
+					classie.removeClass(this.tabs,"hidden");
+				},
+				"disable": function() {
+					classie.addClass(this.tabs,"hidden");
+					this.toggleOptionsBox(false);
+				},
+			},
+			"streambox": {
+				"enable": function() {
+					classie.removeClass(this.streambox,"hidden");
+
+					this.curSongTitle = document.getElementById("sboxSongTitle");
+					this.curSongCreator = document.getElementById("sboxSongCreator");
+				},
+				"disable": function() {
+					classie.addClass(this.streambox,"hidden");
+
+					// Don't reset the curSongTitle and creator, as another function has does it by now
+				},
+			},
+			"timeTextUpdate": {
+				"enable": function() {
+					addEvent(this.player,"timeupdate", this.timeTextUpdate);
+					this.timeTextUpdate();
+				},
+				"disable": function() {
+					removeEvent(this.player,"timeupdate", this.timeTextUpdate);
+				},
+			},
+			"progressUpdate": {
+				"enable": function() {
+					addEvent(this.player,"timeupdate",this.progressUpdate); // not progress, it doesn't fire reliably
+					this.progressUpdate();
+				},
+				"disable": function() {
+					removeEvent(this.player,"timeupdate",this.progressUpdate);
+				},
+			},
+
+			"animations": {
+				"enable": function() {
+					// this.animationsEnabled = true;
+				},
+				"disable": function() {
+					// this.animationsEnabled = false;
+				},
+			},
+
+		};
+
+		// Forces a feature on or off regardless. This is only set by the user.
+		this.overrideFeatures = {};
+
+		this.enableFeature = function(feature) {
+			if( this.features[feature] != null && this.features[feature].enabled !== true )
+			{
+				this.features[feature].enable.call(this);
+				this.features[feature].enabled = true;
+				Logger.get("internals").info(feature+" enabled.");
+			}
+		}.bind(this);
+
+		this.disableFeature = function(feature) {
+			if( this.features[feature] != null && this.features[feature].enabled !== false )
+			{
+				this.features[feature].disable.call(this);
+				this.features[feature].enabled = false;
+				Logger.get("internals").info(feature+" disabled.");
+			}
+		}.bind(this);
+
+		this.toggleFeature = function(feature) {
+			if( this.features[feature] != null )
+			{
+				if(  this.features[feature].enabled != null && this.features[feature].enabled )
+				{
+					this.disableFeature(feature);
+				} else {
+					this.enableFeature(feature);
+				}
+			}
+		}.bind(this);
+
 
 		/////
 		//Hook audio player
@@ -333,13 +512,21 @@
 			}
 
 		}.bind(this);
-		addEvent(this.player,"timeupdate",this.progressUpdate); // not progress, it doesn't fire reliably
 
 		//This will be called as the song progresses.
-		this.timeUpdate = function(e,amt) {
+		this.timeTextUpdate = function(e,amt) {
+			if( e != null && e !== '' )
+			{ amt = this.player.currentTime / this.player.duration; }
+
+			//Don't update the time if it will look the same.
+			var newTime = this.timeFormat(this.player.currentTime);
+			if( this.lastTimeText !== newTime )
+			{ this.timeText.textContent = newTime; this.lastTimeText = newTime; }
+		}.bind(this);
+
+		this.timelineUpdate = function(e,amt) {
 
 			if( e != null && e !== '' )
-			// { amt = 100 * (this.player.currentTime / this.player.duration); }
 			{ amt = this.player.currentTime / this.player.duration; }
 
 			Logger.get("player").debug('Time update: '+amt);
@@ -350,6 +537,7 @@
 			// //Move the playedBar in the timeline
 			// this.playedBar.style.right = amt + "%";
 
+			//REWORK: somehow we need to cache the boundingrect, but for some reason if I don't use it every frame it gets off by a lot.
 			//This pixel-perfect version is just to achieve that one-pixel offset effect in the original .swf
 			//Move the playhead
 			var rect = this.timeline.getBoundingClientRect();
@@ -359,16 +547,16 @@
 			//Move the playedBar in the timeline
 			this.playedBar.style.right = (((rect.right - rect.left) - clickpx) + 1) + "px";
 
-			//Don't update the time if it will look the same.
-			var newTime = this.timeFormat(this.player.currentTime);
-			if( this.lastTimeText !== newTime )
-			{ this.timeText.textContent = newTime; this.lastTimeText = newTime; }
-
 		}.bind(this);
-		addEvent(this.player,"timeupdate", this.timeUpdate);
+
+
+
+		//////////////////////
+		// Player functions //
+		//////////////////////
 
 		/////
-		// Player functions
+		// Playlist Management
 		this.loadPlaylist = function(start) {
 
 			if( this.selectedPlaylist == null || this.selectedPlaylist == "" ) { return; }
@@ -515,8 +703,12 @@
 		}.bind(this);
 
 		this.shuffleSong = function() {
-			Logger.time('Shuffle');
+			Logger.get("internals").time('Shuffle');
 			var list = this.songs;
+
+			//Ensure we don't play the same song again.
+			list.splice(list.indexOf(this.curSong),1);
+
 			if( this.noShuffles[this.selectedPlaylist] != null )
 			{
 				//Generate a list of songs we're allowed to play.
@@ -524,24 +716,15 @@
 
 				this.noShuffles[this.selectedPlaylist].forEach(function(val){ list.splice(list.indexOf(val),1); }.bind(this));
 			}
-			Logger.time('Shuffle');
 
-			//Start a random song that we're allowed to play.
-			this.playSong(Math.floor(Math.random() * list.length));
+			var selected = Math.floor(Math.random() * list.length);
+			Logger.get("internals").time('Shuffle');
+
+			//Start our random song.
+			this.playSong(selected);
 		}.bind(this);
 
-		this.isCurrentSong = function(index) {
-			return index === this.curSong;
-		}.bind(this);
-
-		this.rateUp = function() {
-			Logger.get("player").info("RateUp");
-		};
-
-		this.rateDown = function() {
-			Logger.get("player").info("RateDown");
-		};
-
+		// Forbids or allows a song to be played.
 		this.toggleShuffle = function() {
 			//If we haven't blocked anything on this playlist yet, give it the structure.
 			if( this.noShuffles[this.selectedPlaylist] == null ) { this.noShuffles[this.selectedPlaylist] = []; }
@@ -561,16 +744,26 @@
 			this.setCookie();
 		}.bind(this);
 
+		// Not used. Should remove.
+		this.isCurrentSong = function(index) {
+			return index === this.curSong;
+		}.bind(this);
+
+
+		/////
+		// Rating functions
+
+		this.rateUp = function() {
+			Logger.get("player").info("RateUp");
+		};
+
+		this.rateDown = function() {
+			Logger.get("player").info("RateDown");
+		};
+
 		/////
 		// HTML5 audio player control functions, in button order, then helper function order.
 		// Assistance from: http://www.alexkatz.me/html5-audio/building-a-custom-html5-audio-player-with-javascript/
-
-		this.togglePlay = function(bool) {
-			if( bool !== null ) { bool = !this.playing; }
-
-			if( bool ) { this.play(); }
-			else { this.pause(); }
-		}.bind(this);
 
 		this.play = function() {
 			//Reset the readouts
@@ -589,6 +782,14 @@
 			classie.removeClass(this.playpause,"toggled");
 		}.bind(this);
 
+		this.togglePlay = function(bool) {
+			if( bool !== null ) { bool = !this.playing; }
+
+			if( bool ) { this.play(); }
+			else { this.pause(); }
+		}.bind(this);
+
+		// Traverses the history queue, or just plays a new song.
 		this.seek = function(amt) {
 			// var index = this.curSong + amt;
 			// if( index >= 0 && index <= this.songs.length )
@@ -622,6 +823,20 @@
 			}
 		}.bind(this);
 
+		this.toggleOptionsBox = function(bool) {
+			if( bool == null ) { bool = !this.optionsBoxShown; }
+			this.optionsBoxShown = bool;
+
+			// Update the song info before we show the box, just in case
+			this.updateCurSongInfo();
+
+			// Toggle hidden class.
+			if( this.optionsBoxShown ) { classie.removeClass(this.optionsbox,"hidden"); } else { classie.addClass(this.optionsbox,"hidden"); }
+
+			//Trigger the scrollbar to fix itself.
+			Ps.update(this.playlist);
+		}.bind(this);
+
 		this.toggleFullscreen = function() {
 			toggleFullScreen();
 		}.bind(this);
@@ -652,8 +867,15 @@
 		/////
 		// UI Functions
 		this.resetControls = function() {
-			this.timeUpdate('',0);
+			this.timelineUpdate('',0);
+			this.timeTextUpdate('',0);
 			this.progressUpdate('',0);
+		}.bind(this);
+
+		this.toggleScrollSmooth = function() {
+			this.features.animations.enabled  = !this.features.animations.enabled; // Angular changes the model before the change
+			this.toggleFeature("animations");
+			this.setCookie();
 		}.bind(this);
 
 		this.scrollToSong = function(index) {
@@ -663,7 +885,7 @@
 
 			Logger.get("animation").debug('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+height*index);
 
-			if( this.animationsEnabled )
+			if( this.features.animations.enabled )
 			{
 				//Make the playlist scroll to the currently playing song.
 				scrollToSmooth(this.playlist,height * index, 600);
@@ -672,20 +894,6 @@
 			{
 				this.playlist.scrollTop = height * index;
 			}
-		}.bind(this);
-
-		this.toggleOptionsBox = function(bool) {
-			if( bool == null ) { bool = !this.optionsBoxShown; }
-			this.optionsBoxShown = bool;
-
-			// Update the song info before we show the box, just in case
-			this.updateCurSongInfo();
-
-			// Toggle hidden class.
-			if( this.optionsBoxShown ) { classie.removeClass(this.optionsbox,"hidden"); } else { classie.addClass(this.optionsbox,"hidden"); }
-
-			//Trigger the scrollbar to fix itself.
-			Ps.update(this.playlist);
 		}.bind(this);
 
 		this.setLayout = function(l) {
@@ -697,21 +905,38 @@
 			// Add the one we want.
 			classie.addClass(document.documentElement,this.layouts[this.selectedLayout].class);
 
-			//Trigger the playlist to scroll in case the layout is messed up
+
+			// Enable all features of our layout, and disable everything else.
+			Object.keys(this.features).forEach(function(feature) {
+				if(
+					this.layouts[this.selectedLayout].features.indexOf(feature) > -1 && // layout is supposed to have it on
+					( this.overrideFeatures[feature] == null || this.overrideFeatures[feature] === true ) // and it's not forced off
+				)
+				{
+					this.enableFeature(feature);
+				} else {
+					this.disableFeature(feature);
+				}
+			}.bind(this));
+
+			// Trigger the playlist to scroll in case the layout is messed up
 			this.scrollToSong(this.curSong);
 
-			// Open the optionsbox if it's hidden, re-adjust the tab, and set the optionsbox back the way it was.
-			// This is done because the tab height will probably have changed when the layout changes.
-			var orig = this.optionsBoxShown;
-			this.toggleOptionsBox(true);
-
-			var tab = document.getElementsByClassName("effeckt-tab active")[0];
-			if( tab != null )
+			if( this.features.options.enabled )
 			{
-				window.setTimeout( function() {
-					Tabs.showTab(tab);
-					this.toggleOptionsBox(orig);
-				}.bind(this), 500 );
+				// Open the optionsbox if it's hidden, re-adjust the tab, and set the optionsbox back the way it was.
+				// This is done because the tab height will probably have changed when the layout changes.
+				var orig = this.optionsBoxShown;
+				this.toggleOptionsBox(true);
+
+				var tab = document.getElementsByClassName("effeckt-tab active")[0];
+				if( tab != null )
+				{
+					window.setTimeout( function() {
+						Tabs.showTab(tab);
+						this.toggleOptionsBox(orig);
+					}.bind(this), 500 );
+				}
 			}
 
 		}.bind(this);
@@ -768,49 +993,8 @@
 			Object.keys(this.styleCssGradientText).forEach(function(val) { this.gradientSet(val); }.bind(this));
 		}.bind(this);
 
-
 		/////
-		// Cookie functions
-
-		this.getCookie = function() {
-			var cookie = Cookies.getJSON(this.cookieName);
-			if( cookie == null ) {
-				// First launch, if this is a touch device, put it into touch mode by default.
-				if( isMobile.any() ) { this.switchLayout("Touch"); }
-				return 1;
-			}
-
-			// Directly mapped properties
-			['autoplay','animationsEnabled','selectedLayout','currentStyles','selectedPreset','selectedPlaylist','noShuffles']
-			.forEach(function(val) {
-				if( cookie[val] != null && this[val] != null )
-				{ this[val] = cookie[val]; }
-			}.bind(this));
-
-			// Unpacked properties
-			if( cookie.lastVolume != null ) { this.player.volume = cookie.lastVolume; }
-
-			if( cookie.selectedLayout != null ) { this.setLayout(this.selectedLayout); }
-
-			// Triggers
-			if( cookie.currentStyles != null ) { this.reloadStyle(); }
-
-			Logger.get("internals").info("Cookie read.");
-		}.bind(this);
-
-		this.setCookie = function() {
-			Cookies.set(this.cookieName, {
-				"autoplay": this.autoplay,
-				"animationsEnabled": this.animationsEnabled,
-				"selectedLayout": this.selectedLayout,
-				"currentStyles": this.currentStyles,
-				"lastVolume": this.player.volume,
-				"selectedPreset": this.selectedPreset,
-				"selectedPlaylist": this.selectedPlaylist,
-				"noShuffles": this.noShuffles,
-			}, this.cookieConfig);
-			Logger.get("internals").info("Cookie written.");
-		}.bind(this);
+		// Export and import styles
 
 		this.exportStyles = function() {
 			this.triggerDownload(this.currentStyles);
@@ -851,6 +1035,55 @@
 
 		this.styleReader.onload = this.importStyles;
 
+
+		/////
+		// Cookie functions
+
+		this.getCookie = function() {
+			var cookie = Cookies.getJSON(this.cookieName);
+			if( cookie == null ) {
+				// First launch, if this is a touch device, put it into touch mode by default.
+				if( isMobile.any() ) { this.switchLayout("Touch"); }
+				return 1;
+			}
+
+			// Directly mapped properties
+			['autoplay','selectedLayout','currentStyles','selectedPreset','selectedPlaylist','noShuffles']
+			.forEach(function(val) {
+				if( cookie[val] != null && this[val] != null )
+				{ this[val] = cookie[val]; }
+			}.bind(this));
+
+			// Unpacked properties
+			if( cookie.lastVolume != null ) { this.player.volume = cookie.lastVolume; }
+
+			if( cookie.features != null && cookie.features.animations != null && cookie.features.animations.enabled != null )
+			{ this.overrideFeatures.animations = cookie.features.animations.enabled; }
+
+			// Triggers
+			if( cookie.currentStyles != null ) { this.reloadStyle(); }
+
+			Logger.get("internals").info("Cookie read.");
+		}.bind(this);
+
+		this.setCookie = function() {
+			Cookies.set(this.cookieName, {
+				"autoplay": this.autoplay,
+				"features": { "animations": { "enabled": this.features.animations.enabled } },
+				"selectedLayout": this.selectedLayout,
+				"currentStyles": this.currentStyles,
+				"lastVolume": this.player.volume,
+				"selectedPreset": this.selectedPreset,
+				"selectedPlaylist": this.selectedPlaylist,
+				"noShuffles": this.noShuffles,
+			}, this.cookieConfig);
+			Logger.get("internals").info("Cookie written.");
+		}.bind(this);
+
+
+		/////
+		// File downloading and uploading
+
 		this.triggerDownload = function(data) {
 			if( typeof data === "object" )
 			{ data = JSON.stringify(data,null,'\t'); }
@@ -870,6 +1103,7 @@
 			this.upload.dispatchEvent(new MouseEvent('click'));
 		}.bind(this);
 
+		// Reads the sharing links
 		this.decodeHash = function() {
 			var newPlaylist = false;
 			var newSong = false;
@@ -891,11 +1125,14 @@
 
 		this.updateCurSongInfo = function() {
 			//Update the song panel
-			if( this.optionsBoxShown && this.curSong != null && this.songs[this.curSong] != null )
-			{
+			if( this.curSong != null && this.songs[this.curSong] != null && (
+				 ( (this.selectedLayout === "Classic" || this.selectedLayout === "Touch") && this.optionsBoxShown ) || // In Classic or Touch interface, don't update unless it's visible.
+				 ( this.selectedLayout === "Streambox" || this.selectedLayout === "Streambar" )	//In Streambox or Streambar, update.
+			 )
+			 ){
 				this.curSongTitle.innerHTML = this.songs[this.curSong].title;
 				this.curSongCreator.innerHTML = this.songs[this.curSong].creator;
-				this.curSongRating.innerHTML = "0"; //this.songs[this.curSong].rating;
+				// this.curSongRating.innerHTML = "0"; //this.songs[this.curSong].rating;
 			}
 		};
 
@@ -909,6 +1146,9 @@
 
 			// Get any stored values that will override our defaults.
 			this.getCookie();
+
+			// Enable features in our currently selected layout
+			this.setLayout(this.selectedLayout);
 
 			// Detect browser support for file formats and remove any formats that are not supported
 			var formats = [];
@@ -1019,11 +1259,21 @@ function addEvent(object, type, callback) {
     }
 }
 
+function removeEvent(object, type, callback) {
+    if (object == null || typeof(object) == 'undefined') return;
+    if (object.removeEventListener) {
+        object.removeEventListener(type, callback, false);
+    } else if (object.detachEvent) {
+        object.detachEvent("on" + type, callback);
+    } else {
+        object["on"+type] = null;
+    }
+}
+
 // returns click as decimal (.77) of the total object's width
 function clickPercent(e,obj) {
 	return (e.pageX - obj.getBoundingClientRect().left) / obj.offsetWidth;
 }
-
 
 //https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
 function toggleFullScreen() {

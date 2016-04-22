@@ -41,21 +41,6 @@
 		<div class="effeckt-overlay" id="effeckt-overlay"></div>
     -->
 
-        <!-- <div class="header-container">
-            <header>
-				<div class="vbox">
-					<h1 class="title"><!--%= friendlyname --><!--</h1>
-					<h4 id="logintext"></h4>
-                </div>
-                <!-- Tab buttons
-                <div class="nav-tabs">
-                    <ul>
-                        <li><a href="#tab-dummy"></a></li>
-                    </ul>
-                </div> --><!--
-            </header>
-        </div> -->
-
         <div class="optionsbox hidden">
             <div class="effeckt-tabs-wrap" data-effeckt-type="slide-left">
                 <div class="effeckt-tabs">
@@ -63,7 +48,7 @@
                     <li><a data-tab-id="#tab-layout" class="effeckt-tab">Layout</a></li>
                     <!-- <li><a data-tab-id="#tab-player" class="effeckt-tab">Player</a></li> -->
                     <li><a data-tab-id="#tab-theme" class="effeckt-tab">Theme</a></li>
-                    <li><a data-tab-id="#tab-question" class="effeckt-tab">???????</a></li>
+                    <li><a data-tab-id="#tab-news" class="effeckt-tab">Recent News</a></li>
                 </div>
                 <div class="effeckt-tabs-container">
 
@@ -75,8 +60,8 @@
                         <!-- Song information, links, etc. -->
                         <div class="infopane-h">
                             <div class="vbox">
-                                <li id="curSongTitle">Loading...</li>
-                                <li id="curSongCreator">Loading...</li>
+                                <li id="oboxSongTitle">Loading...</li>
+                                <li id="oboxSongCreator">Loading...</li>
                                 <li><strike>album name?</strike></li>
                                 <div class="controls-container">
                                     <div id="toggleShuffle" class="controlsToggle" ng-click="aersiaCtrl.toggleShuffle();">
@@ -84,7 +69,7 @@
                                         <svg width="17px" height="17px" ><use xlink:href="#icon-poweroff" /></svg>
                                     </div>
 
-                                    <div style="display:none;">
+                                    <div class="hidden">
                                         <div class="spacer"></div>
                                         <div id="rateup" ng-click="aersiaCtrl.rateUp();">
                                             <svg width="17px" height="17px" ><use xlink:href="#icon-rateup" /></svg>
@@ -95,9 +80,9 @@
                                         <div class="controls-text" id="curSongRating" >0</div>
                                     </div>
                                     <div class="spacer"></div>
-                                    <div ng-click="aersiaCtrl.triggerLinkDownload(aersiaCtrl.songs[aersiaCtrl.curSong].location)" >
+                                    <!-- <div ng-click="aersiaCtrl.triggerLinkDownload(aersiaCtrl.songs[aersiaCtrl.curSong].location)" >
                                         <svg width="17px" height="17px" ><use xlink:href="#icon-download" /></svg>
-                                    </div>
+                                    </div> -->
                                     <div id="copyBtn" >
                                         <svg width="17px" height="17px" ><use xlink:href="#icon-share" /></svg>
                                     </div>
@@ -115,7 +100,7 @@
                                 <div class='sep'></div>
                                 <section>
                                     <div><label class="topcoat-checkbox"><input type="checkbox" name="autoplay" ng-model="aersiaCtrl.autoplay" /><div class="topcoat-checkbox__checkmark"></div>Autoplay</label></div>
-                                    <div><label class="topcoat-checkbox"><input type="checkbox" name="anims" ng-model="aersiaCtrl.animationsEnabled" /><div class="topcoat-checkbox__checkmark"></div>Scroll Smooth</label></div>
+                                    <div><label class="topcoat-checkbox"><input type="checkbox" name="anims" ng-model="aersiaCtrl.features.animations.enabled" ng-change="aersiaCtrl.toggleScrollSmooth()" /><div class="topcoat-checkbox__checkmark"></div>Scroll Smooth</label></div>
                                 </section>
                             </div>
                             <!-- Song remix information -->
@@ -135,12 +120,6 @@
                             <!-- boxes aare created here for each layout -->
                         </div>
                     </div>
-<!--
-                    <div id="tab-player" class="effeckt-tab-content">
-                        <div class="infopane-h">
-
-                        </div>
-                    </div> -->
 
                     <div id="tab-theme" class="effeckt-tab-content">
                         <section>
@@ -182,16 +161,43 @@
                         </section>
                     </div>
 
-                    <div id="tab-question" class="effeckt-tab-content">
-                        <div style="font-size:48px;text-align:center">????????????</div>
+                    <div id="tab-news" class="effeckt-tab-content">
+                        <div style="font-size:48px;text-align:center">Recent News</div>
                     </div>
 
                 </div>
             </div>
         </div>
         <div class="vbox">
-            <div class="controls-container fullwidth">
-    			<audio> <!--<script type="text/javascript">location.href='vip.swf';</script>--> <p>Your browser does not support the <code>audio</code> element.</p> </audio>
+
+            <!-- this can be moved under controls-container if I want the gradient to inherit -->
+            <div id="messagebox" class="hidden"><span></span><div class='closebutton ui-icon ui-icon-circle-close'></div></div>
+
+            <div id="streambox" class="hidden">
+                <div class="hbox nogrow"> <!-- Image and controls near image -->
+                    <div class="vbox"><img id="songimg" src="assets/img/placeholder.png" /></div>
+                </div>
+
+                <!-- Song information, links, etc. -->
+                <div class="infopane-h">
+                    <div class="vbox">
+                        <li id="sboxSongTitle">Loading...</li>
+                        <li id="sboxSongCreator">Loading...</li>
+                        <li><strike>album name?</strike></li>
+                    </div>
+                </div>
+
+                <div class="controls-container">
+                    <div><div class="controls-text"><!--%= friendlyname --> v<!--%= version --></div></div>
+
+                    <div class="options" ng-click="aersiaCtrl.toggleOptionsBox();">
+                        <svg width="17px" height="17px" ><use xlink:href="#icon-gear" /></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-container fullwidth" id="mainControls">
+    			<audio> <p>Your browser does not support the <code>audio</code> element.</p> </audio>
                 <div id="playpause" class="controlsToggle" ng-click="aersiaCtrl.togglePlay();">
                     <svg width="17px" height="17px" ><use xlink:href="#icon-play" /></svg>
                     <svg width="17px" height="17px" ><use xlink:href="#icon-pause" /></svg>
@@ -202,8 +208,8 @@
                 <div id="next" ng-click="aersiaCtrl.seek(1);">
                     <svg width="17px" height="17px" ><use xlink:href="#icon-next" /></svg>
                 </div>
-                <div class="timebox">
-                    <div class="controls-text" id="timeText">00:00</div>
+                <div id="timebox">
+                    <div class="controls-text" id="timeProgText">00:00</div>
                     <div class="vbox">
                         <div id="timeline" ng-click="aersiaCtrl.seekBar($event);">
                             <div id="loadBar"></div>
@@ -211,9 +217,26 @@
                         </div>
                         <div id="playhead"></div>
                     </div>
-                    <div class="controls-text" id="loadPct">0%</div>
+                    <div class="controls-text" id="timeLoadPct">0%</div>
                 </div>
-                <div id="gear" ng-click="aersiaCtrl.toggleOptionsBox();">
+                <div id="controlsInfoBox" class="hidden">
+                    <div>
+                        <span class="controls-text" id="controlsProgText">00:00</span>
+                        <span class="controls-text divide" >/</span>
+                        <span class="controls-text" id="controlsLoadPct">00:00</span>
+                    </div>
+
+                    <div>
+                        <span class="controls-text" id="controlsSongTitle">Loading...</span>
+                        <span class="controls-text divide" >-</span>
+                        <span class="controls-text" id="controlsSongCreator">Loading...</span>
+                        <span class="controls-text divide" >-</span>
+                        <span class="controls-text"><strike>album name?</strike></span>
+                    </div>
+
+                    <div class="controls-text"><!--%= friendlyname --> v<!--%= version --></div>
+                </div>
+                <div ng-click="aersiaCtrl.toggleOptionsBox();">
                 <svg width="17px" height="17px" ><use xlink:href="#icon-gear" /></svg>
                 </div>
                 <div id="fullscreen" ng-click="aersiaCtrl.toggleFullscreen();">
@@ -221,8 +244,8 @@
                 </div>
                 <div class="volbox hbox">
                     <div id="volumeMute" class="controlsToggle" ng-click="aersiaCtrl.toggleMute();" ng-class="{ toggled: aersiaCtrl.prevVolume === 0 }">
-                        <svg width="17px" height="17px" ><use xlink:href="#icon-vol" /></svg>
                         <svg width="17px" height="17px" ><use xlink:href="#icon-volMute" /></svg>
+                        <svg width="17px" height="17px" ><use xlink:href="#icon-vol" /></svg>
                     </div>
                     <div id="volumeBar" ng-click="aersiaCtrl.volume($event);">
                     </div>
@@ -238,12 +261,6 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="footer-container">
-        <div class="statusbox"><div class="statustext"><span>Status</span></div></div>
-            <footer class="wrapper hbox">
-                <div class="hbox"><h3 class="foot-text">Authorized users only</h3></div>
-            </footer>
-        </div> -->
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="assets/js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
