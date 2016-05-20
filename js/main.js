@@ -79,17 +79,17 @@
 			"Classic": {
 				"class": "layout-classic",
 				"href": "layout-classic",
-				"features": ["controls","timeline","timeTextUpdate","progressUpdate","playlist","animations","options"]
+				"features": ["controls","timeline","timeTextUpdate","progressUpdate","playlist","animations","options","songImg"]
 			},
 			"Touch": {
 				"class": "layout-touch",
 				"href": "layout-touch",
-				"features": ["controls","timeline","timeTextUpdate","progressUpdate","playlist","animations","options"]
+				"features": ["controls","timeline","timeTextUpdate","progressUpdate","playlist","animations","options","songImg"]
 			},
 			"Streambox": {
 				"class": "layout-streambox",
 				"href": "layout-streambox",
-				"features": ["timeTextUpdate", "progressUpdate", "streambox","options"]
+				"features": ["timeTextUpdate", "progressUpdate", "streambox","options","songImg"]
 			},
 			"Streambar": {
 				"class": "layout-streambar",
@@ -107,7 +107,8 @@
 		this.selectedPlaylist = "VIP";
 		this.playlists = {
 			"VIP": {
-				"url": "http://vip.aersia.net/roster.xml",
+				"url": "/rosterfullArt.json",
+				// "url": "http://vip.aersia.net/roster.xml",
 				"longName": "Vidya Intarweb Playlist",
 			},
 			"VIP - Source": {
@@ -157,6 +158,7 @@
 		this.curSongTitle = document.getElementById("oboxSongTitle");
 		this.curSongCreator = document.getElementById("oboxSongCreator");
 		// this.curSongRating = document.getElementById("oboxSongRating");
+		this.curSongImg = document.getElementById("oboxSongImg");
 
 
 		/////
@@ -298,6 +300,9 @@
 			this.messagebox.children[0].innerHTML = str;
 		}.bind(this);
 
+		this.mboxclosebutton = document.getElementById('mboxclose');
+		addEvent(this.mboxclosebutton,"click",this.closembox);
+
 
 		/////
 		// To enable layouts to swap functions on and off, here is an object of status and hooks.
@@ -317,6 +322,7 @@
 
 					this.curSongTitle = document.getElementById("oboxSongTitle");
 					this.curSongCreator = document.getElementById("oboxSongCreator");
+					this.curSongImg = document.getElementById("oboxSongImg");
 
 					this.timeText = document.getElementById("timeProgText");
 					this.loadPct = document.getElementById("timeLoadPct");
@@ -392,6 +398,15 @@
 			},
 
 			"animations": {
+				"enable": function() {
+					// this.animationsEnabled = true;
+				},
+				"disable": function() {
+					// this.animationsEnabled = false;
+				},
+			},
+
+			"songImg": {
 				"enable": function() {
 					// this.animationsEnabled = true;
 				},
@@ -575,7 +590,8 @@
 						// Prepare the playlist for use
 
 						//Convert it from XML to JSON
-						var playlist = x2js.xml2js(res.data).playlist.trackList.track;
+						// var playlist = x2js.xml2js(res.data).playlist.trackList.track;
+						var playlist = res.data;
 
 						//Set the song list
 						this.songs = playlist;
@@ -595,7 +611,14 @@
 							{ window.setTimeout(this.shuffleSong,500); }
 							// But give Angular's list a little time to update, since it's stupid.
 						}
-					}.bind(this));
+					}.bind(this),
+
+					function(res) {
+						//If the request fails for some reason
+						this.error("The playlist was not able to be loaded. Please try again or reload the page.");
+
+					}.bind(this)
+				);
 			}
 			else if( start != null && start !== false )
 			{
@@ -1133,6 +1156,12 @@
 				this.curSongTitle.innerHTML = this.songs[this.curSong].title;
 				this.curSongCreator.innerHTML = this.songs[this.curSong].creator;
 				// this.curSongRating.innerHTML = "0"; //this.songs[this.curSong].rating;
+
+				if( this.features.songImg.enabled && this.curSong.art != null && this.curSong.art.length > 0)
+				{
+					// Set up the cover art rotator.
+					// this.curSongImg
+				}
 			}
 		};
 
