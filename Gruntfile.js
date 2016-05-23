@@ -30,18 +30,6 @@ module.exports = function(grunt) {
 
         dirs: dirs, //this is stupid.
 
-        // == Grunt Dev Update
-        // https://npmjs.org/package/grunt-dev-update
-        // http://pgilad.github.io/grunt-dev-update
-        devUpdate: {
-            main: {
-                options: {
-                    reportUpdated: false, // Report updated dependencies: 'false' | 'true'
-                    updateType   : "force" // 'force'|'report'|'prompt'
-                }
-            }
-        },
-
         modernizr: {
             dist: {
                 "crawl": false,
@@ -288,6 +276,7 @@ concat: {
     js: {
         src: [
             'js/modules/noconsole.js',
+            'js/modules/transitionEnd.js',
 
             'js/modules/core.js', //must be first in Effeckt block
             'js/modules/tabs.js',

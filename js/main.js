@@ -73,6 +73,10 @@
 		this.fullyLoaded = 0;
 		this.optionsBoxShown = false;
 		this.animationsEnabled = true;
+
+		this.songRotatePeriod = 10000;
+		this.songRotateTimer = null;
+
 		this.selectedLayout = "Classic";
 
 		this.layouts = {
@@ -423,7 +427,9 @@
 		this.enableFeature = function(feature) {
 			if( this.features[feature] != null && this.features[feature].enabled !== true )
 			{
-				this.features[feature].enable.call(this);
+				if( this.features[feature].enable != null )
+				{ this.features[feature].enable.call(this); }
+
 				this.features[feature].enabled = true;
 				Logger.get("internals").info(feature+" enabled.");
 			}
@@ -432,7 +438,9 @@
 		this.disableFeature = function(feature) {
 			if( this.features[feature] != null && this.features[feature].enabled !== false )
 			{
-				this.features[feature].disable.call(this);
+				if( this.features[feature].disable != null )
+				{ this.features[feature].disable.call(this); }
+
 				this.features[feature].enabled = false;
 				Logger.get("internals").info(feature+" disabled.");
 			}
@@ -726,7 +734,6 @@
 		}.bind(this);
 
 		this.shuffleSong = function() {
-			Logger.get("internals").time('Shuffle');
 			var list = this.songs;
 
 			//Ensure we don't play the same song again.
@@ -741,7 +748,6 @@
 			}
 
 			var selected = Math.floor(Math.random() * list.length);
-			Logger.get("internals").time('Shuffle');
 
 			//Start our random song.
 			this.playSong(selected);
@@ -1147,7 +1153,7 @@
 		}.bind(this);
 
 		this.updateCurSongInfo = function() {
-			//Update the song panel
+			// Update the song panel
 			if( this.curSong != null && this.songs[this.curSong] != null && (
 				 ( (this.selectedLayout === "Classic" || this.selectedLayout === "Touch") && this.optionsBoxShown ) || // In Classic or Touch interface, don't update unless it's visible.
 				 ( this.selectedLayout === "Streambox" || this.selectedLayout === "Streambar" )	//In Streambox or Streambar, update.
@@ -1157,11 +1163,98 @@
 				this.curSongCreator.innerHTML = this.songs[this.curSong].creator;
 				// this.curSongRating.innerHTML = "0"; //this.songs[this.curSong].rating;
 
-				if( this.features.songImg.enabled && this.curSong.art != null && this.curSong.art.length > 0)
+				this.setSongArt();
+			}
+		};
+
+		// Function to control the song rotation
+		this.setSongArt = function() {
+			var curArt = this.songs[this.curSong].art;
+			if( this.features.songImg.enabled && curArt != null && curArt.length > 0)
+			{
+				classie.removeClass(this.curSongImg,"fadeout");
+
+				if( this.curSongImg.getAttribute('data-song') == null || this.curSong !== this.curSongImg.getAttribute('data-song') )
 				{
-					// Set up the cover art rotator.
-					// this.curSongImg
+					this.curSongImg.setAttribute('data-song',this.curSong);
+					this.curSongImg.setAttribute('data-idx',null);
 				}
+
+				// Start at 0, or wrap if we're past the length of the art array. Otherwise, increment.
+				var nextidx = 0;
+				if( this.curSongImg.getAttribute('data-idx') != null && this.curSongImg.getAttribute('data-idx') <= curArt.length-1 )
+				{
+					nextidx = this.curSongImg.getAttribute('data-idx')+1;
+				}
+
+				if( nextidx !== this.curSongImg.getAttribute('data-idx') )
+				{
+					this.rotateSongArt(curArt,nextidx);
+					this.curSongImg.setAttribute('data-idx',nextidx);
+				}
+			}
+			else
+			{
+				// Art is disabled or the song has no art, zero out the values.
+				// If the last song is defined, we need to set the placeholder.
+				if( this.curSongImg.getAttribute('data-idx') != null || this.curSongImg.getAttribute('data-song') != null )
+				{
+					this.curSongImg.setAttribute('data-idx',null);
+					this.curSongImg.setAttribute('data-song',null);
+					classie.removeClass(this.curSongImg,"fadeout");
+					this.rotateSongArt();
+				}
+			}
+		};
+
+		// Function to do the actual rotation
+		this.rotateSongArt = function(art,index) {
+			var placeholdersrc = 'assets/img/placeholder.png';
+
+			// Set it to placeholder if we're given nothing.
+			if( art == null && index == null )
+			{
+				Logger.get("internals").debug("Removing song art");
+
+				this.curSongImg.src = placeholdersrc;
+
+				window.clearTimeout(this.songRotateTimer);
+				removeEvent(this.curSongImg, window.transitionEnd);
+
+				return;
+			}
+
+			// Set up the cover art rotator. If it's set to placeholder, we'll stomp it immediately.
+			if( this.curSongImg.src === window.location.href+placeholdersrc )
+			{
+				Logger.get("internals").debug("Stomping song art");
+				this.curSongImg.src = 'http://mobygames.com'+art[index].thumbnail;
+			}
+			else {
+				// Fade out, set art, fade in.
+				Logger.get("internals").debug("Fading song art");
+
+				classie.addClass(this.curSongImg,"fadeout");
+
+				// Set the source of the image once it finishes fading out.
+				addEvent(this.curSongImg, window.transitionEnd, function() {
+					Logger.get("animation").debug("Song art switch");
+					this.curSongImg.src = 'http://mobygames.com'+art[index].thumbnail;
+				}.bind(this));
+
+				// Fade back in whenever the image finishes loading.
+				addEvent(this.curSongImg,"load", function() {
+					classie.removeClass(this.curSongImg,"fadeout");
+				}.bind(this) );
+			}
+
+			if( art.length > 1 )
+			{
+				this.songRotateTimer = window.setTimeout(
+					function(){
+						this.rotateSongArt(art,index+1);
+					}.bind(this), this.songRotatePeriod
+				);
 			}
 		};
 
@@ -1170,7 +1263,7 @@
 
 		this.init = function() {
 
-			//Assign the default preset to the "current style";
+			// Assign the default preset to the "current style";
 			this.currentStyles = this.presetStyles[this.selectedPreset];
 
 			// Get any stored values that will override our defaults.
