@@ -55,6 +55,7 @@
 		Logger.get('internals').setLevel(Logger.INFO);
 		Logger.get('player').setLevel(Logger.INFO);
 		Logger.get('animation').setLevel(Logger.ERROR);
+		Logger.get('songart').setLevel(Logger.DEBUG);
 
 		//Initialize variables
 		this.songs = [];
@@ -76,6 +77,7 @@
 
 		this.songRotatePeriod = 10000;
 		this.songRotateTimer = null;
+		this.songArtHasEvents = false;
 
 		this.selectedLayout = "Classic";
 
@@ -159,10 +161,28 @@
 
 		this.toggleShuffleBtn = document.getElementById("toggleShuffle");
 
-		this.curSongTitle = document.getElementById("oboxSongTitle");
-		this.curSongCreator = document.getElementById("oboxSongCreator");
-		// this.curSongRating = document.getElementById("oboxSongRating");
-		this.curSongImg = document.getElementById("oboxSongImg");
+		this.songUI = {
+			'Streambox': {
+				'title': document.getElementById("sboxSongTitle"),
+				'creator': document.getElementById("sboxSongCreator"),
+				'img': document.getElementById("sboxSongImg"),
+			},
+			'Streambar': {
+				'title': document.getElementById("controlsSongTitle"),
+				'creator': document.getElementById("controlsSongCreator"),
+			},
+			'default': {
+				'title': document.getElementById("oboxSongTitle"),
+				'creator': document.getElementById("oboxSongCreator"),
+				'img': document.getElementById("oboxSongImg"),
+			}
+		};
+
+		// Hook any layouts that have the songImg
+		Object.keys(this.songUI).forEach(function(val) {
+			if( this.songUI[val].img != null )
+			{ this.hookSongArtElement( this.songUI[val].img ); }
+		}.bind(this));
 
 
 		/////
@@ -324,10 +344,6 @@
 					classie.removeClass(this.timebox,"hidden");
 					classie.addClass(this.controlsInfoBox,"hidden");
 
-					this.curSongTitle = document.getElementById("oboxSongTitle");
-					this.curSongCreator = document.getElementById("oboxSongCreator");
-					this.curSongImg = document.getElementById("oboxSongImg");
-
 					this.timeText = document.getElementById("timeProgText");
 					this.loadPct = document.getElementById("timeLoadPct");
 
@@ -339,9 +355,6 @@
 				"disable": function() {
 					classie.addClass(this.timebox,"hidden");
 					classie.removeClass(this.controlsInfoBox,"hidden");
-
-					this.curSongTitle = document.getElementById("controlsSongTitle");
-					this.curSongCreator = document.getElementById("controlsSongCreator");
 
 					this.timeText = document.getElementById("controlsProgText");
 					this.loadPct = document.getElementById("controlsLoadPct");
@@ -372,14 +385,9 @@
 			"streambox": {
 				"enable": function() {
 					classie.removeClass(this.streambox,"hidden");
-
-					this.curSongTitle = document.getElementById("sboxSongTitle");
-					this.curSongCreator = document.getElementById("sboxSongCreator");
 				},
 				"disable": function() {
 					classie.addClass(this.streambox,"hidden");
-
-					// Don't reset the curSongTitle and creator, as another function has does it by now
 				},
 			},
 			"timeTextUpdate": {
@@ -413,6 +421,7 @@
 			"songImg": {
 				"enable": function() {
 					// this.animationsEnabled = true;
+					this.updateCurSongInfo();
 				},
 				"disable": function() {
 					// this.animationsEnabled = false;
@@ -677,7 +686,7 @@
 			{ classie.removeClass(this.playlist.children[this.curSong],'active-song'); }
 
 			//log
-			Logger.info("Playing song: "+this.songs[index].title);
+			Logger.get("player").info("Playing song: "+this.songs[index].title);
 
 			// Set the interface for the new song
 			this.curSong = index;
@@ -1159,7 +1168,7 @@
 				 ( this.selectedLayout === "Streambox" || this.selectedLayout === "Streambar" )	//In Streambox or Streambar, update.
 			 )
 			 ){
-				this.curSongTitle.innerHTML = this.songs[this.curSong].title;
+				this.getUIElement('title').innerHTML = this.songs[this.curSong].title;
 				this.curSongCreator.innerHTML = this.songs[this.curSong].creator;
 				// this.curSongRating.innerHTML = "0"; //this.songs[this.curSong].rating;
 
@@ -1167,41 +1176,53 @@
 			}
 		};
 
+		// Function to get the right elements from the current layouts
+		this.getUIElement = function(type) {
+			if( this.songUI[this.selectedLayout] != null )
+			{
+				return this.songUI[this.selectedLayout][type];
+			} else {
+				return this.songUI.default[type];
+			}
+		}.bind(this);
+
 		// Function to control the song rotation
 		this.setSongArt = function() {
+			this.stopSongArt();
+
 			var curArt = this.songs[this.curSong].art;
 			if( this.features.songImg.enabled && curArt != null && curArt.length > 0)
 			{
-				classie.removeClass(this.curSongImg,"fadeout");
+				classie.removeClass(this.getUIElement('img'),"fadeout");
 
-				if( this.curSongImg.getAttribute('data-song') == null || this.curSong !== this.curSongImg.getAttribute('data-song') )
+				if( this.getUIElement('img').getAttribute('data-song') == null || this.curSong !== this.getUIElement('img').getAttribute('data-song') )
 				{
-					this.curSongImg.setAttribute('data-song',this.curSong);
-					this.curSongImg.setAttribute('data-idx',null);
+					this.getUIElement('img').setAttribute('data-song',this.curSong);
+					this.getUIElement('img').setAttribute('data-idx',null);
 				}
 
 				// Start at 0, or wrap if we're past the length of the art array. Otherwise, increment.
 				var nextidx = 0;
-				if( this.curSongImg.getAttribute('data-idx') != null && this.curSongImg.getAttribute('data-idx') <= curArt.length-1 )
+				if( this.getUIElement('img').getAttribute('data-idx') != null && this.getUIElement('img').getAttribute('data-idx') <= curArt.length-1 )
 				{
-					nextidx = this.curSongImg.getAttribute('data-idx')+1;
+					nextidx = this.getUIElement('img').getAttribute('data-idx')+1;
 				}
 
-				if( nextidx !== this.curSongImg.getAttribute('data-idx') )
+				if( nextidx !== this.getUIElement('img').getAttribute('data-idx') )
 				{
 					this.rotateSongArt(curArt,nextidx);
-					this.curSongImg.setAttribute('data-idx',nextidx);
+					this.getUIElement('img').setAttribute('data-idx',nextidx);
 				}
 			}
 			else
 			{
 				// Art is disabled or the song has no art, zero out the values.
 				// If the last song is defined, we need to set the placeholder.
-				if( this.curSongImg.getAttribute('data-idx') != null || this.curSongImg.getAttribute('data-song') != null )
+				if( this.getUIElement('img').getAttribute('data-idx') != null || this.getUIElement('img').getAttribute('data-song') != null )
 				{
-					this.curSongImg.setAttribute('data-idx',null);
-					this.curSongImg.setAttribute('data-song',null);
-					classie.removeClass(this.curSongImg,"fadeout");
+					this.getUIElement('img').setAttribute('data-idx',null);
+					this.getUIElement('img').setAttribute('data-song',null);
+					classie.removeClass(this.getUIElement('img'),"fadeout");
 					this.rotateSongArt();
 				}
 			}
@@ -1214,49 +1235,67 @@
 			// Set it to placeholder if we're given nothing.
 			if( art == null && index == null )
 			{
-				Logger.get("internals").debug("Removing song art");
+				Logger.get("songart").debug("Removing song art");
 
-				this.curSongImg.src = placeholdersrc;
+				this.getUIElement('img').src = placeholdersrc;
 
-				window.clearTimeout(this.songRotateTimer);
-				removeEvent(this.curSongImg, window.transitionEnd);
+				this.stopSongArt();
 
 				return;
 			}
 
 			// Set up the cover art rotator. If it's set to placeholder, we'll stomp it immediately.
-			if( this.curSongImg.src === window.location.href+placeholdersrc )
+			if( this.getUIElement('img').src === window.location.href+placeholdersrc )
 			{
-				Logger.get("internals").debug("Stomping song art");
-				this.curSongImg.src = 'http://mobygames.com'+art[index].thumbnail;
+				Logger.get("songart").debug("Stomping song art");
+				this.getUIElement('img').src = 'http://mobygames.com'+art[index].thumbnail;
 			}
 			else {
-				// Fade out, set art, fade in.
-				Logger.get("internals").debug("Fading song art");
+				// Fade out, set art, fade in. The rest will be triggered automatically.
+				Logger.get("songart").debug("Fading out song art.");
 
-				classie.addClass(this.curSongImg,"fadeout");
-
-				// Set the source of the image once it finishes fading out.
-				addEvent(this.curSongImg, window.transitionEnd, function() {
-					Logger.get("animation").debug("Song art switch");
-					this.curSongImg.src = 'http://mobygames.com'+art[index].thumbnail;
-				}.bind(this));
-
-				// Fade back in whenever the image finishes loading.
-				addEvent(this.curSongImg,"load", function() {
-					classie.removeClass(this.curSongImg,"fadeout");
-				}.bind(this) );
+				classie.addClass(this.getUIElement('img'),"fadeout");
 			}
 
 			if( art.length > 1 )
 			{
 				this.songRotateTimer = window.setTimeout(
-					function(){
-						this.rotateSongArt(art,index+1);
+					function() {
+
+						if( index < art.length-1 )
+						{ this.rotateSongArt(art,index+1); }
+						else { this.rotateSongArt(art,0); }
+
 					}.bind(this), this.songRotatePeriod
 				);
 			}
 		};
+
+		this.hookSongArtElement = function(el) {
+			addEvent(el, window.transitionEnd, function() {
+				if( classie.hasClass(el,"fadeout") )
+				{
+					Logger.get("songart").debug("Faded out, switched song art.");
+					el.src = 'http://mobygames.com'+art[index].thumbnail;
+				}
+			}.bind(this));
+
+			// Fade back in whenever the image finishes loading.
+			addEvent(el,"load", function() {
+				Logger.get("songart").debug("Song art loaded, fading in.");
+				classie.removeClass(el,"fadeout");
+			}.bind(this) );
+
+			addEvent(el,"error", function() {
+				Logger.get('songart').error("Unable to load song art, setting placeholder.");
+				this.rotateSongArt();
+			}.bind(this) );
+		}.bind(this);
+
+		this.stopSongArt = function() {
+			window.clearTimeout(this.songRotateTimer);
+			removeEvent(this.getUIElement('img'), window.transitionEnd);
+		}.bind(this);
 
 		/////
 		// Initialization
