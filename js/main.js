@@ -73,7 +73,6 @@
 		this.lastLoadText = '';
 		this.fullyLoaded = 0;
 		this.optionsBoxShown = false;
-		this.animationsEnabled = true;
 
 		this.songRotatePeriod = 10000;
 		this.songRotateTimer = null;
@@ -177,6 +176,44 @@
 				'img': document.getElementById("oboxSongImg"),
 			}
 		};
+
+		this.hookSongArtElement = function(el) {
+			addEvent(el, window.transitionEnd, function() {
+				if( classie.hasClass(el,"fadeout") )
+				{
+					// Grab the art in question
+					var song = el.getAttribute('data-song');
+					var idx = el.getAttribute('data-idx');
+
+					if( song == null || idx == null || this.songs[song] == null || this.songs[song].art == null || this.songs[song].art[idx] == null )
+					{
+						Logger.get("songart").error("Faded out, but "+song+" + "+idx+" did not point to valid art!");
+						return;
+					}
+
+					Logger.get("songart").debug("Faded out, switched song art.");
+					el.src = 'http://mobygames.com'+this.songs[song].art[idx].thumbnail;
+				}
+			}.bind(this));
+
+			// Fade back in whenever the image finishes loading.
+			addEvent(el,"load", function() {
+				Logger.get("songart").debug("Song art loaded, fading in.");
+
+				// Trigger the object-fit polyfill
+				objectFitImages(el);
+
+				classie.removeClass(el,"fadeout");
+			}.bind(this) );
+
+			addEvent(el,"error", function() {
+				Logger.get('songart').error("Unable to load song art, setting placeholder.");
+				this.rotateSongArt();
+			}.bind(this) );
+
+			// Trigger the object-fit polyfill for the first time
+			objectFitImages(el);
+		}.bind(this);
 
 		// Hook any layouts that have the songImg
 		Object.keys(this.songUI).forEach(function(val) {
@@ -1169,7 +1206,7 @@
 			 )
 			 ){
 				this.getUIElement('title').innerHTML = this.songs[this.curSong].title;
-				this.curSongCreator.innerHTML = this.songs[this.curSong].creator;
+				this.getUIElement('creator').innerHTML = this.songs[this.curSong].creator;
 				// this.curSongRating.innerHTML = "0"; //this.songs[this.curSong].rating;
 
 				this.setSongArt();
@@ -1211,7 +1248,6 @@
 				if( nextidx !== this.getUIElement('img').getAttribute('data-idx') )
 				{
 					this.rotateSongArt(curArt,nextidx);
-					this.getUIElement('img').setAttribute('data-idx',nextidx);
 				}
 			}
 			else
@@ -1254,6 +1290,9 @@
 				// Fade out, set art, fade in. The rest will be triggered automatically.
 				Logger.get("songart").debug("Fading out song art.");
 
+				// Give it the right idx so it knows what to set to
+				this.getUIElement('img').setAttribute('data-idx',index);
+
 				classie.addClass(this.getUIElement('img'),"fadeout");
 			}
 
@@ -1270,27 +1309,6 @@
 				);
 			}
 		};
-
-		this.hookSongArtElement = function(el) {
-			addEvent(el, window.transitionEnd, function() {
-				if( classie.hasClass(el,"fadeout") )
-				{
-					Logger.get("songart").debug("Faded out, switched song art.");
-					el.src = 'http://mobygames.com'+art[index].thumbnail;
-				}
-			}.bind(this));
-
-			// Fade back in whenever the image finishes loading.
-			addEvent(el,"load", function() {
-				Logger.get("songart").debug("Song art loaded, fading in.");
-				classie.removeClass(el,"fadeout");
-			}.bind(this) );
-
-			addEvent(el,"error", function() {
-				Logger.get('songart').error("Unable to load song art, setting placeholder.");
-				this.rotateSongArt();
-			}.bind(this) );
-		}.bind(this);
 
 		this.stopSongArt = function() {
 			window.clearTimeout(this.songRotateTimer);

@@ -70,7 +70,11 @@ module.exports = function(grunt) {
                 tasks: ['css']
             },
             js: {
-                files: ['js/modules/*.js','node_modules/desandro-classie/classie.js','node_modules/clipboard/dist/clipboard.js'],
+                files: [
+                  'node_modules/desandro-classie/classie.js',
+                  'node_modules/clipboard/dist/clipboard.js',
+                  'js/modules/*.js',
+                ],
                 tasks: ['concat:js','copy:js']
             },
             mainjs: {
@@ -82,6 +86,7 @@ module.exports = function(grunt) {
             },
             nodeModules: {
                 files: [
+                    'js/ofi/dist/ofi.browser.js',
                     'node_modules/angular/angular.js',
                     'node_modules/x2js/x2js.js',
                     'node_modules/perfect-scrollbar/dist/js/perfect-scrollbar.js',
@@ -258,6 +263,7 @@ copy: {
     nodeModules: {
         files: [
             { expand: true, flatten:true, src: [
+                'js/ofi/dist/ofi.browser.js',
                 'node_modules/angular/angular.js',
                 'node_modules/js-cookie/src/js.cookie.js',
                 'node_modules/x2js/x2js.js',

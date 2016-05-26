@@ -383,6 +383,12 @@ section,
 	text-shadow: 1px 1px 2px #222, 2px 0 1px #222;
 }
 
+#oboxSongImg, #sboxSongImg
+{
+	object-fit: contain;
+	font-family: 'object-fit: contain'; /* Object-fit polyfill reads font-family to get the properties */
+}
+
 .fade {
 	transition: opacity 250ms ease;
 	opacity: 1;
