@@ -63,6 +63,7 @@
 		this.curSong = 0;
 		this.autoplay = true;
 		this.playing = false;
+		this.playtries = 0;
 		this.prevVolume = 0;
 		this.history = [];
 		this.historyPosition = 0;
@@ -509,9 +510,15 @@
 		//Hook audio player
 
 		//This will be called whenever a song ends.
-		addEvent(this.player,"ended", function() {
+		addEvent(this.player, "ended", function() {
 			if( this.autoplay )
 			{ this.shuffleSong(); }
+		}.bind(this));
+
+		// This will be called if the player breaks for any reason
+		addEvent(this.player, "error", function(ev) {
+			// Just retry. If this is called twice without a full playthrough, it will just stop.
+			this.playSong(this.curSong,true);
 		}.bind(this));
 
 		//This will be called every time a new song loads, and when the song is seeked and begins playing?
@@ -642,10 +649,13 @@
 				$http.get(this.playlists[this.selectedPlaylist].url)
 					.then(function(res) {
 						// Prepare the playlist for use
-
-						//Convert it from XML to JSON
-						// var playlist = x2js.xml2js(res.data).playlist.trackList.track;
 						var playlist = res.data;
+
+						//Convert it from XML to JSON if necessary
+						if( /.xml$/.test(this.playlists[this.selectedPlaylist].url) )
+						{
+							playlist = x2js.xml2js(playlist).playlist.trackList.track;
+						}
 
 						//Set the song list
 						this.songs = playlist;
@@ -710,11 +720,26 @@
 			}
 		}.bind(this);
 
-
-		this.playSong = function(index) {
+		// retry overrides attempting to play the same song.
+		this.playSong = function(index,retry) {
 			if( index == null || index === false ) { return; }
 			index = parseInt(index);
-			if( index === this.curSong ) { return; }
+			if( index === this.curSong && ( retry == null || retry === false )) { return; }
+
+			if( retry == null ) { retry = false; }
+
+			// Error handling
+			if( retry && this.playtries > 0 ) {
+				// If we've already retried for any reason, don't try again.
+				Logger.get("player").error("Cannot play song: "+this.songs[index].title);
+				return;
+			} else if ( retry ) {
+				// If this is our first retry, let's keep track of that.
+				this.playtries = 1;
+			} else {
+				// If we're being asked to play a song and this isn't a retry, let's reset our tries counter.
+				this.playtries = 0;
+			}
 
 			//Stop and unregister the old song.
 			this.pause();
@@ -723,7 +748,10 @@
 			{ classie.removeClass(this.playlist.children[this.curSong],'active-song'); }
 
 			//log
-			Logger.get("player").info("Playing song: "+this.songs[index].title);
+			if( retry )
+			{ Logger.get("player").error("Retrying song: "+this.songs[index].title); }
+			else
+			{ Logger.get("player").info("Playing song: "+this.songs[index].title); }
 
 			// Set the interface for the new song
 			this.curSong = index;
@@ -731,18 +759,22 @@
 
 			this.fullyLoaded = 0;
 
-			// Set the shuffle control to reflect the disabled state
-			if( this.noShuffles[this.selectedPlaylist] != null && this.noShuffles[this.selectedPlaylist].indexOf(this.curSong) > -1 )
-			{ classie.addClass(this.toggleShuffleBtn, "toggled"); }
-			else
-			{ classie.removeClass(this.toggleShuffleBtn, "toggled"); }
+			// If this is a retry, we've already done this stuff and don't want to do it again.
+			if( retry )
+			{
+				// Set the shuffle control to reflect the disabled state
+				if( this.noShuffles[this.selectedPlaylist] != null && this.noShuffles[this.selectedPlaylist].indexOf(this.curSong) > -1 )
+				{ classie.addClass(this.toggleShuffleBtn, "toggled"); }
+				else
+				{ classie.removeClass(this.toggleShuffleBtn, "toggled"); }
 
-			// Highlight the active song
-			if( this.curSong != null && this.playlist.children[this.curSong] != null )
-			{ classie.addClass(this.playlist.children[this.curSong],'active-song'); }
+				// Highlight the active song
+				if( this.curSong != null && this.playlist.children[this.curSong] != null )
+				{ classie.addClass(this.playlist.children[this.curSong],'active-song'); }
 
-			// Put this song in history
-			this.historyTrack(this.curSong);
+				// Put this song in history
+				this.historyTrack(this.curSong);
+			}
 
 			// Play
 			if( this.songs[this.curSong].formats != null )
