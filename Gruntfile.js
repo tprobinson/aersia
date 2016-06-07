@@ -86,6 +86,7 @@ module.exports = function(grunt) {
             },
             nodeModules: {
                 files: [
+                    'node_modules/jsonlylightbox/js/lightbox.js',
                     'js/ofi/dist/ofi.browser.js',
                     'node_modules/angular/angular.js',
                     'node_modules/x2js/x2js.js',
@@ -263,6 +264,7 @@ copy: {
     nodeModules: {
         files: [
             { expand: true, flatten:true, src: [
+                'node_modules/jsonlylightbox/js/lightbox.js',
                 'js/ofi/dist/ofi.browser.js',
                 'node_modules/angular/angular.js',
                 'node_modules/js-cookie/src/js.cookie.js',
