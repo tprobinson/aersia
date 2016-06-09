@@ -306,6 +306,8 @@ concat: {
             '<%= dirs.generated %>tidy.css',
             '<%= dirs.generated %>effeckt.css',
             '<%= dirs.generated %>simptip.css',
+            'node_modules/jsonlylightbox/css/lightbox.css',
+
             '<%= dirs.generated %>perfect-scrollbar.css',
             'css/custom.css'
         ],

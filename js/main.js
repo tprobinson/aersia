@@ -39,6 +39,8 @@
 		this.lightbox = new Lightbox();
 		this.lightbox.load({
 			'preload': false,
+			'controls': false,
+			'nextOnClick': false
 		});
 
 		// Initialize the share button

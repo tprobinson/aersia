@@ -605,9 +605,6 @@ html.layout-touch section {
 	flex-direction: row;
 }
 
-/*html.layout-touch .sep {
-	width: 93vw;
-}*/
 
 .sep {
 	border-bottom-width: 1px;
