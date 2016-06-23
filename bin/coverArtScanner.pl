@@ -9,6 +9,63 @@ use File::Slurp;
 use HTML::TreeBuilder::XPath;
 use Term::ProgressBar;
 use Getopt::Long;
+use List::Util qw/any/;
+
+# As these are all regular expressions, rather than strict matches,
+# be careful. E.g. "Wii" will match "Wii" and "Wii U"
+my %desired_platforms = (
+  # Prefer PC as this will usually catch higher quality images.
+  'Macintosh and Windows' => 7,
+  'Windows' => 6,
+
+  # Prefer Wii series and Playstation, as they tend to have square icons.
+  'Wii' => 6,
+  'Playstation' => 6,
+
+  # Don't prefer Xbox, usually this ends up being covers.
+  'Xbox' => 1,
+
+  # For mobile versions, these are usually good, but not as good as any existing PC versions.
+  'i(Phone|Pad)' => 5,
+  'Android' => 5,
+);
+
+# This just searches through the attribute keys, and should match up with desired_values.
+# Don't weight this high, it should only be an edge if necessary.
+my %desired_attributes = (
+  'Packaging' => 3,
+  'Country' => 2,
+  'Video' => 1,
+);
+
+my %desired_values = (
+  'Packaging' => {
+    # Prefer electronic for quality, jewel case for aspect ratio.
+    'Electronic' => 10,
+    'Jewel Case' => 8,
+  },
+
+  'Country' => {
+    'Worldwide' => 10,
+    'United States' => 7,
+  },
+
+  'Video' => {
+    #minorly prefer NTSC over PAL versions.
+    'NTSC' => 2,
+  },
+);
+
+my %desired_art = (
+  # Prefer fronts.
+  'Sleeve.+Front' => 6,
+  'Front Cover' => 5,
+  'Keep Case.+Front' => 5,
+
+  #CD is neat too.
+  'Media' => 4,
+)
+
 
 my $agent = WWW::Mechanize->new();
 
@@ -20,18 +77,19 @@ if( -f 'nameMapping.json' ) { $mapping = decode_json(read_file('nameMapping.json
 my %unique_arts = ();
 
 
-
 #Process dash options
-my ( $opt_namemapping, $opt_force, $opt_quiet, $opt_reprocess, $opt_purge );
+my ( $opt_namemapping, $opt_force, $opt_trace, $opt_quiet, $opt_reprocess, $opt_clean, $opt_only, $opt_manual, $opt_manual_grab );
 
 GetOptions ('n|namemap!' => \$opt_namemapping,
             'r|reprocess!' => \$opt_reprocess,
-			'q|quiet!' => \$opt_quiet,
-			'f|force!' => \$opt_force,
-            'p|purge!' => \$opt_purge,
+            't|trace!' => \$opt_trace,
+      			'q|quiet!' => \$opt_quiet,
+      			'f|force!' => \$opt_force,
+            'c|clean!' => \$opt_clean,
+            'o|only=s@' => \$opt_only,
 ) || die(Usage());
 
-if( $opt_purge )
+if( $opt_clean )
 {
     map
     {
@@ -39,9 +97,9 @@ if( $opt_purge )
         delete $_->{'fullArt'};
     } @$playlist;
 
-    write_file('roster_purged.json', encode_json($playlist)) || die $!;
+    write_file('roster_clean.json', encode_json($playlist)) || die $!;
 
-    print "Purged roster of all art, output to roster_purged.json.\n";
+    print "Cleaned roster of all art, output to roster_clean.json.\n";
 
     exit 0;
 }
@@ -54,20 +112,13 @@ if( ! $opt_quiet ) { $progress = Term::ProgressBar->new((scalar @{$playlist}) - 
 if ( ! $opt_reprocess ) {
 GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
 
-    # Skip if we already have art, unless we're forcing.
-    if( !$opt_force && ( defined $playlist->[$i]->{'art'} || defined $playlist->[$i]->{'fullArt'} ) ) { next; }
-
     my $game = $playlist->[$i]->{'creator'};
 
-    # Ignore stuff at the front
-    if (
-        $game eq "Vidya Intarweb Playlist" ||
-        $game =~ /^MOTD/ ||
-        $game eq "Changelog" ||
-        $game eq "Notice"
-    ) { next GAME; }
+    # Skip this game if we're in 'only' mode and it's not in our list.
+    if( scalar @$opt_only && ! any {/$game/i} @$opt_only )
+    { next; }
 
-    # Check if we already have scanned art for this game, and re-use it if so.
+    # If we have already scanned this game this run, skip.
     if( defined $unique_arts{$game} )
     {
         if( $unique_arts{$game} != 0 )
@@ -76,6 +127,25 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
         }
         next GAME;
     }
+
+    # If we're forcing, remove any art we've already found for this item.
+    if( $opt_force )
+    {
+        delete $playlist->[$i]->{'art'};
+        delete $playlist->[$i]->{'fullArt'};
+    }
+
+    # If this game already has art in the file (such as a re-run), skip.
+    if( defined $playlist->[$i]->{'art'} || defined $playlist->[$i]->{'fullArt'} )
+    { next; }
+
+    # Skip stuff at the front.
+    if (
+        $game eq 'Vidya Intarweb Playlist' ||
+        $game =~ /^MOTD/ ||
+        $game eq 'Changelog' ||
+        $game eq 'Notice'
+    ) { next GAME; }
 
 
     # Find the right page to scan.
@@ -155,7 +225,9 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
         my $metadata = shift @covers;
 
         # Grab the platform it's for
-        my $platform = ($metadata->look_down(_tag=>'h2')->content_list)[0];
+        my $descend = $metadata->look_down(_tag=>'h2');
+        next if ! defined $descend; # excludes "covers" that don't have an actual title.
+        my $platform = ($descend->content_list)[0];
         if( ! defined $lookup{$platform} )
         {
             $lookup{$platform} = {};
@@ -232,18 +304,149 @@ else {
 
 SONG: foreach my $song( @$playlist )
 {
-    if( ! $opt_force && defined $song->{'art'} ) { next SONG; }
+    my $game = $song->{'creator'};
+
+    # Skip this game if we're in 'only' mode and it's not in our list.
+    if( scalar @$opt_only && ! any {/$game/i} @$opt_only )
+    { next; }
+
+    # If we have already scanned this game this run, skip.
+    if( defined $unique_arts{$game} )
+    {
+        if( $unique_arts{$game} != 0 )
+        {
+            $playlist->[$i]->{'fullArt'} = $unique_arts{$game};
+        }
+        next GAME;
+    }
+
+    # If we're forcing, remove any art we've already processed for this item.
+    if( $opt_force )
+    {
+        delete $playlist->[$i]->{'art'};
+    }
+
+    # If this game already has art in the file (such as a re-run), skip.
+    if( defined $playlist->[$i]->{'art'} )
+    { next; }
+
+    # If the game didn't get anything from MobyGames, skip.
     if( ! defined $song->{'fullArt'} )
     {
-        print $song->{'creator'}, ' did not have fullArt.',"\n";
+        print $song->{'creator'}, ' has no art.',"\n";
         next SONG;
     }
 
+    # Skip stuff at the front.
+    if (
+        $game eq 'Vidya Intarweb Playlist' ||
+        $game =~ /^MOTD/ ||
+        $game eq 'Changelog' ||
+        $game eq 'Notice'
+    ) { next GAME; }
+
+    # # Build a list of platforms
+    # my @platforms;
+    # foreach my $target (keys %desired_platforms)
+    # {
+    #     my @found = grep{/$target/i} keys %{$song->{'fullArt'}};
+    #     if( scalar @found )
+    #     { push @platforms, @found; }
+    # }
+    #
+    # # Just take them all if we couldn't get any priorities.
+    # if( scalar @platforms == 0 ) { @platforms = keys %{$song->{'fullArt'}}; }
+    #
+    # tracelog($game,'Found platforms: '.join(',',@platforms));
+    #
+    # # Loop over platforms (level 2)
+    # foreach my $platform ( @platforms )
+    # {
+    #     if( ! defined $song->{'fullArt'}->{$platform} )
+    #     { print 'Error: ', $song->{'creator'}, ' had bogus platform ',$platform,"\n"; next; }
+    #
+    #     # Build a list of desired attributes
+    #     my @attrs;
+    #     foreach my $target (@desired_attributes)
+    #     {
+    #         my @found = grep{/$target/i} keys %{$song->{'fullArt'}->{$platform}};
+    #         if ( scalar @found )
+    #         { push @attrs, @found; }
+    #     }
+    #
+    #     # Just take them all if we couldn't get any priorities.
+    #     if( scalar @attrs == 0 ) { @attrs = keys %{$song->{'fullArt'}->{$platform}}; }
+    #
+    #     tracelog($game,'Found attributes: '.join(',',@attrs));
+    #
+    #     # Loop over attrs (level 3)
+    #     foreach my $attr ( @attrs )
+    #     {
+    #         if( ! defined $song->{'fullArt'}->{$platform}->{$attr} )
+    #         { print 'Error: ', $song->{'creator'}, ' had bogus attr ',$attr,"\n"; next; }
+    #
+    #         # Build a list of desired values.
+    #         my @values;
+    #         foreach my $target (@desired_values)
+    #         {
+    #             if( $attr !~ /$target->[0]/i ) { next; }
+    #
+    #             my @found = grep{/$target->[1]/i} keys %{$song->{'fullArt'}->{$platform}->{$attr}};
+    #             if( scalar @found )
+    #             { push @values, @found; }
+    #         }
+    #
+    #         # Just take them all if we couldn't get any priorities.
+    #         if( scalar @values == 0 ) { @values = keys %{$song->{'fullArt'}->{$platform}->{$attr}}; }
+    #
+    #         tracelog($game,'Found values: '.join(',',@values));
+    #
+    #         # Loop over values (level 4)
+    #         foreach my $value ( @values )
+    #         {
+    #             if( ! defined $song->{'fullArt'}->{$platform}->{$attr}->{$value} )
+    #             { print 'Error: ', $song->{'creator'}, ' had bogus attrvalue ',$attr,',',$value,"\n"; next; }
+    #
+    #             # Separate the covers into priority, and non-priority.
+    #             my @priority_covers;
+    #             my @covers;
+    #             foreach my $target ( @{$song->{'fullArt'}->{$platform}->{$attr}->{$value}} )
+    #             {
+    #                 foreach my $key ( keys %{$target} )
+    #                 {
+    #                     my $hash = $target->{$key};
+    #                     $hash->{'title'} = $key;
+    #                     $hash->{'source'} = 'Mobygames';
+    #
+    #                     if( $key =~ /front/i )
+    #                     {
+    #                         push( @priority_covers, $hash );
+    #                     } else {
+    #                         push( @covers, $hash );
+    #                     }
+    #                 }
+    #             }
+    #
+    #             push(@priority_covers, sort { $a->{'title'} cmp $b->{'title'} } @covers );
+    #
+    #             $song->{'art'} = \@priority_covers;
+    #
+    #             # Take the last one if it exists. (the last one will tend to catch more recent release dates, etc)
+    #             # if( scalar @covers > 0 )
+    #             # {
+    #             #     my $pick = sort @covers
+    #             #     $song->{'art'} = $covers[$#covers];
+    #             #     next SONG;
+    #             # }
+    #         }
+    #     }
+    # }
+
     # Build a list of platforms
     my @platforms;
-    foreach my $target ( qw/Wii Windows Playstation Xbox/ )
+    foreach my $target (keys %desired_platforms)
     {
-        my @found = grep{/$target/i} keys %{$song->{'fullArt'}};
+        my @found = grep{/$target/i} ;
         if( scalar @found )
         { push @platforms, @found; }
     }
@@ -251,89 +454,72 @@ SONG: foreach my $song( @$playlist )
     # Just take them all if we couldn't get any priorities.
     if( scalar @platforms == 0 ) { @platforms = keys %{$song->{'fullArt'}}; }
 
-    # Loop over platforms (level 2)
-    foreach my $platform ( @platforms )
-    {
-        if( ! defined $song->{'fullArt'}->{$platform} )
-        { print 'Error: ', $song->{'creator'}, ' had bogus platform ',$platform,"\n"; next; }
+    tracelog($game,'Found platforms: '.join(',',@platforms));
 
-        # Build a list of desired attributes
-        my @attrs;
-        foreach my $target (qw/Packaging Country Video/)
-        {
-            my @found = grep{/$target/i} keys %{$song->{'fullArt'}->{$platform}};
-            if ( scalar @found )
-            { push @attrs, @found; }
+    my $weight = 0;
+    my @debug;
+    my @covers;
+    # Loop over platforms (level 1)
+    foreach my $platform ( keys %{$song->{'fullArt'}} )
+    {
+        if( defined $desired_platforms{$platform} ) {
+            $weight += $desired_platforms{$platform};
+            push(@debug,[$platform,$desired_platforms{$platform}]);
         }
 
-        # Just take them all if we couldn't get any priorities.
-        if( scalar @attrs == 0 ) { @attrs = keys %{$song->{'fullArt'}->{$platform}}; }
-
-        # Loop over attrs (level 3)
-        foreach my $attr ( @attrs )
+        # Loop over attrs (level 2)
+        foreach my $attr ( keys %{$song->{'fullArt'}->{$platform}} )
         {
-            if( ! defined $song->{'fullArt'}->{$platform}->{$attr} )
-            { print 'Error: ', $song->{'creator'}, ' had bogus attr ',$attr,"\n"; next; }
-
-            # Build a list of desired values.
-            my @values;
-            foreach my $target ((
-            ['Packaging','Electronic'],
-            ['Country','Worldwide'],
-            ['Country','United States'],
-            ['Video','NTSC'],
-            ))
-            {
-                if( $attr !~ /$target->[0]/i ) { next; }
-
-                my @found = grep{/$target->[1]/i} keys %{$song->{'fullArt'}->{$platform}->{$attr}};
-                if( scalar @found )
-                { push @values, @found; }
+            if( defined $desired_attributes{$attr} ) {
+                $weight += $desired_attributes{$attr};
+                push(@debug,[$attr,$desired_attributes{$attr}]);
             }
 
-            # Just take them all if we couldn't get any priorities.
-            if( scalar @values == 0 ) { @values = keys %{$song->{'fullArt'}->{$platform}->{$attr}}; }
-
-            # Loop over values (level 4)
-            foreach my $value ( @values )
+            # Loop over values (level 3)
+            foreach my $value ( keys %{$song->{'fullArt'}->{$platform}->{$attr}} )
             {
-                if( ! defined $song->{'fullArt'}->{$platform}->{$attr}->{$value} )
-                { print 'Error: ', $song->{'creator'}, ' had bogus attrvalue ',$attr,',',$value,"\n"; next; }
+                if( defined $desired_values{$value} ) {
+                    $weight += $desired_values{$value};
+                    push(@debug,[$value,$desired_values{$value}]);
+                }
 
-                # Separate the covers into priority, and non-priority.
-                my @priority_covers;
-                my @covers;
+                # Loop over every set that matches these (level 4)
                 foreach my $target ( @{$song->{'fullArt'}->{$platform}->{$attr}->{$value}} )
                 {
+                    # Loop over every art in that set (level 5)
                     foreach my $key ( keys %{$target} )
                     {
+                        if( defined $desired_images{$key} ) {
+                            $weight += $desired_images{$key};
+                            push(@debug,[$key,$desired_images{$key}]);
+                        })
+
                         my $hash = $target->{$key};
                         $hash->{'title'} = $key;
                         $hash->{'source'} = 'Mobygames';
+                        $hash->{'weight'} = $weight;
 
-                        if( $key =~ /front/i )
-                        {
-                            push( @priority_covers, $hash );
-                        } else {
-                            push( @covers, $hash );
-                        }
+                        push(@covers,$hash);
+
+                        my $debugstring = "$key at $weight: ";
+                        foreach my $set (@debug)
+                        { $debugstring .= "$set[1] @ $set[0], "; }
+                        tracelog($game,$debugstring);
                     }
                 }
-
-                push(@priority_covers, sort { $a->{'title'} cmp $b->{'title'} } @covers );
-
-                $song->{'art'} = \@priority_covers;
-
-                # Take the last one if it exists. (the last one will tend to catch more recent release dates, etc)
-                # if( scalar @covers > 0 )
-                # {
-                #     my $pick = sort @covers
-                #     $song->{'art'} = $covers[$#covers];
-                #     next SONG;
-                # }
             }
         }
     }
+
+    @covers = sort { $a->{'weight'} <=> $b->{'weight'} } @covers;
+
+    if( scalar @covers > 5 )
+    {
+      $song->{'art'} = [@covers[0..4]];
+    } else {
+      $song->{'art'} = [@covers];
+    }
+
 }
 
 map {delete $_->{'fullArt'}} @$playlist;
@@ -353,6 +539,15 @@ sub translate_game_to_url {
     $game = lc $game;
 
     return $game;
+}
+
+sub tracelog {
+  if( $opt_trace )
+  {
+    my $song = shift;
+    my $log = shift;
+    print STDOUT "[$song]: $log\n";
+  }
 }
 
 sub Usage {

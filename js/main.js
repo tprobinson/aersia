@@ -1349,6 +1349,7 @@
 			this.songArt.rotating = false;
 			this.songArt.curArt = false;
 			this.songArt.nextArt = 0;
+			this.songArt.placeholder = true;
 			this.getUIElement('img').src = this.songArt.placeholdersrc;
 		}.bind(this);
 
