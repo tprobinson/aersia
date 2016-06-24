@@ -56,7 +56,7 @@ my %desired_values = (
   },
 );
 
-my %desired_art = (
+my %desired_images = (
   # Prefer fronts.
   'Sleeve.+Front' => 6,
   'Front Cover' => 5,
@@ -64,7 +64,7 @@ my %desired_art = (
 
   #CD is neat too.
   'Media' => 4,
-)
+);
 
 
 my $agent = WWW::Mechanize->new();
@@ -315,7 +315,7 @@ SONG: foreach my $song( @$playlist )
     {
         if( $unique_arts{$game} != 0 )
         {
-            $playlist->[$i]->{'fullArt'} = $unique_arts{$game};
+            $song->{'fullArt'} = $unique_arts{$game};
         }
         next GAME;
     }
@@ -323,11 +323,11 @@ SONG: foreach my $song( @$playlist )
     # If we're forcing, remove any art we've already processed for this item.
     if( $opt_force )
     {
-        delete $playlist->[$i]->{'art'};
+        delete $song->{'art'};
     }
 
     # If this game already has art in the file (such as a re-run), skip.
-    if( defined $playlist->[$i]->{'art'} )
+    if( defined $song->{'art'} )
     { next; }
 
     # If the game didn't get anything from MobyGames, skip.
@@ -442,74 +442,56 @@ SONG: foreach my $song( @$playlist )
     #     }
     # }
 
-    # Build a list of platforms
-    my @platforms;
-    foreach my $target (keys %desired_platforms)
-    {
-        my @found = grep{/$target/i} ;
-        if( scalar @found )
-        { push @platforms, @found; }
-    }
-
-    # Just take them all if we couldn't get any priorities.
-    if( scalar @platforms == 0 ) { @platforms = keys %{$song->{'fullArt'}}; }
-
-    tracelog($game,'Found platforms: '.join(',',@platforms));
-
     my $weight = 0;
     my @debug;
-    my @covers;
-    # Loop over platforms (level 1)
-    foreach my $platform ( keys %{$song->{'fullArt'}} )
-    {
-        if( defined $desired_platforms{$platform} ) {
-            $weight += $desired_platforms{$platform};
-            push(@debug,[$platform,$desired_platforms{$platform}]);
-        }
 
-        # Loop over attrs (level 2)
-        foreach my $attr ( keys %{$song->{'fullArt'}->{$platform}} )
-        {
-            if( defined $desired_attributes{$attr} ) {
-                $weight += $desired_attributes{$attr};
-                push(@debug,[$attr,$desired_attributes{$attr}]);
-            }
+    my @covers = weight( $song->{'fullArt'}, [
+      \%desired_platforms,
+      \%desired_attributes,
+      \%desired_values,
+      \%desired_images,
+    ]);
 
-            # Loop over values (level 3)
-            foreach my $value ( keys %{$song->{'fullArt'}->{$platform}->{$attr}} )
-            {
-                if( defined $desired_values{$value} ) {
-                    $weight += $desired_values{$value};
-                    push(@debug,[$value,$desired_values{$value}]);
-                }
-
-                # Loop over every set that matches these (level 4)
-                foreach my $target ( @{$song->{'fullArt'}->{$platform}->{$attr}->{$value}} )
-                {
-                    # Loop over every art in that set (level 5)
-                    foreach my $key ( keys %{$target} )
-                    {
-                        if( defined $desired_images{$key} ) {
-                            $weight += $desired_images{$key};
-                            push(@debug,[$key,$desired_images{$key}]);
-                        })
-
-                        my $hash = $target->{$key};
-                        $hash->{'title'} = $key;
-                        $hash->{'source'} = 'Mobygames';
-                        $hash->{'weight'} = $weight;
-
-                        push(@covers,$hash);
-
-                        my $debugstring = "$key at $weight: ";
-                        foreach my $set (@debug)
-                        { $debugstring .= "$set[1] @ $set[0], "; }
-                        tracelog($game,$debugstring);
-                    }
-                }
-            }
-        }
-    }
+    # # Loop over platforms (level 1)
+    # foreach my $platform ( keys %{$song->{'fullArt'}} )
+    # {
+    #     if( defined $desired_platforms{$platform} ) {
+    #         $weight += $desired_platforms{$platform};
+    #         push(@debug,[$platform,$desired_platforms{$platform}]);
+    #     }
+    #
+    #     # Loop over attrs (level 2)
+    #     foreach my $attr ( keys %{$song->{'fullArt'}->{$platform}} )
+    #     {
+    #         if( defined $desired_attributes{$attr} ) {
+    #             $weight += $desired_attributes{$attr};
+    #             push(@debug,[$attr,$desired_attributes{$attr}]);
+    #         }
+    #
+    #         # Loop over values (level 3)
+    #         foreach my $value ( keys %{$song->{'fullArt'}->{$platform}->{$attr}} )
+    #         {
+    #             if( defined $desired_values{$value} ) {
+    #                 $weight += $desired_values{$value};
+    #                 push(@debug,[$value,$desired_values{$value}]);
+    #             }
+    #
+    #             # Loop over every set that matches these (level 4)
+    #             foreach my $target ( @{$song->{'fullArt'}->{$platform}->{$attr}->{$value}} )
+    #             {
+    #                 # Loop over every art in that set (level 5)
+    #                 foreach my $key ( keys %{$target} )
+    #                 {
+    #
+    #                     # my $debugstring = "$key at $weight: ";
+    #                     # foreach my $set (@debug)
+    #                     # { $debugstring .= "$set->[1] @ $set->[0], "; }
+    #                     # tracelog($game,$debugstring);
+    #                 }
+    #             }
+    #         }
+    #     }
+    # }
 
     @covers = sort { $a->{'weight'} <=> $b->{'weight'} } @covers;
 
@@ -522,12 +504,63 @@ SONG: foreach my $song( @$playlist )
 
 }
 
-map {delete $_->{'fullArt'}} @$playlist;
+map { delete $_->{'fullArt'} } @$playlist;
 
 write_file('roster_new.json', encode_json($playlist)) || die $!;
 
 if( defined $mapping && scalar keys %$mapping > 0 ) { write_file('nameMapping.json', encode_json($mapping)) || die $!; }
 
+sub weight {
+  my $ref = shift;
+  my $weightings = shift;
+  my $return = shift || [];
+  my $weight = shift || 0;
+  my $depth = shift || 0;
+  my $last = shift || '';
+  if( ref $ref eq 'HASH' )
+  {
+    if( defined $ref->{'thumbnail'} && defined $ref->{'fullsize'} )
+    {
+      # We've reached the bottom, and will now store the weighted entry.
+      $ref->{'title'} = $last;
+      $ref->{'source'} = 'Mobygames';
+      $ref->{'weight'} = $weight;
+
+      push(@$return,$ref);
+
+      tracelog($ref->{'creator'},"$last at $weight");
+    }
+    else
+    {
+      foreach my $key ( keys %$ref )
+      {
+
+      }
+
+
+      foreach my $key ( keys %$ref )
+      {
+        my $add = 0;
+        if( defined $weightings->[$depth]->{$key} ) {
+            $add = $weightings->[$depth]->{$key};
+            # push(@debug,[$key,$desired_images{$key}]);
+        }
+        weight( $ref->{$key}, $weightings, $return, $weight+$add, $depth+1, $key );
+      }
+    }
+
+  } elsif( ref $ref eq 'ARRAY' ) {
+    # Just recurse
+    foreach my $item ( @$ref )
+    {
+      weight( $item, $weightings, $return, $weight, $depth, $last );
+    }
+  } else {
+    return;
+  }
+
+  return $return;
+}
 
 sub translate_game_to_url {
     my $game = shift;
