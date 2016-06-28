@@ -370,6 +370,8 @@ section,
 	box-shadow: -5px -5px 10px 0 rgba(0,0,0,0.2) inset;
 }
 
+#tab-songinfo { height: 120px; }
+
 #tab-songinfo>.infopane-h, #streambox>.infopane-h {
 	background: -moz-linear-gradient(-45deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 30%);
 	background: -webkit-linear-gradient(-45deg, rgba(0,0,0,0.6) 0%,rgba(0,0,0,0) 30%);
@@ -386,6 +388,7 @@ section,
 #oboxSongImg, #sboxSongImg
 {
 	object-fit: contain;
+	height: 100%;
 	font-family: 'object-fit: contain'; /* Object-fit polyfill reads font-family to get the properties */
 }
 
@@ -507,7 +510,7 @@ section,
 
 .divide { margin: 0 0.25rem; }
 
-#streambox { display: flex; }
+#streambox { display: flex; height: 120px; }
 
 #streambox .controls-container {
 	position: absolute;

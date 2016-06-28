@@ -129,8 +129,8 @@
 		this.selectedPlaylist = "VIP";
 		this.playlists = {
 			"VIP": {
-				//"url": "/rosterfullArt.json",
-				"url": "http://vip.aersia.net/roster.xml",
+				"url": "/roster.json",
+				//"url": "http://vip.aersia.net/roster.xml",
 				"longName": "Vidya Intarweb Playlist",
 			},
 			"VIP - Source": {
@@ -1279,7 +1279,7 @@
 
 		this.updateCurSongInfo = function() {
 			// Update the song panel
-			if( this.curSong != null && this.songs[this.curSong] != null && (
+			if( this.curSong != null && this.songs[this.curSong] != null && this.songs[this.curSong].art != null && this.songs[this.curSong].art.length > 0 && (
 				 ( (this.selectedLayout === "Classic" || this.selectedLayout === "Touch") && this.optionsBoxShown ) || // In Classic or Touch interface, don't update unless it's visible.
 				 ( this.selectedLayout === "Streambox" || this.selectedLayout === "Streambar" )	//In Streambox or Streambar, update.
 			 )
