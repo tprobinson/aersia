@@ -17,9 +17,15 @@ my %desired_platforms = (
   'Macintosh and Windows' => 8,
   'Windows' => 7,
 
-  # Prefer Wii series and Playstation, as they tend to have square icons.
-  'Wii' => 6,
-  'Playstation' => 6,
+  # Prefer original box art in most cases.
+  'SNES' => 7,
+  'NES' => 6,
+
+  # Playstation tends to have nice square icons.
+  'Playstation' => 5,
+
+  # Don't prefer Wii, its art has odd whitespace and titles
+  'Wii' => 2,
 
   # Don't prefer Xbox, usually this ends up being box covers and Xbox has the most obtrusive ones.
   'Xbox' => 1,
@@ -506,6 +512,6 @@ Usage: $0 [options]
 			  Does not skip entries that already have art, and re-does them.
 
     --reprocess or -r
-        Only runs the second, post-scanning step. This is only useful when run over a fullArt version.
+        Only runs the second, post-scanning step. This is only useful when changing weights or weighting algorithms.
 EOF
 }
