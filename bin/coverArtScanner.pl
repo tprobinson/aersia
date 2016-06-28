@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-
 use strict;
 use warnings;
 
@@ -15,14 +14,14 @@ use List::Util qw/any/;
 # be careful. E.g. "Wii" will match "Wii" and "Wii U"
 my %desired_platforms = (
   # Prefer PC as this will usually catch higher quality images.
-  'Macintosh and Windows' => 7,
-  'Windows' => 6,
+  'Macintosh and Windows' => 8,
+  'Windows' => 7,
 
   # Prefer Wii series and Playstation, as they tend to have square icons.
   'Wii' => 6,
   'Playstation' => 6,
 
-  # Don't prefer Xbox, usually this ends up being covers.
+  # Don't prefer Xbox, usually this ends up being box covers and Xbox has the most obtrusive ones.
   'Xbox' => 1,
 
   # For mobile versions, these are usually good, but not as good as any existing PC versions.
@@ -48,6 +47,9 @@ my %desired_values = (
   'Country' => {
     'Worldwide' => 10,
     'United States' => 7,
+    'United Kingdom' => 6,
+    'Europe' => 6,
+    'Japan' => 5,
   },
 
   'Video' => {
@@ -115,7 +117,7 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
     my $game = $playlist->[$i]->{'creator'};
 
     # Skip this game if we're in 'only' mode and it's not in our list.
-    if( scalar @$opt_only && ! any {/$game/i} @$opt_only )
+    if( defined $opt_only && scalar @$opt_only > 0 && ! any {/$game/i} @$opt_only )
     { next; }
 
     # If we have already scanned this game this run, skip.
@@ -218,9 +220,10 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
     my @covers = $tree->findnodes('//div[@id="main"]/div/div[last()]/div[@class!="pull-right"]');
 
     my %lookup = ();
+    my %unique_urls = ();
 
     # Generate a lookup hash of all cover shots, filed by platform, then by metadata attributes, then by shot type.
-    while( scalar @covers > 0 )
+    COVER: while( scalar @covers > 0 )
     {
         my $metadata = shift @covers;
 
@@ -254,6 +257,10 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
             my $style = $link->attr('style');
             if( $style =~ /\(([^\)]+?)\)/ ) { $style = $1; }
             else { print "Error extracting thumbnail for $game"; }
+
+            # If this thumbnail is not unique, skip.
+            if( defined $unique_urls{$style} )
+            { next COVER; }
 
             $shots{($type->content_list)[0]}->{'thumbnail'} = $style;
 
@@ -307,7 +314,7 @@ SONG: foreach my $song( @$playlist )
     my $game = $song->{'creator'};
 
     # Skip this game if we're in 'only' mode and it's not in our list.
-    if( scalar @$opt_only && ! any {/$game/i} @$opt_only )
+    if( defined $opt_only && scalar @$opt_only > 0 && ! any {/$game/i} @$opt_only )
     { next; }
 
     # If we have already scanned this game this run, skip.
@@ -317,7 +324,7 @@ SONG: foreach my $song( @$playlist )
         {
             $song->{'fullArt'} = $unique_arts{$game};
         }
-        next GAME;
+        next SONG;
     }
 
     # If we're forcing, remove any art we've already processed for this item.
@@ -343,157 +350,48 @@ SONG: foreach my $song( @$playlist )
         $game =~ /^MOTD/ ||
         $game eq 'Changelog' ||
         $game eq 'Notice'
-    ) { next GAME; }
+    ) { next SONG; }
 
-    # # Build a list of platforms
-    # my @platforms;
-    # foreach my $target (keys %desired_platforms)
-    # {
-    #     my @found = grep{/$target/i} keys %{$song->{'fullArt'}};
-    #     if( scalar @found )
-    #     { push @platforms, @found; }
-    # }
-    #
-    # # Just take them all if we couldn't get any priorities.
-    # if( scalar @platforms == 0 ) { @platforms = keys %{$song->{'fullArt'}}; }
-    #
-    # tracelog($game,'Found platforms: '.join(',',@platforms));
-    #
-    # # Loop over platforms (level 2)
-    # foreach my $platform ( @platforms )
-    # {
-    #     if( ! defined $song->{'fullArt'}->{$platform} )
-    #     { print 'Error: ', $song->{'creator'}, ' had bogus platform ',$platform,"\n"; next; }
-    #
-    #     # Build a list of desired attributes
-    #     my @attrs;
-    #     foreach my $target (@desired_attributes)
-    #     {
-    #         my @found = grep{/$target/i} keys %{$song->{'fullArt'}->{$platform}};
-    #         if ( scalar @found )
-    #         { push @attrs, @found; }
-    #     }
-    #
-    #     # Just take them all if we couldn't get any priorities.
-    #     if( scalar @attrs == 0 ) { @attrs = keys %{$song->{'fullArt'}->{$platform}}; }
-    #
-    #     tracelog($game,'Found attributes: '.join(',',@attrs));
-    #
-    #     # Loop over attrs (level 3)
-    #     foreach my $attr ( @attrs )
-    #     {
-    #         if( ! defined $song->{'fullArt'}->{$platform}->{$attr} )
-    #         { print 'Error: ', $song->{'creator'}, ' had bogus attr ',$attr,"\n"; next; }
-    #
-    #         # Build a list of desired values.
-    #         my @values;
-    #         foreach my $target (@desired_values)
-    #         {
-    #             if( $attr !~ /$target->[0]/i ) { next; }
-    #
-    #             my @found = grep{/$target->[1]/i} keys %{$song->{'fullArt'}->{$platform}->{$attr}};
-    #             if( scalar @found )
-    #             { push @values, @found; }
-    #         }
-    #
-    #         # Just take them all if we couldn't get any priorities.
-    #         if( scalar @values == 0 ) { @values = keys %{$song->{'fullArt'}->{$platform}->{$attr}}; }
-    #
-    #         tracelog($game,'Found values: '.join(',',@values));
-    #
-    #         # Loop over values (level 4)
-    #         foreach my $value ( @values )
-    #         {
-    #             if( ! defined $song->{'fullArt'}->{$platform}->{$attr}->{$value} )
-    #             { print 'Error: ', $song->{'creator'}, ' had bogus attrvalue ',$attr,',',$value,"\n"; next; }
-    #
-    #             # Separate the covers into priority, and non-priority.
-    #             my @priority_covers;
-    #             my @covers;
-    #             foreach my $target ( @{$song->{'fullArt'}->{$platform}->{$attr}->{$value}} )
-    #             {
-    #                 foreach my $key ( keys %{$target} )
-    #                 {
-    #                     my $hash = $target->{$key};
-    #                     $hash->{'title'} = $key;
-    #                     $hash->{'source'} = 'Mobygames';
-    #
-    #                     if( $key =~ /front/i )
-    #                     {
-    #                         push( @priority_covers, $hash );
-    #                     } else {
-    #                         push( @covers, $hash );
-    #                     }
-    #                 }
-    #             }
-    #
-    #             push(@priority_covers, sort { $a->{'title'} cmp $b->{'title'} } @covers );
-    #
-    #             $song->{'art'} = \@priority_covers;
-    #
-    #             # Take the last one if it exists. (the last one will tend to catch more recent release dates, etc)
-    #             # if( scalar @covers > 0 )
-    #             # {
-    #             #     my $pick = sort @covers
-    #             #     $song->{'art'} = $covers[$#covers];
-    #             #     next SONG;
-    #             # }
-    #         }
-    #     }
-    # }
 
-    my $weight = 0;
-    my @debug;
-
-    my @covers = weight( $song->{'fullArt'}, [
+    my $ret = weight( $song->{'fullArt'}, [
       \%desired_platforms,
       \%desired_attributes,
       \%desired_values,
       \%desired_images,
     ]);
 
-    # # Loop over platforms (level 1)
-    # foreach my $platform ( keys %{$song->{'fullArt'}} )
+    my @covers = sort { $b->{'weight'} <=> $a->{'weight'} } @$ret;
+
+
+    # Dedupe by cover types
+    my @fix;
+
+    my %test;
+
+    foreach my $item (@covers)
+    {
+        if( ! defined $test{$item->{'title'}} )
+        {
+          $test{$item->{'title'}}++;
+          push(@fix,$item);
+        }
+    }
+
+    # Dedupe URLs
+    # my @fix;
+    #
+    # my %test;
+    # foreach my $item (@covers)
     # {
-    #     if( defined $desired_platforms{$platform} ) {
-    #         $weight += $desired_platforms{$platform};
-    #         push(@debug,[$platform,$desired_platforms{$platform}]);
-    #     }
-    #
-    #     # Loop over attrs (level 2)
-    #     foreach my $attr ( keys %{$song->{'fullArt'}->{$platform}} )
+    #     if( ! defined $test{$item->{'thumbnail'}} )
     #     {
-    #         if( defined $desired_attributes{$attr} ) {
-    #             $weight += $desired_attributes{$attr};
-    #             push(@debug,[$attr,$desired_attributes{$attr}]);
-    #         }
-    #
-    #         # Loop over values (level 3)
-    #         foreach my $value ( keys %{$song->{'fullArt'}->{$platform}->{$attr}} )
-    #         {
-    #             if( defined $desired_values{$value} ) {
-    #                 $weight += $desired_values{$value};
-    #                 push(@debug,[$value,$desired_values{$value}]);
-    #             }
-    #
-    #             # Loop over every set that matches these (level 4)
-    #             foreach my $target ( @{$song->{'fullArt'}->{$platform}->{$attr}->{$value}} )
-    #             {
-    #                 # Loop over every art in that set (level 5)
-    #                 foreach my $key ( keys %{$target} )
-    #                 {
-    #
-    #                     # my $debugstring = "$key at $weight: ";
-    #                     # foreach my $set (@debug)
-    #                     # { $debugstring .= "$set->[1] @ $set->[0], "; }
-    #                     # tracelog($game,$debugstring);
-    #                 }
-    #             }
-    #         }
+    #       $test{$item->{'thumbnail'}}++;
+    #       push(@fix,$item);
     #     }
     # }
 
-    @covers = sort { $a->{'weight'} <=> $b->{'weight'} } @covers;
+    @covers = @fix;
+    map {delete $_->{'weight'}} @covers;
 
     if( scalar @covers > 5 )
     {
@@ -517,6 +415,7 @@ sub weight {
   my $weight = shift || 0;
   my $depth = shift || 0;
   my $last = shift || '';
+  tracelog(join(',',$weight,$depth,$last));
   if( ref $ref eq 'HASH' )
   {
     if( defined $ref->{'thumbnail'} && defined $ref->{'fullsize'} )
@@ -528,23 +427,23 @@ sub weight {
 
       push(@$return,$ref);
 
-      tracelog($ref->{'creator'},"$last at $weight");
+      tracelog('',"$last at $weight");
     }
     else
     {
       foreach my $key ( keys %$ref )
       {
+        # Grab every weighting that matches this key.
+        my @matches = grep {/$key/i} keys %{$weightings->[$depth]};
 
-      }
-
-
-      foreach my $key ( keys %$ref )
-      {
+        # Get the best.
         my $add = 0;
-        if( defined $weightings->[$depth]->{$key} ) {
-            $add = $weightings->[$depth]->{$key};
-            # push(@debug,[$key,$desired_images{$key}]);
+        if( scalar @matches > 0 )
+        {
+          @matches = sort {$weightings->[$depth]->{$b} <=> $weightings->[$depth]->{$a}} @matches;
+          $add = $weightings->[$depth]->{$matches[0]};
         }
+
         weight( $ref->{$key}, $weightings, $return, $weight+$add, $depth+1, $key );
       }
     }
@@ -578,7 +477,7 @@ sub tracelog {
   if( $opt_trace )
   {
     my $song = shift;
-    my $log = shift;
+    my $log = shift || '';
     print STDOUT "[$song]: $log\n";
   }
 }
@@ -589,21 +488,24 @@ Cover art scanner for Aersia.
 Usage: $0 [options]
 	Options:
 
+    --quiet or -q
+        Suppress text (sometimes).
+
+    --namemapping or -n
+        When this flag is given and an entry is encountered that does not
+        exist on the scanned database, it will ask for a proper name.
+        This will be output to nameMapping.json for future runs.
+
+    --clean or -c
+        Removes all art entries from the roster, outputting roster_clean.json.
+
+    --only or -o
+        Case-insensitively selects certain entries to be processed. Can be specified multiple times.
+
 		--force or -f
-			Does not skip entries that already have art.
+			  Does not skip entries that already have art, and re-does them.
 
-        --quiet or -q
-            Suppress text (sometimes).
-
-        --namemapping or -n
-            When this flag is given and an entry is encountered that does not
-            exist on the scanned database, it will ask for a proper name.
-            This will be output to nameMapping.json for future runs.
-
-        --purge or -p
-            Cleans roster.json of all art, and prints to roster_purged.json
-
-        --reprocess or -r
-            Only runs the second, post-scanning step. This is only useful when run over a fullArt version.
+    --reprocess or -r
+        Only runs the second, post-scanning step. This is only useful when run over a fullArt version.
 EOF
 }
