@@ -807,7 +807,7 @@
 			this.fullyLoaded = 0;
 
 			// If this is a retry, we've already done this stuff and don't want to do it again.
-			if( retry )
+			if( ! retry )
 			{
 				// Set the shuffle control to reflect the disabled state
 				if( this.noShuffles[this.selectedPlaylist] != null && this.noShuffles[this.selectedPlaylist].indexOf(this.curSong) > -1 )
