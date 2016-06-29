@@ -1,6 +1,30 @@
-Replacing Aersia's Flash-based player, for fun and ~~profit~~!
+Replacing Aersia's Flash-based player!
 
-#Done in version 0.0.6:
+#Done in version 0.1.0:
+* Internals
+    * Allowed both XML and JSON formats to be loaded as playlists. This functionality, along with the ability to parse XML, will probably be removed later.
+    * Object-fit polyfill included, for browsers that don't support it.
+    * Lightbox file included in Node dependencies and Grunt deploys.
+    * Decreased default logging level.
+    * The playlist now sorts itself, to support adding future songs while keeping song-blocking information (which is stored by song index) intact.
+* Player
+    * Added in error checking and retrying for song loading issues.
+    * Song art now included in playlist, and loaded per-song.
+    * A lightbox will be brought up with the full-size art if the song art is clicked/touched.
+* Layouts
+    * Song art properly included and a few things were locked down to make sure the art doesn't "escape".
+
+
+#Planned for the next version:
+* Fixing some layout issues in the options box. Making Streambox less dynamic?
+* Fixing the need to use getClientBoundingRect every single update. I don't know why caching this value causes it to fall wildly out of sync.
+
+#Planned for the future:
+* Mobile support?
+* Compile the JS
+
+##Previous Versions
+###0.0.6
 * Internals
     * Removed more broken Angular code
     * Layout fixes and automatic correction of when the layout changes.
@@ -9,19 +33,7 @@ Replacing Aersia's Flash-based player, for fun and ~~profit~~!
 * Layouts
     * Streambox, a stubby version of the Current Song tab.
     * Streambar, the top controls bar and nothing else.
-
-
-#Planned for the next version:
-* Song information panel
- * Cover art or other art of song
- * Selection of original/remixes
-* Revamp playlist structure to support relational information.
-
-#Planned for the future:
-* Mobile support?
-* Compile the JS
-
-##Previous Versions
+    *
 ###0.0.5
 * Song information panel
  * Toggle shuffling to current song

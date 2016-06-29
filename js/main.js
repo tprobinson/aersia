@@ -60,10 +60,10 @@
 		        if (context.name) messages.unshift('[' + context.name + ']');
 		    }
 		});
-		Logger.get('internals').setLevel(Logger.INFO);
-		Logger.get('player').setLevel(Logger.INFO);
+		Logger.get('internals').setLevel(Logger.ERROR);
+		Logger.get('player').setLevel(Logger.ERROR);
 		Logger.get('animation').setLevel(Logger.ERROR);
-		Logger.get('songart').setLevel(Logger.DEBUG);
+		Logger.get('songart').setLevel(Logger.ERROR);
 
 		//Initialize variables
 		this.songs = [];
