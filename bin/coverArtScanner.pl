@@ -10,6 +10,8 @@ use Term::ProgressBar;
 use Getopt::Long;
 use List::Util qw/any/;
 
+use Data::Dumper;
+
 # As these are all regular expressions, rather than strict matches,
 # be careful. E.g. "Wii" will match "Wii" and "Wii U"
 my %desired_platforms = (
@@ -35,22 +37,15 @@ my %desired_platforms = (
   'Android' => 5,
 );
 
-# This just searches through the attribute keys, and should match up with desired_values.
-# Don't weight this high, it should only be an edge if necessary.
 my %desired_attributes = (
-  'Packaging' => 3,
-  'Country' => 2,
-  'Video' => 1,
-);
-
-my %desired_values = (
   'Packaging' => {
-    # Prefer electronic for quality, jewel case for aspect ratio.
+    # Prefer electronic for quality, keep case for authenticity, jewel case for aspect ratio.
     'Electronic' => 10,
+    'Keep Case' => 9,
     'Jewel Case' => 8,
   },
 
-  'Country' => {
+  'Countr(y|ies)' => {
     'Worldwide' => 10,
     'United States' => 7,
     'United Kingdom' => 6,
@@ -64,7 +59,7 @@ my %desired_values = (
   },
 );
 
-my %desired_images = (
+my %desired_titles = (
   # Prefer fronts.
   'Sleeve.+Front' => 6,
   'Front Cover' => 5,
@@ -223,39 +218,54 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
         next;
     }
 
-    my @covers = $tree->findnodes('//div[@id="main"]/div/div[last()]/div[@class!="pull-right"]');
+    my @rows = $tree->findnodes('//div[@id="main"]/div/div[last()]/div[@class!="pull-right"]');
 
-    my %lookup = ();
-    my %unique_urls = ();
-
-    # Generate a lookup hash of all cover shots, filed by platform, then by metadata attributes, then by shot type.
-    COVER: while( scalar @covers > 0 )
+    # Generate a lookup hash of all cover shots, indexed by URL.
+    my %shots = ();
+    ROW: while (scalar @rows > 0)
     {
-        my $metadata = shift @covers;
+        my $attrs = shift @rows;
+        my $row = shift @rows;
+
+        my %hash = ();
 
         # Grab the platform it's for
-        my $descend = $metadata->look_down(_tag=>'h2');
+        my $descend = $attrs->look_down(_tag=>'h2');
         next if ! defined $descend; # excludes "covers" that don't have an actual title.
-        my $platform = ($descend->content_list)[0];
-        if( ! defined $lookup{$platform} )
+        $hash{'Platform'} = [($descend->content_list)[0]];
+
+        # Grab all other related attributes.
+        $hash{'Attributes'} = {};
+        foreach my $tag ( $attrs->look_down(_tag=>'tr') )
         {
-            $lookup{$platform} = {};
+          my $key = (($tag->content_list)[0]->content_list)[0];
+          $key =~ s/\x{a0}/ /g; #remove a unicode space
+
+          # Support multiple values
+          my @values = ($tag->content_list)[2]->content_list;
+
+          # Filter out junk
+          @values = grep {ref $_ eq 'HTML::Element'} @values;
+
+          # Grab the actual content of each item.
+          map { $_ = ($_->content_list)[0] } @values;
+
+          $hash{'Attributes'}->{$key} = \@values;
         }
 
-        # Generate a little hash of the covers. The first element was just metadata, second half of the pair is actual cover art.
-        my $row = shift @covers;
-        my %shots = ();
         foreach my $shot ( ($row->content_list)[0]->content_list ) # One element child of row, then everything below that is the art
         {
             if( ref $shot ne 'HTML::Element' ) { next; }
 
-            # Categorize attributes under the shot name, such as "Front Cover".
-            my $type = ($shot->look_down( class => 'thumbnail-cover-caption' )->content_list)[0];
-            $shots{($type->content_list)[0]} = {};
+            # Grab the shot name, such as "Front Cover".
+            my $title = (($shot->look_down( class => 'thumbnail-cover-caption' )->content_list)[0]->content_list)[0];
+            $hash{'Title'} = $title; # put it in the weighting metadata too.
 
+            # Grab its href.
             my $link = ($shot->look_down( class => 'thumbnail-image-wrapper' )->content_list)[0];
 
             # Add the title.
+            # This is not necessary and can be generated from attributes.
             # my $title = $link->attr('title');
             # $shots{($type->content_list)[0]}->{'title'} = $title;
 
@@ -263,40 +273,35 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
             my $style = $link->attr('style');
             if( $style =~ /\(([^\)]+?)\)/ ) { $style = $1; }
             else { print "Error extracting thumbnail for $game"; }
+            my $thumbnail = $style;
 
             # If this thumbnail is not unique, skip.
-            if( defined $unique_urls{$style} )
-            { next COVER; }
-
-            $shots{($type->content_list)[0]}->{'thumbnail'} = $style;
+            if( defined $shots{$thumbnail} )
+            { next ROW; }
 
             # Add the fullsize link, just replace s with l.
             if( $style =~ m,/s/, ) { $style =~ s,/s/,/l/,; }
             else { print "Error extracting fullsize for $game"; }
+            my $fullsize = $style;
 
-            $shots{($type->content_list)[0]}->{'fullsize'} = $style;
+            #Store this shot.
+            $shots{$thumbnail} = {
+              'thumbnail' => $thumbnail,
+              'fullsize' => $fullsize,
+              'source' => 'Mobygames',
+              'metadata' => \%hash,
+              'title' => $title,
+            };
         }
-
-        # Add all covers filed under its various attributes. For example, Windows->Packaging->Electronic->[{'title': "Front Cover"}, etc]
-        foreach my $tag ( $metadata->look_down(_tag=>'tr') )
-        {
-            my $key = (($tag->content_list)[0]->content_list)[0];
-            my $value = ((($tag->content_list)[2]->content_list)[0]->content_list)[0];
-            if( ! defined $lookup{$platform}->{ $key }->{ $value } )
-            {
-                $lookup{$platform}->{ $key }->{ $value } = [];
-            }
-
-            push( @{ $lookup{$platform}->{ $key }->{ $value } }, \%shots );
-        }
-
     }
 
-    $playlist->[$i]->{'fullArt'} = \%lookup;
-    $unique_arts{$game} = \%lookup;
+    # Strip out the uniqueness-keys of thumbnail URLs when storing.
+    my $fullart = [values %shots];
+
+    $playlist->[$i]->{'art'} = $fullart;
+    $unique_arts{$game} = $fullart;
 
     if( ! $opt_quiet ) { print "\n"; }
-
 }
 
 write_file('roster_fullArt.json', encode_json($playlist)) || die $!;
@@ -315,157 +320,180 @@ else {
 # Order 2nd tier: Electronic packaging, Worldwide release, United States release, NTSC video standard, any other.
 # Order 3rd tier: Front Cover, any.
 
-SONG: foreach my $song( @$playlist )
+SONG: foreach my $song ( @$playlist )
 {
-    my $game = $song->{'creator'};
+  my $game = $song->{'creator'};
 
-    # Skip this game if we're in 'only' mode and it's not in our list.
-    if( defined $opt_only && scalar @$opt_only > 0 && ! any {/$game/i} @$opt_only )
-    { next; }
+  # Skip this game if we're in 'only' mode and it's not in our list.
+  if( defined $opt_only && scalar @$opt_only > 0 && ! any {/$game/i} @$opt_only )
+  { next; }
 
-    # If we have already scanned this game this run, skip.
-    if( defined $unique_arts{$game} )
+  # If we have already scanned this game this run, skip.
+  if( defined $unique_arts{$game} )
+  {
+    if( $unique_arts{$game} != 0 )
     {
-        if( $unique_arts{$game} != 0 )
+      $song->{'art'} = $unique_arts{$game};
+    }
+    next SONG;
+  }
+  # 
+  # # If we're forcing, remove any art we've already processed for this item.
+  # if( $opt_force )
+  # { delete $song->{'art'}; }
+
+  # Skip stuff at the front.
+  if (
+    $game eq 'Vidya Intarweb Playlist' ||
+    $game =~ /^MOTD/ ||
+    $game eq 'Changelog' ||
+    $game eq 'Notice'
+  ) { next SONG; }
+
+  # If the game didn't get anything from MobyGames, skip.
+  if( ! defined $song->{'art'} )
+  {
+    print "$game has no art.\n";
+    next SONG;
+  }
+
+  my $root = 'metadata';
+
+  foreach my $ref ( @{ $song->{'art'} } )
+  {
+    $ref->{$root}->{'weight'} = 0;
+    tracelog($game,'Weighting art: '.Dumper($ref));
+
+    # Check Platform keys
+    tracelog($game,'Platform match:');
+    if( defined $ref->{$root}->{'Platform'} )
+    {
+      my @matches;
+      foreach my $v ( keys %desired_platforms )
+      {
+        tracelog($game, "Seeking matches for $v");
+        foreach my $key ( @{$ref->{$root}->{'Platform'}} )
         {
-            $song->{'fullArt'} = $unique_arts{$game};
+          tracelog($game,"  Matching $v against $key");
+
+          if( $key =~ /$v/i )
+          {
+            tracelog($game,"    Matched $v with $key, weight: ".$desired_platforms{$v});
+            push(@matches, $v);
+          }
         }
-        next SONG;
+      }
+
+      # Add in the best.
+      if( scalar @matches > 0 )
+      {
+        @matches = sort {$desired_platforms{$b} <=> $desired_platforms{$a}} @matches;
+        tracelog($game,'Adding '.$desired_platforms{$matches[0]}.' weight.');
+        $ref->{$root}->{'weight'} += $desired_platforms{$matches[0]};
+      }
     }
 
-    # If we're forcing, remove any art we've already processed for this item.
-    if( $opt_force )
+    # Check Title keys
+    tracelog($game,'Title match:');
+    if( defined $ref->{$root}->{'Title'} )
     {
-        delete $song->{'art'};
-    }
-
-    # If this game already has art in the file (such as a re-run), skip.
-    if( defined $song->{'art'} )
-    { next; }
-
-    # If the game didn't get anything from MobyGames, skip.
-    if( ! defined $song->{'fullArt'} )
-    {
-        print $song->{'creator'}, ' has no art.',"\n";
-        next SONG;
-    }
-
-    # Skip stuff at the front.
-    if (
-        $game eq 'Vidya Intarweb Playlist' ||
-        $game =~ /^MOTD/ ||
-        $game eq 'Changelog' ||
-        $game eq 'Notice'
-    ) { next SONG; }
-
-
-    my $ret = weight( $song->{'fullArt'}, [
-      \%desired_platforms,
-      \%desired_attributes,
-      \%desired_values,
-      \%desired_images,
-    ]);
-
-    my @covers = sort { $b->{'weight'} <=> $a->{'weight'} } @$ret;
-
-
-    # Dedupe by cover types
-    my @fix;
-
-    my %test;
-
-    foreach my $item (@covers)
-    {
-        if( ! defined $test{$item->{'title'}} )
+      my @matches;
+      foreach my $v ( keys %desired_titles )
+      {
+        tracelog($game,"Matching $v against ".$ref->{$root}->{'Title'});
+        if( $ref->{$root}->{'Title'} =~ /$v/i )
         {
-          $test{$item->{'title'}}++;
-          push(@fix,$item);
+          tracelog($game,"  Matched $v with ".$ref->{$root}->{'Title'}.", weight: ".$desired_titles{$v});
+          push(@matches, $v);
         }
+      }
+
+      # Add in the best.
+      if( scalar @matches > 0 )
+      {
+        @matches = sort {$desired_titles{$b} <=> $desired_titles{$a}} @matches;
+        tracelog($game,'Adding '.$desired_titles{$matches[0]}.' weight.');
+        $ref->{$root}->{'weight'} += $desired_titles{$matches[0]};
+      }
     }
 
-    # Dedupe URLs
-    # my @fix;
-    #
-    # my %test;
-    # foreach my $item (@covers)
-    # {
-    #     if( ! defined $test{$item->{'thumbnail'}} )
-    #     {
-    #       $test{$item->{'thumbnail'}}++;
-    #       push(@fix,$item);
-    #     }
-    # }
-
-    @covers = @fix;
-    map {delete $_->{'weight'}} @covers;
-
-    if( scalar @covers > 5 )
+    # Check Attributes
+    tracelog($game,'Attributes match:');
+    if( defined $ref->{$root}->{'Attributes'} )
     {
-      $song->{'art'} = [@covers[0..4]];
-    } else {
-      $song->{'art'} = [@covers];
-    }
+      # two-level hash match
+      my @matches;
+      my %two;
+      foreach my $da ( keys %desired_attributes )
+      {
+        tracelog($game,"Seeking matches for $da");
+        foreach my $key ( keys %{$ref->{$root}->{'Attributes'}} )
+        {
+          tracelog($game,"  Matching $da against $key");
+          if( $key =~ /$da/i )
+          {
+            tracelog($game,"    Matched $da with $key");
+            foreach my $subda ( keys %{$desired_attributes{$da}} )
+            {
+              tracelog($game,"    $key: Seeking matches for $subda");
+              foreach my $subkey ( @{$ref->{$root}->{'Attributes'}->{$key}} )
+              {
+                tracelog($game,"    $key: Matching $subda against $subkey");
+                if( $subkey =~ /$subda/i )
+                {
+                  tracelog($game,"      $key: Matched $subda with $subkey, weight: ".$desired_attributes{$da}->{$subda});
+                  push( @matches, [$da,$subda,$key,$subkey] );
+                }
+              }
+            }
+          }
+        }
+      }
 
+      # Add in the best.
+      if( scalar @matches > 0 )
+      {
+        @matches = sort {$desired_attributes{$b->[0]}->{$b->[1]} <=> $desired_attributes{$a->[0]}->{$a->[1]}} @matches;
+        tracelog($game,'Adding '.$desired_attributes{$matches[0]->[0]}->{$matches[0]->[1]}.' weight.');
+        $ref->{$root}->{'weight'} += $desired_attributes{$matches[0]->[0]}->{$matches[0]->[1]};
+      }
+    }
+  }
+
+  tracelog($game,"Cover weighting complete. Ranking:\n".Dumper($song->{'art'}));
+
+  # Take only the best of each cover type.
+  my @fix;
+  my %test;
+  $song->{'art'} = [sort { $b->{'metadata'}->{'weight'} <=> $a->{'metadata'}->{'weight'} } @{$song->{'art'}}];
+
+  foreach my $item ( @{ $song->{'art'} } )
+  {
+    if( ! defined $test{$item->{'title'}} )
+    {
+      $test{$item->{'title'}}++;
+      push(@fix,$item);
+    }
+  }
+
+  tracelog($game,"Deduplication complete. Ranking:\n".Dumper(\@fix));
+
+  $song->{'art'} = \@fix;
+
+  if( scalar @{$song->{'art'}} > 5 )
+  {
+    $song->{'art'} = [$song->{'art'}->[0..4]];
+  }
+
+  tracelog($game,"Trimmed to 5. Ranking:\n".Dumper($song->{'art'}));
+
+  map { delete $_->{'metadata'} } @{ $song->{'art'} };
 }
-
-map { delete $_->{'fullArt'} } @$playlist;
 
 write_file('roster_new.json', encode_json($playlist)) || die $!;
 
 if( defined $mapping && scalar keys %$mapping > 0 ) { write_file('nameMapping.json', encode_json($mapping)) || die $!; }
 
-sub weight {
-  my $ref = shift;
-  my $weightings = shift;
-  my $return = shift || [];
-  my $weight = shift || 0;
-  my $depth = shift || 0;
-  my $last = shift || '';
-  tracelog(join(',',$weight,$depth,$last));
-  if( ref $ref eq 'HASH' )
-  {
-    if( defined $ref->{'thumbnail'} && defined $ref->{'fullsize'} )
-    {
-      # We've reached the bottom, and will now store the weighted entry.
-      $ref->{'title'} = $last;
-      $ref->{'source'} = 'Mobygames';
-      $ref->{'weight'} = $weight;
-
-      push(@$return,$ref);
-
-      tracelog('',"$last at $weight");
-    }
-    else
-    {
-      foreach my $key ( keys %$ref )
-      {
-        # Grab every weighting that matches this key.
-        my @matches = grep {/$key/i} keys %{$weightings->[$depth]};
-
-        # Get the best.
-        my $add = 0;
-        if( scalar @matches > 0 )
-        {
-          @matches = sort {$weightings->[$depth]->{$b} <=> $weightings->[$depth]->{$a}} @matches;
-          $add = $weightings->[$depth]->{$matches[0]};
-        }
-
-        weight( $ref->{$key}, $weightings, $return, $weight+$add, $depth+1, $key );
-      }
-    }
-
-  } elsif( ref $ref eq 'ARRAY' ) {
-    # Just recurse
-    foreach my $item ( @$ref )
-    {
-      weight( $item, $weightings, $return, $weight, $depth, $last );
-    }
-  } else {
-    return;
-  }
-
-  return $return;
-}
 
 sub translate_game_to_url {
     my $game = shift;

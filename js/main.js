@@ -1307,7 +1307,7 @@
 			this.stopSongArt();
 
 			this.rotateSongArt();
-		};
+		}.bind(this);
 
 		// Function to do the actual rotation
 		this.rotateSongArt = function() {
@@ -1340,7 +1340,7 @@
 					this.songArt.timer = window.setTimeout(this.rotateSongArt, this.songArt.rotateperiod);
 				}
 			}
-		};
+		}.bind(this);
 
 		this.stopSongArt = function() {
 			// Stop the timer, reset attributes, and show the placeholder.
