@@ -1279,7 +1279,7 @@
 
 		this.updateCurSongInfo = function() {
 			// Update the song panel
-			if( this.curSong != null && this.songs[this.curSong] != null && this.songs[this.curSong].art != null && this.songs[this.curSong].art.length > 0 && (
+			if( this.curSong != null && this.songs[this.curSong] != null && (
 				 ( (this.selectedLayout === "Classic" || this.selectedLayout === "Touch") && this.optionsBoxShown ) || // In Classic or Touch interface, don't update unless it's visible.
 				 ( this.selectedLayout === "Streambox" || this.selectedLayout === "Streambar" )	//In Streambox or Streambar, update.
 			 )
@@ -1288,7 +1288,14 @@
 				this.getUIElement('creator').innerHTML = this.songs[this.curSong].creator;
 				// this.curSongRating.innerHTML = "0"; //this.songs[this.curSong].rating;
 
-				this.setSongArt();
+				if( this.songs[this.curSong].art != null && this.songs[this.curSong].art.length > 0 )
+				{
+					this.setSongArt();
+				} else {
+					this.stopSongArt();
+				}
+
+
 			}
 		};
 
