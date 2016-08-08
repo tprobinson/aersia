@@ -379,6 +379,11 @@ section,
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#99000000', endColorstr='#00000000',GradientType=1 );
 }
 
+/* The container for SongTitle, SongCreator. */
+.songinfo {
+	justify-content: space-around;
+}
+
 #oboxSongTitle, #oboxSongCreator,
 #sboxSongTitle, #sboxSongCreator
 {
@@ -389,7 +394,9 @@ section,
 {
 	object-fit: contain;
 	height: 100%;
-	font-family: 'object-fit: contain'; /* Object-fit polyfill reads font-family to get the properties */
+
+	/* Object-fit polyfill reads font-family to get the properties */
+	font-family: 'object-fit: contain';
 }
 
 .fade {
@@ -513,7 +520,6 @@ section,
 #streambox { display: flex; height: 120px; }
 
 #streambox .controls-container {
-	position: absolute;
 	right: 0; top: 0;
 }
 
