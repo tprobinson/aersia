@@ -100,7 +100,7 @@ if( $opt_clean )
         delete $_->{'fullArt'};
     } @$playlist;
 
-    write_file('roster_clean.json', encode_json($playlist)) || die $!;
+    write_file('../generated/roster_clean.json', encode_json($playlist)) || die $!;
 
     print "Cleaned roster of all art, output to roster_clean.json.\n";
 
@@ -304,15 +304,15 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
     if( ! $opt_quiet ) { print "\n"; }
 }
 
-write_file('roster_fullArt.json', encode_json($playlist)) || die $!;
+write_file('../generated/roster_fullArt.json', encode_json($playlist)) || die $!;
 print "Art retrieved, post-processing.\n";
 
 } # If we're reprocessing, we've skipped all the art retrieval.
 else {
-    if ( ! -f 'roster_fullArt.json' )
-    { die "Reprocess specified, but roster_fullArt.json does not exist.\n" }
+    if ( ! -f '../generated/roster_fullArt.json' )
+    { die "Reprocess specified, but ../generated/roster_fullArt.json does not exist.\n" }
 
-    $playlist = decode_json(read_file('roster_fullArt.json')) || die $!;
+    $playlist = decode_json(read_file('../generated/roster_fullArt.json')) || die $!;
 }
 
 # Go through and find the best art.
@@ -337,7 +337,7 @@ SONG: foreach my $song ( @$playlist )
     }
     next SONG;
   }
-  # 
+  #
   # # If we're forcing, remove any art we've already processed for this item.
   # if( $opt_force )
   # { delete $song->{'art'}; }
@@ -490,7 +490,7 @@ SONG: foreach my $song ( @$playlist )
   map { delete $_->{'metadata'} } @{ $song->{'art'} };
 }
 
-write_file('roster_new.json', encode_json($playlist)) || die $!;
+write_file('../generated/roster_new.json', encode_json($playlist)) || die $!;
 
 if( defined $mapping && scalar keys %$mapping > 0 ) { write_file('nameMapping.json', encode_json($mapping)) || die $!; }
 

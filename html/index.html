@@ -61,9 +61,10 @@
                         <!-- Song information, links, etc. -->
                         <div class="infopane-h">
                             <div class="vbox">
-                                <li id="oboxSongTitle">Loading...</li>
-                                <li id="oboxSongCreator">Loading...</li>
-                                <li><strike>album name?</strike></li>
+                                <div class="vbox songinfo">
+                                  <li id="oboxSongTitle">Loading...</li>
+                                  <li id="oboxSongCreator">Loading...</li>
+                                </div>
                                 <div class="controls-container">
                                     <div id="toggleShuffle" class="controlsToggle" ng-click="aersiaCtrl.toggleShuffle();">
                                         <svg width="17px" height="17px" ><use xlink:href="#icon-poweron" /></svg>
@@ -181,10 +182,9 @@
 
                 <!-- Song information, links, etc. -->
                 <div class="infopane-h">
-                    <div class="vbox">
+                    <div class="vbox songinfo">
                         <li id="sboxSongTitle">Loading...</li>
                         <li id="sboxSongCreator">Loading...</li>
-                        <li><strike>album name?</strike></li>
                     </div>
                 </div>
 
@@ -231,8 +231,6 @@
                         <span class="controls-text" id="controlsSongTitle">Loading...</span>
                         <span class="controls-text divide" >-</span>
                         <span class="controls-text" id="controlsSongCreator">Loading...</span>
-                        <span class="controls-text divide" >-</span>
-                        <span class="controls-text"><strike>album name?</strike></span>
                     </div>
 
                     <div class="controls-text"><!--%= friendlyname --> v<!--%= version --></div>

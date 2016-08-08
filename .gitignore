@@ -11,5 +11,3 @@
 npm-debug.log
 .grunt/
 
-#/bin/*.json
-#!/bin/nameMapping.json

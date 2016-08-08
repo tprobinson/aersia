@@ -869,7 +869,7 @@
 				//Generate a list of songs we're allowed to play.
 				list = clone(this.songs);
 
-				this.noShuffles[this.selectedPlaylist].forEach(function(val){ list.splice(list.indexOf(val),1); }.bind(this));
+				this.noShuffles[this.selectedPlaylist].forEach(function(val){ list.splice(val,1); }.bind(this));
 			}
 
 			var selected = Math.floor(Math.random() * list.length);
@@ -1034,15 +1034,25 @@
 
 		this.scrollToSong = function(index) {
 
+			// this function is called when the layout is set, which happens before the songs are even loaded once.
+			if( this.songs.length === 0 )
+			{ return; }
+
 			//Get the elements' height, since this could change.
 			var height = this.playlist.firstElementChild.offsetHeight;
+
+			// If this element would be closer to the end of the list than the viewport allows, just scroll as close as we can to avoid overflowing.
+			// The browser should realistically stop this, but every 'set' seems to move a pixel beyond the limit, and the smooth animation sets rapidly, causing a big overflow.
+			while ( (height * this.songs.length) - (height * index) < this.playlist.offsetHeight  )
+			{ index--; }
+			// could be optimized by binary search
 
 			Logger.get("animation").debug('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+height*index);
 
 			if( this.features.animations.enabled )
 			{
 				//Make the playlist scroll to the currently playing song.
-				scrollToSmooth(this.playlist,height * index, 600);
+				scrollToSmooth(this.playlist, height * index, 600);
 			}
 			else
 			{
@@ -1295,13 +1305,12 @@
 					this.stopSongArt();
 				}
 
-
 			}
 		};
 
 		// Function to get the right elements from the current layouts
 		this.getUIElement = function(type) {
-			if( this.songUI[this.selectedLayout] != null )
+			if( this.songUI[this.selectedLayout] != null && this.songUI[this.selectedLayout][type] != null )
 			{
 				return this.songUI[this.selectedLayout][type];
 			} else {
@@ -1407,44 +1416,30 @@ function scrollToSmooth(el,targetScroll,duration) {
     requestAnimationFrame(step);
     function step () {
         setTimeout(function() {
-			//Get our time diff to scale against.
-			var now = Date.now();
+					//Get our time diff to scale against.
+					var now = Date.now();
 
-            // if ( el.scrollTop < targetScroll && now <= beginTime + duration) {
-			if ( now <= beginTime + duration) {
-				//Queue the next frame ahead of time
-				requestAnimationFrame(step);
+					if ( now <= beginTime + duration) {
+						//Queue the next frame ahead of time
+						requestAnimationFrame(step);
 
-				//This is probably overcomplicated, but this gets the amount we need to add to the initial scroll for our time
-                var mod =
+						//This is probably overcomplicated, but this gets the amount we need to add to the initial scroll for our time
+		        var mod = easeInOut( now, beginTime,duration, beginScroll,targetScroll );
 
-					//Sin easeIn
-					// Math.sin (
-					// 	(2 * Math.PI) + 						//beginning at 2Pi to ease in.
-					// 	(
-					// 		Math.PI/2 							//ending at 3/2Pi
-					// 		* ((now - beginTime) / duration)	// multiplied by delta to get where we are on curve
-					// 	)
-					// ) * (Math.abs(targetScroll-beginScroll));	// scaled up to the amount that we need to move.
+						Logger.get("animation").debug('anim: '+ (now-beginTime) +' + '+mod);
 
-					//Exponential easeIn
-					(-1 * Math.pow(((now - beginTime) / duration) - 1,2) + 1)	// y = -x^2 + 1
-					* (Math.abs(targetScroll-beginScroll));						// scaled up to the amount that we need to move.
+						//Set the scroll absolutely
+						if( beginScroll < targetScroll ) { el.scrollTop = beginScroll + mod; }
+						else { el.scrollTop = beginScroll - mod; }
 
+		      } else {
+						//Final frame, don't schedule another.
+						Logger.get("animation").debug('Ending animation: end:'+ (now > (beginTime + duration))+' s:'+el.scrollTop);
 
-				Logger.get("animation").debug('anim: '+ (now-beginTime) +' + '+mod);
-
-				//Set the scroll
-				if( beginScroll < targetScroll ) { el.scrollTop = beginScroll + mod; }
-				else { el.scrollTop = beginScroll - mod; }
-
-            } else {
-				//Final frame, don't schedule another.
-				Logger.get("animation").debug('Ending animation: end:'+ (now > (beginTime + duration))+' s:'+el.scrollTop);
-            	el.scrollTop = targetScroll;
-            }
-        }, 15 );
-    }
+						el.scrollTop = targetScroll;
+		      }
+		  	}, 15 );
+		}
 }
 
 // function testEase(begin,duration,end) {
@@ -1471,6 +1466,11 @@ function scrollToSmooth(el,targetScroll,duration) {
 // 			if( now  >= end ) { done = 1; }
 // 	}
 // }
+
+function easeInOut(now, beginX,targetX, beginY,targetY ) {
+	return ( -1 * Math.pow(((now - beginX) / targetX) - 1,2) + 1 )	// y = -x^2 + 1
+	* (Math.abs(targetY-beginY));						// scaled up to the amount that we need to move.
+}
 
 function addEvent(object, type, callback) {
     if (object == null || typeof(object) == 'undefined') return;
