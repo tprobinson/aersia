@@ -859,16 +859,14 @@
 		}.bind(this);
 
 		this.shuffleSong = function() {
-			var list = this.songs;
+			//Generate a list of songs we're allowed to play.
+			var list = clone(this.songs);
 
 			//Ensure we don't play the same song again.
 			list.splice(list.indexOf(this.curSong),1);
 
 			if( this.noShuffles[this.selectedPlaylist] != null )
 			{
-				//Generate a list of songs we're allowed to play.
-				list = clone(this.songs);
-
 				this.noShuffles[this.selectedPlaylist].forEach(function(val){ list.splice(val,1); }.bind(this));
 			}
 
