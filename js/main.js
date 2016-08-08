@@ -1041,18 +1041,19 @@
 			//Get the elements' height, since this could change.
 			var height = this.playlist.firstElementChild.offsetHeight;
 
-			// If this element would be closer to the end of the list than the viewport allows, just scroll as close as we can to avoid overflowing.
-			// The browser should realistically stop this, but every 'set' seems to move a pixel beyond the limit, and the smooth animation sets rapidly, causing a big overflow.
-			while ( (height * this.songs.length) - (height * index) < this.playlist.offsetHeight  )
-			{ index--; }
-			// could be optimized by binary search
+			var targetY = height * index;
 
-			Logger.get("animation").debug('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+height*index);
+			// If this element would be closer to the end of the list than the viewport allows, just scroll to the bottom to avoid overflowing.
+			// The browser should realistically stop this, but every 'set' seems to move a pixel beyond the limit, and the smooth animation sets rapidly, causing a big overflow.
+			if( (height * this.songs.length) - targetY < this.playlist.offsetHeight )
+			{ targetY = (height * this.songs.length) - this.playlist.offsetHeight; }
+
+			Logger.get("animation").debug('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+targetY);
 
 			if( this.features.animations.enabled )
 			{
 				//Make the playlist scroll to the currently playing song.
-				scrollToSmooth(this.playlist, height * index, 600);
+				scrollToSmooth(this.playlist, targetY, 600);
 			}
 			else
 			{
