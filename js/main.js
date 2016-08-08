@@ -859,21 +859,27 @@
 		}.bind(this);
 
 		this.shuffleSong = function() {
-			//Generate a list of songs we're allowed to play.
-			var list = clone(this.songs);
+			
+			//Generate a list of indexes we're allowed to play.
+			var list = [];
+			for ( var i=0; i<this.songs.length; i++ ) {
+				if
+				(
+					// Ensure we don't play the same song again and
+					i !== this.curSong &&
 
-			//Ensure we don't play the same song again.
-			list.splice(list.indexOf(this.curSong),1);
-
-			if( this.noShuffles[this.selectedPlaylist] != null )
-			{
-				this.noShuffles[this.selectedPlaylist].forEach(function(val){ list.splice(val,1); }.bind(this));
+					// it's not in our list of things not to shuffle
+					this.noShuffles[this.selectedPlaylist].indexOf(i) === -1
+				)
+				{
+					list.push(i);
+				}
 			}
 
 			var selected = Math.floor(Math.random() * list.length);
 
 			//Start our random song.
-			this.playSong(selected);
+			this.playSong( list[selected] );
 		}.bind(this);
 
 		// Forbids or allows a song to be played.
