@@ -1,6 +1,27 @@
 Replacing Aersia's Flash-based player!
 
-#Done in version 0.1.0:
+# Done in version 0.1.1:
+* Internals
+    * Corrected an error in playlist sorting, Angular does not preserve the original index pre-sort.
+    * Reduced CPU usage in timelineUpdate() by caching bounding rectangles.
+
+* Player
+    * Loading spinner added for when a playlist is loading.
+    * The playlist will now neither overscroll nor underscroll when attempting to focus on an entry at the end of the playlist.
+    * Failures that the user should know about are now displayed in an error box.
+    * Removed the Recent News tab, as it doesn't do anything.
+    * Removed the "album" listing.
+
+
+#Planned for the next version:
+* Fixing some layout issues in the options box. Making Streambox less dynamic?
+
+#Planned for the future:
+* Mobile support?
+* Compile the JS
+
+##Previous Versions
+###0.1.0:
 * Internals
     * Allowed both XML and JSON formats to be loaded as playlists. This functionality, along with the ability to parse XML, will probably be removed later.
     * Object-fit polyfill included, for browsers that don't support it.
@@ -14,16 +35,6 @@ Replacing Aersia's Flash-based player!
 * Layouts
     * Song art properly included and a few things were locked down to make sure the art doesn't "escape".
 
-
-#Planned for the next version:
-* Fixing some layout issues in the options box. Making Streambox less dynamic?
-* Fixing the need to use getClientBoundingRect every single update. I don't know why caching this value causes it to fall wildly out of sync.
-
-#Planned for the future:
-* Mobile support?
-* Compile the JS
-
-##Previous Versions
 ###0.0.6
 * Internals
     * Removed more broken Angular code
@@ -33,7 +44,7 @@ Replacing Aersia's Flash-based player!
 * Layouts
     * Streambox, a stubby version of the Current Song tab.
     * Streambar, the top controls bar and nothing else.
-    *
+
 ###0.0.5
 * Song information panel
  * Toggle shuffling to current song

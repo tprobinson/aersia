@@ -1,9 +1,9 @@
 {
   "name": "aersia",
   "friendlyname": "Aersia Player",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
-  "repository": "https://github.com/tprobinson/vip.git",
+  "repository": "https://github.com/tprobinson/aersia.git",
   "devDependencies": {
     "autoprefixer": "^3.1.0",
     "grunt": "^0.4.5",

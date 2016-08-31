@@ -179,6 +179,17 @@
 
 		this.loadglobal = document.getElementById("loadglobal");
 
+		this.timelinerect = this.timeline.getBoundingClientRect();
+
+		this.updateTimelineRect = function() {
+			// var rect = this.timeline.getBoundingClientRect();
+			// Logger.get("rectresize").debug('L:'+rect.left+' R:'+rect.right+' T:'+rect.top+' B:'+rect.bottom+' X:'+rect.x+' Y:'+rect.y+' W:'+rect.width+' H:'+rect.height);
+			this.timelinerect = this.timeline.getBoundingClientRect();
+		}.bind(this);
+
+		//Bind it to update when window resizes.
+		addEvent(window,"resize", this.updateTimelineRect );
+
 		this.songUI = {
 			'Streambox': {
 				'title': document.getElementById("sboxSongTitle"),
@@ -584,7 +595,7 @@
 
 			Logger.get("player").debug('Timeline seek: '+amt);
 			this.player.currentTime = this.player.duration * amt;
-			this.timeUpdate(e);
+			this.timelineUpdate(e);
 
 		}.bind(this);
 		addEvent(this.timeline,"click", this.seekBar);
@@ -593,7 +604,7 @@
 		this.progressUpdate = function(e,amt) {
 			var newText = '';
 
-			//Respond to either click or direct invocation.
+			//Respond to either event or direct invocation.
 			if( e !== '' )
 			{
 				var bufend = 0;
@@ -608,7 +619,7 @@
 					}
 					else
 					{
-						//We are fully loaded. Show a timestamp instead.
+						// We are fully loaded. Show a timestamp instead.
 						newText = this.timeFormat(this.player.duration);
 					}
 				}
@@ -632,6 +643,9 @@
 				this.loadPct.textContent = newText;
 				this.lastLoadText = newText;
 
+				// The text will probably have pushed on the timeline's rectangle, so let's update it.
+				this.updateTimelineRect();
+
 				//Move loadBar in timeline
 				this.loadBar.style.right = (100 - amt) + '%'; // inverse percentage
 			}
@@ -650,6 +664,7 @@
 		}.bind(this);
 
 		this.timelineUpdate = function(e,amt) {
+			if( this.timelinerect == null ) { return; }
 
 			if( e != null && e !== '' )
 			{ amt = this.player.currentTime / this.player.duration; }
@@ -662,15 +677,13 @@
 			// //Move the playedBar in the timeline
 			// this.playedBar.style.right = amt + "%";
 
-			//REWORK: somehow we need to cache the boundingrect, but for some reason if I don't use it every frame it gets off by a lot.
 			//This pixel-perfect version is just to achieve that one-pixel offset effect in the original .swf
 			//Move the playhead
-			var rect = this.timeline.getBoundingClientRect();
-			var clickpx = (rect.right - rect.left) * amt;
+			var clickpx = (this.timelinerect.right - this.timelinerect.left) * amt;
 			this.playhead.style.left = clickpx + "px";
 
 			//Move the playedBar in the timeline
-			this.playedBar.style.right = (((rect.right - rect.left) - clickpx) + 1) + "px";
+			this.playedBar.style.right = (((this.timelinerect.right - this.timelinerect.left) - clickpx) + 1) + "px";
 
 		}.bind(this);
 
@@ -792,6 +805,7 @@
 			if( retry && this.playtries > 0 ) {
 				// If we've already retried for any reason, don't try again.
 				Logger.get("player").error("Cannot play song: "+this.songs[index].title);
+				this.error("Cannot play song: "+this.songs[index].title);
 				return;
 			} else if ( retry ) {
 				// If this is our first retry, let's keep track of that.
@@ -845,8 +859,8 @@
 						if( this.songs[this.curSong].formats[format] != null )
 						{ selFormat = format; throw BreakException; }
 					});
-				} catch(e) { // alert for now, use a message box later
-					if (e!==BreakException) throw e;
+				} catch(e) {
+					if (e!==BreakException) throw e;  // a crude break in the loop structure. If it wasn't a break, explode.
 				}
 
 				if( selFormat === '' )
@@ -967,9 +981,6 @@
 
 		// Traverses the history queue, or just plays a new song.
 		this.seek = function(amt) {
-			// var index = this.curSong + amt;
-			// if( index >= 0 && index <= this.songs.length )
-			// { this.playSong(index); }
 			if( amt < 0 )
 			{
 				if( (this.history.length-1) >= 0 -(this.historyPosition + amt)  )
@@ -1067,8 +1078,8 @@
 
 			// If this element would be closer to the end of the list than the viewport allows, just scroll to the bottom to avoid overflowing.
 			// The browser should realistically stop this, but every 'set' seems to move a pixel beyond the limit, and the smooth animation sets rapidly, causing a big overflow.
-			if( (height * this.songs.length) - targetY < this.playlist.offsetHeight )
-			{ targetY = (height * this.songs.length) - this.playlist.offsetHeight; }
+			if( (height * (this.songs.length - 1)) - targetY < this.playlist.offsetHeight )
+			{ targetY = this.playlist.scrollHeight - this.playlist.offsetHeight; }
 
 			Logger.get("animation").debug('Scroll event: '+this.playlist.scrollTop + ' by interval '+ height +' to '+targetY);
 
@@ -1079,7 +1090,7 @@
 			}
 			else
 			{
-				this.playlist.scrollTop = height * index;
+				this.playlist.scrollTop = targetY;
 			}
 		}.bind(this);
 
@@ -1193,7 +1204,7 @@
 			var result;
 
 			try { result = JSON.parse(event.target.result); }
-			catch ( e ) { alert("File does not contain a valid style structure."); }
+			catch ( e ) { this.error("The style you uploaded does not contain a valid JSON structure."); }
 
 			if( result != null )
 			{
@@ -1208,9 +1219,9 @@
 					this.reloadStyle();
 					Logger.get('internals').info('Style imported successfully.');
 					this.setCookie();
-				} catch(e) { // alert for now, use a message box later
-					if (e!==BreakException) throw e;
-					alert("Imported style was not formatted correctly.");
+				} catch(e) {
+					if (e!==BreakException) throw e; // a crude break in the loop structure. If it wasn't a break, explode.
+					this.error("The style you uploaded was not formatted correctly.");
 				}
 			}
 		}.bind(this);
@@ -1319,7 +1330,7 @@
 			 ){
 				this.getUIElement('title').innerHTML = this.songs[this.curSong].title;
 				this.getUIElement('creator').innerHTML = this.songs[this.curSong].creator;
-				// this.curSongRating.innerHTML = "0"; //this.songs[this.curSong].rating;
+				// this.getUIElement('rating').innerHTML = "0"; //this.songs[this.curSong].rating;
 
 				if( this.songs[this.curSong].art != null && this.songs[this.curSong].art.length > 0 )
 				{

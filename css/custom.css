@@ -479,6 +479,7 @@ section,
 #timeline {
 	position: relative;
 	overflow: hidden;
+	flex: 0 1 auto;
 }
 
 #loadBar, #playedBar {

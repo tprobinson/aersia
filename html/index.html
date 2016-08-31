@@ -53,7 +53,7 @@
                     <li><a data-tab-id="#tab-songinfo" class="effeckt-tab">Current Song</a></li>
                     <li><a data-tab-id="#tab-layout" class="effeckt-tab">Layout</a></li>
                     <li><a data-tab-id="#tab-theme" class="effeckt-tab">Theme</a></li>
-                    <li><a data-tab-id="#tab-news" class="effeckt-tab">Recent News</a></li>
+                    <!-- <li><a data-tab-id="#tab-news" class="effeckt-tab">Recent News</a></li> -->
                 </div>
                 <div class="effeckt-tabs-container">
 
@@ -147,15 +147,15 @@
                             <section>
                                 <span>Controls Border</span>
                                 <div>
-                                    <input type="color" name="colorcontrolsoutstart" ng-model="aersiaCtrl.currentStyles.controlsout['0%']" ng-change="aersiaCtrl.changeGradient('controlsout');" />
-                                    <input type="color" name="colorcontrolsoutend" ng-model="aersiaCtrl.currentStyles.controlsout['100%']" ng-change="aersiaCtrl.changeGradient('controlsout');" />
+                                    <input type="color" name="colorcontrolsoutstart" ng-model="aersiaCtrl.currentStyles.controlsout['']" ng-change="aersiaCtrl.changeGradient('controlsout');" />
+                                    <input type="color" name="colorcontrolsoutend" ng-model="aersiaCtrl.currentStyles.controlsout['10']" ng-change="aersiaCtrl.changeGradient('controlsout');" />
                                 </div>
                             </section>
                             <section>
                                 <span>Controls</span>
                                 <div>
-                                    <input type="color" name="colorcontrolsinstart" ng-model="aersiaCtrl.currentStyles.controlsin['0%']" ng-change="aersiaCtrl.changeGradient('controlsin');" />
-                                    <input type="color" name="colorcontrolsinend" ng-model="aersiaCtrl.currentStyles.controlsin['100%']" ng-change="aersiaCtrl.changeGradient('controlsin');" />
+                                    <input type="color" name="colorcontrolsinstart" ng-model="aersiaCtrl.currentStyles.controlsin['']" ng-change="aersiaCtrl.changeGradient('controlsin');" />
+                                    <input type="color" name="colorcontrolsinend" ng-model="aersiaCtrl.currentStyles.controlsin['10']" ng-change="aersiaCtrl.changeGradient('controlsin');" />
                                 </div>
                             </section>
                             <div class="sep"></div>
@@ -166,9 +166,9 @@
                         </section>
                     </div>
 
-                    <div id="tab-news" class="effeckt-tab-content">
+                    <!-- <div id="tab-news" class="effeckt-tab-content">
                         <div style="font-size:48px;text-align:center">Recent News</div>
-                    </div>
+                    </div> -->
 
                 </div>
             </div>
@@ -213,7 +213,7 @@
                     <svg width="17px" height="17px" ><use xlink:href="#icon-next" /></svg>
                 </div>
                 <div id="timebox">
-                    <div class="controls-text" id="timeProgText">00:00</div>
+                    <div class="controls-text" id="timeProgText"></div>
                     <div class="vbox">
                         <div id="timeline" ng-click="aersiaCtrl.seekBar($event);">
                             <div id="loadBar"></div>
@@ -221,13 +221,13 @@
                         </div>
                         <div id="playhead"></div>
                     </div>
-                    <div class="controls-text" id="timeLoadPct">0%</div>
+                    <div class="controls-text" id="timeLoadPct"></div>
                 </div>
                 <div id="controlsInfoBox" class="hidden">
                     <div>
-                        <span class="controls-text" id="controlsProgText">00:00</span>
+                        <span class="controls-text" id="controlsProgText"></span>
                         <span class="controls-text divide" >/</span>
-                        <span class="controls-text" id="controlsLoadPct">00:00</span>
+                        <span class="controls-text" id="controlsLoadPct"></span>
                     </div>
 
                     <div>
