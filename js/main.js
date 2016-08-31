@@ -13,6 +13,7 @@
 */
 /* jshint -W116 */
 (function() {
+
 	//Initialize Angular app
 	var app = angular.module("aersia", [ ]);
 
@@ -705,6 +706,12 @@
 						{
 							var x2js = new X2JS();
 							playlist = x2js.xml2js(playlist).playlist.trackList.track;
+						}
+
+						// Give each song an index -- this is necessary so Angular can track the objects.
+						// I really want this bit of code to die.
+						for ( var i=0; i<playlist.length; i++ ) {
+							playlist[i].index = i;
 						}
 
 						//Set the song list
