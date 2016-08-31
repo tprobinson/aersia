@@ -248,7 +248,7 @@ copy: {
     },
     img: {
         files: [
-            { expand: true, cwd: './img', src: ['./**/*.*'], dest: '<%= dirs.output %>assets/img' }
+            { expand: true, cwd: './img', src: ['./**/*.*'], dest: '<%= dirs.output %>assets/img' },
         ]
     },
     font: {
@@ -502,7 +502,7 @@ uglify: {
 
 	realFavicon: {
 		favicons: {
-			src: 'files/aersia.svg',
+			src: 'img/aersia.svg',
 			dest: '<%= dirs.output %>',
 			options: {
 				iconsPath: '/',
@@ -518,7 +518,7 @@ uglify: {
 					windows: {
 						masterPicture: {
 							type: 'inline',
-							content: 'files/aersia-silhouette.svg',
+							content: 'img/aersia-silhouette.svg',
 						},
 						pictureAspect: 'whiteSilhouette',
 						backgroundColor: '#da532c',
@@ -539,7 +539,7 @@ uglify: {
 					safariPinnedTab: {
 						masterPicture: {
 							type: 'inline',
-							content: 'files/aersia-silhouette.svg',
+							content: 'img/aersia-silhouette.svg',
 						},
 						pictureAspect: 'silhouette',
 						themeColor: '#183C63'

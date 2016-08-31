@@ -1,17 +1,4 @@
 /* Overlays */
-.loading {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	color: #DDD;
-	text-shadow: -2px -2px rgba(25,25,25,0.5);
-	text-align: center;
-	font-size: 72px;
-	line-height: 5rem;
-	top: 0;
-	left: 0;
-	z-index:4;
-}
 
 .topcoat-progress-bar {
 position: relative;
@@ -627,6 +614,36 @@ html.layout-touch section {
 
 /* Styles for the second pane */
 
+/* Loading spinner */
+.loading {
+	width: 107px;
+	height: 107px;
+	z-index: 10;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -53.5px 0 0 -53.5px; /* center */
+	transform: translate3d(0,0,0); /* force GPU */
+	animation: turn 2400ms cubic-bezier(.17,.89,.52,1.38) infinite;
+	animation-fill-mode:forwards;
+}
+
+@keyframes turn {
+  0% {
+    transform: rotateZ(0);
+  }
+  25% {
+    transform: rotateZ(360deg);
+  }
+	50% {
+    transform: rotateZ(360deg);
+  }
+	75% {
+    transform: rotateZ(0);
+  }
+}
+
+
 .playlist-container {
 	flex: 1 1 auto;
 	flex-direction: column;
@@ -854,4 +871,6 @@ span.value { font-style: italic; }
 .hidden {
 	display: none;
 	visibility: hidden;
+	animation: none;
+	transition: none;
 }

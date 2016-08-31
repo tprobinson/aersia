@@ -19,27 +19,33 @@
         <script src="assets/js/modernizr.js"></script>
     </head>
     <body ng-controller="aersiaController as aersiaCtrl">
+      <!-- Invisible helper objects -->
         <!--%= compiledicons -->
         <!--%= compiledlayouts -->
+      <!-- End invisible helpers -->
+
         <!--[if lt IE 8]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-<!-- Modal dialog. Future functionality?
-		<div class="effeckt-modal-wrap" id="effeckt-modal-wrap"> <!-- for centering transform --><!--
-			<div class="effeckt-modal topcoat-overlay" id="effeckt-modal">
-				<h1></h1>
-				<div class="effeckt-modal-content">
-					<p>Are you sure?</p>
-				</div>
-				<div class="topcoat-overlay-buttons">
-					<button class="effeckt-modal-cancel topcoat-button">Cancel</button>
-					<button class="effeckt-modal-confirm topcoat-button--cta">Commit</button>
-				</div>
-			</div>
-		</div>
-		<div class="effeckt-overlay" id="effeckt-overlay"></div>
-    -->
+    <!-- Modal dialog. Future functionality?
+    		<div class="effeckt-modal-wrap" id="effeckt-modal-wrap"> <!-- for centering transform --><!--
+    			<div class="effeckt-modal topcoat-overlay" id="effeckt-modal">
+    				<h1></h1>
+    				<div class="effeckt-modal-content">
+    					<p>Are you sure?</p>
+    				</div>
+    				<div class="topcoat-overlay-buttons">
+    					<button class="effeckt-modal-cancel topcoat-button">Cancel</button>
+    					<button class="effeckt-modal-confirm topcoat-button--cta">Commit</button>
+    				</div>
+    			</div>
+    		</div>
+    		<div class="effeckt-overlay" id="effeckt-overlay"></div>
+        -->
+        <div class="loading hidden" id="loadglobal">
+          <img src="assets/img/aersia.svg" />
+        </div>
 
         <div class="optionsbox hidden">
             <div class="effeckt-tabs-wrap" data-effeckt-type="slide-left">
@@ -52,9 +58,6 @@
                 <div class="effeckt-tabs-container">
 
                     <div id="tab-songinfo" class="effeckt-tab-content">
-                        <!-- <div class="hbox nogrow"> <!-- Image and controls near image --><!--
-                            <div class="vbox"></div>
-                        </div> -->
 
                         <img id="oboxSongImg" class="fade" src="assets/img/placeholder.png" />
 
@@ -254,7 +257,7 @@
             </div>
 
             <div class="playlist-container hbox">
-                <div class="playlist vbox" id="playlist">
+                <div class="playlist vbox hidden" id="playlist">
                     <li ng-click="aersiaCtrl.playSong($index)"
                         ng-repeat="song in aersiaCtrl.songs | orderBy:creator track by $index">{{song.creator}} - {{song.title}}</li>
                 </div>
