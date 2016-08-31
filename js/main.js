@@ -20,20 +20,8 @@
 		this.friendlyname = "/*%= friendlyname */";
 		this.version = "/*%= version */";
 
-		// Create a bogus link to download stuff with
-		this.download = document.head.appendChild(document.createElement('a'));
-		this.download.style = "display:none;visibility:hidden;";
-		this.download.download = "aersiaStyle.json";
-
-		// Create a bogus file input to upload stuff with
-		this.upload = document.head.appendChild(document.createElement('input'));
-		this.upload.style = "display:none;visibility:hidden;";
-		this.upload.type = "file";
-		this.styleReader = new FileReader();
-
-
-		// Create x2js instance with default config
-		var x2js = new X2JS();
+		/////
+		// Library initializations
 
 		// Create the lightbox
 		this.lightbox = new Lightbox();
@@ -64,6 +52,10 @@
 		Logger.get('player').setLevel(Logger.ERROR);
 		Logger.get('animation').setLevel(Logger.ERROR);
 		Logger.get('songart').setLevel(Logger.ERROR);
+
+		//js-cookie variables
+		this.cookieName = "aersia";
+		this.cookieConfig = { };
 
 		//Initialize variables
 		this.songs = [];
@@ -120,10 +112,6 @@
 			},
 		};
 
-		//js-cookie variables
-		this.cookieName = "aersia";
-		this.cookieConfig = { };
-
 		//Playlists
 		this.lastPlaylist = "";
 		this.selectedPlaylist = "VIP";
@@ -151,6 +139,17 @@
 			}
 		};
 
+		// Create a bogus link to download stuff with
+		this.download = document.head.appendChild(document.createElement('a'));
+		this.download.style = "display:none;visibility:hidden;";
+		this.download.download = "aersiaStyle.json";
+
+		// Create a bogus file input to upload stuff with
+		this.upload = document.head.appendChild(document.createElement('input'));
+		this.upload.style = "display:none;visibility:hidden;";
+		this.upload.type = "file";
+		this.styleReader = new FileReader();
+
 		//Grab DOM elements
 		this.player = document.getElementsByTagName("audio")[0];
 		this.playlist = document.getElementById("playlist");
@@ -176,6 +175,8 @@
 		this.messagebox = document.getElementById("messagebox");
 
 		this.toggleShuffleBtn = document.getElementById("toggleShuffle");
+
+		this.loadglobal = document.getElementById("loadglobal");
 
 		this.songUI = {
 			'Streambox': {
@@ -688,6 +689,7 @@
 			if( this.selectedPlaylist !== this.lastPlaylist )
 			{
 				// Loading a new playlist
+				this.showLoading();
 
 				//Stop the song.
 				this.pause();
@@ -701,6 +703,7 @@
 						//Convert it from XML to JSON if necessary
 						if( /.xml$/.test(this.playlists[this.selectedPlaylist].url) )
 						{
+							var x2js = new X2JS();
 							playlist = x2js.xml2js(playlist).playlist.trackList.track;
 						}
 
@@ -711,6 +714,9 @@
 
 						// Update the window's title.
 						document.title = this.playlists[this.selectedPlaylist].longName + ' - ' + this.friendlyname + ' v' + this.version;
+
+						// Hide loading, in a little while.
+						window.setTimeout(this.hideLoading,1000);
 
 						// If we're allowed, start playing.
 						if( this.autoplay )
@@ -859,8 +865,13 @@
 		}.bind(this);
 
 		this.shuffleSong = function() {
-			
+
 			//Generate a list of indexes we're allowed to play.
+
+			// Make sure this list is defined first.
+			if( this.noShuffles[this.selectedPlaylist] == null )
+			{ this.noShuffles[this.selectedPlaylist] = []; }
+
 			var list = [];
 			for ( var i=0; i<this.songs.length; i++ ) {
 				if
@@ -1375,6 +1386,17 @@
 		}.bind(this);
 
 		/////
+		// Loading spinner
+		this.showLoading = function() {
+			classie.removeClass(this.loadglobal,"hidden");
+		}.bind(this);
+
+		this.hideLoading = function() {
+			classie.addClass(this.loadglobal,"hidden");
+		}.bind(this);
+
+
+		/////
 		// Initialization
 
 		this.init = function() {
@@ -1446,31 +1468,6 @@ function scrollToSmooth(el,targetScroll,duration) {
 		  	}, 15 );
 		}
 }
-
-// function testEase(begin,duration,end) {
-// 	var now = begin;
-// 	var done = 0;
-// 	var i = 0;
-// 	while ( !done ) {
-// 		i++;
-// 		if (i > 1000 ) { done = 1;}
-//
-// 		var pct = (now-begin) / (end-begin);
-//
-// 		var mod =
-// 			pct *
-// 			//the cosine curve scaled by how far we are.
-// 			((Math.cos (
-// 				Math.PI + //beginning at Pi to ease in
-// 				(Math.PI * Math.abs(pct))
-// 			) + 1 ) / 2)
-// 		;
-// 		var delta =
-// 		now += mod;
-// 			Logger.get('animations').debug('pct: '+pct+', now: '+now+', mod: '+mod);
-// 			if( now  >= end ) { done = 1; }
-// 	}
-// }
 
 function easeInOut(now, beginX,targetX, beginY,targetY ) {
 	return ( -1 * Math.pow(((now - beginX) / targetX) - 1,2) + 1 )	// y = -x^2 + 1
