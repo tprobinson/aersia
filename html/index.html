@@ -1,280 +1,252 @@
 <!doctype html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="" ng-app="vip"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang="" ng-app="vip"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9" lang="" ng-app="vip"> <![endif]-->
+<!--[if lt IE 7]>    <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="" ng-app="vip"> <![endif]-->
+<!--[if IE 7]>     <html class="no-js lt-ie9 lt-ie8" lang="" ng-app="vip"> <![endif]-->
+<!--[if IE 8]>     <html class="no-js lt-ie9" lang="" ng-app="vip"> <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="" ng-app="aersia"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title><!--%= friendlyname --> v<!--%= version --></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title><!--%= friendlyname --> v<!--%= version --></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!-- Generated favicons -->
-        <!--%= favicons -->
+    <!-- Generated favicons -->
+    <!--%= favicons -->
 
-        <link href='https://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" href="assets/css/tidy.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'>
 
-        <script src="assets/js/modernizr.js"></script>
-    </head>
-    <body ng-controller="aersiaController as aersiaCtrl">
-      <!-- Invisible helper objects -->
-        <!--%= compiledicons -->
-        <!--%= compiledlayouts -->
-      <!-- End invisible helpers -->
+    <!-- CSS Stylesheets --><!--%= cssdeps -->
 
-        <!--[if lt IE 8]>
-            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
+    <script src="assets/js/modernizr.js"></script>
+  </head>
+  <body ng-controller="aersiaController as aersiaCtrl">
+    <!-- Invisible helper objects -->
+    <!--%= compiledicons -->
+    <!--%= compiledlayouts -->
+    <!-- End invisible helpers -->
 
-    <!-- Modal dialog. Future functionality?
-    		<div class="effeckt-modal-wrap" id="effeckt-modal-wrap"> <!-- for centering transform --><!--
-    			<div class="effeckt-modal topcoat-overlay" id="effeckt-modal">
-    				<h1></h1>
-    				<div class="effeckt-modal-content">
-    					<p>Are you sure?</p>
-    				</div>
-    				<div class="topcoat-overlay-buttons">
-    					<button class="effeckt-modal-cancel topcoat-button">Cancel</button>
-    					<button class="effeckt-modal-confirm topcoat-button--cta">Commit</button>
-    				</div>
-    			</div>
-    		</div>
-    		<div class="effeckt-overlay" id="effeckt-overlay"></div>
-        -->
-        <div class="loading hidden" id="loadglobal">
-          <img src="assets/img/aersia.svg" />
+    <!--[if lt IE 8]>
+      <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+    <div class="loading hidden" id="loadglobal">
+      <img src="assets/img/aersia.svg" />
+    </div>
+
+    <div class="optionsbox hidden">
+      <div class="effeckt-tabs-wrap" data-effeckt-type="slide-left">
+        <div class="effeckt-tabs">
+          <li><a data-tab-id="#tab-songinfo" class="effeckt-tab">Current Song</a></li>
+          <li><a data-tab-id="#tab-layout" class="effeckt-tab">Layout</a></li>
+          <li><a data-tab-id="#tab-theme" class="effeckt-tab">Theme</a></li>
         </div>
+        <div class="effeckt-tabs-container">
 
-        <div class="optionsbox hidden">
-            <div class="effeckt-tabs-wrap" data-effeckt-type="slide-left">
-                <div class="effeckt-tabs">
-                    <li><a data-tab-id="#tab-songinfo" class="effeckt-tab">Current Song</a></li>
-                    <li><a data-tab-id="#tab-layout" class="effeckt-tab">Layout</a></li>
-                    <li><a data-tab-id="#tab-theme" class="effeckt-tab">Theme</a></li>
-                    <!-- <li><a data-tab-id="#tab-news" class="effeckt-tab">Recent News</a></li> -->
+          <div id="tab-songinfo" class="effeckt-tab-content">
+
+            <img id="oboxSongImg" class="fade" src="assets/img/placeholder.png" />
+
+            <!-- Song information, links, etc. -->
+            <div class="infopane-h">
+              <div class="vbox">
+                <div class="vbox songinfo">
+                  <li id="oboxSongTitle">Loading...</li>
+                  <li id="oboxSongCreator">Loading...</li>
                 </div>
-                <div class="effeckt-tabs-container">
-
-                    <div id="tab-songinfo" class="effeckt-tab-content">
-
-                        <img id="oboxSongImg" class="fade" src="assets/img/placeholder.png" />
-
-                        <!-- Song information, links, etc. -->
-                        <div class="infopane-h">
-                            <div class="vbox">
-                                <div class="vbox songinfo">
-                                  <li id="oboxSongTitle">Loading...</li>
-                                  <li id="oboxSongCreator">Loading...</li>
-                                </div>
-                                <div class="controls-container">
-                                    <div id="toggleShuffle" class="controlsToggle" ng-click="aersiaCtrl.toggleShuffle();">
-                                        <svg width="17px" height="17px" ><use xlink:href="#icon-poweron" /></svg>
-                                        <svg width="17px" height="17px" ><use xlink:href="#icon-poweroff" /></svg>
-                                    </div>
-
-                                    <div class="hidden">
-                                        <div class="spacer"></div>
-                                        <div id="rateup" ng-click="aersiaCtrl.rateUp();">
-                                            <svg width="17px" height="17px" ><use xlink:href="#icon-rateup" /></svg>
-                                        </div>
-                                        <div id="ratedown" ng-click="aersiaCtrl.rateDown();">
-                                            <svg width="17px" height="17px" ><use xlink:href="#icon-ratedown" /></svg>
-                                        </div>
-                                        <div class="controls-text" id="curSongRating" >0</div>
-                                    </div>
-                                    <div class="spacer"></div>
-                                    <!-- <div ng-click="aersiaCtrl.triggerLinkDownload(aersiaCtrl.songs[aersiaCtrl.curSong].location)" >
-                                        <svg width="17px" height="17px" ><use xlink:href="#icon-download" /></svg>
-                                    </div> -->
-                                    <div id="copyBtn" >
-                                        <svg width="17px" height="17px" ><use xlink:href="#icon-share" /></svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="vbox">
-                                <section>
-                                    <div><label>
-                                        Playlists
-                                        <select name="preset" ng-model="aersiaCtrl.selectedPlaylist" ng-change="aersiaCtrl.changePlaylist();" />
-                                            <option ng-repeat="(option,null) in aersiaCtrl.playlists" value="{{option}}">{{aersiaCtrl.playlists[option].longName}}</option>
-                                        </select>
-                                    </label></div>
-                                </section>
-                                <div class='sep'></div>
-                                <section>
-                                    <div><label class="topcoat-checkbox"><input type="checkbox" name="autoplay" ng-model="aersiaCtrl.autoplay" /><div class="topcoat-checkbox__checkmark"></div>Autoplay</label></div>
-                                    <div><label class="topcoat-checkbox"><input type="checkbox" name="anims" ng-model="aersiaCtrl.features.animations.enabled" ng-change="aersiaCtrl.toggleScrollSmooth()" /><div class="topcoat-checkbox__checkmark"></div>Scroll Smooth</label></div>
-                                </section>
-                            </div>
-                            <!-- Song remix information -->
-                            <div class="infopane-v space" ng-show="aersiaCtrl.songs[aersiaCtrl.curSong].remixes.length >= 0">
-                                <div>Remixes
-                                    <div class="playlist">
-                                        <li ng-click="aersiaCtrl.playSong($index)"
-                                            ng-repeat="song in aersiaCtrl.songs[aersiaCtrl.curSong].remixes track by $index">{{song.creator}} - {{song.title}}</li>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="tab-layout" class="effeckt-tab-content">
-                        <div id="layoutbox" class="infopane-h space">
-                            <!-- boxes are created here for each layout -->
-                        </div>
-                    </div>
-
-                    <div id="tab-theme" class="effeckt-tab-content">
-                        <section>
-                            <div><label>
-                                Presets
-                                <select name="preset" ng-model="aersiaCtrl.selectedPreset" ng-change="aersiaCtrl.loadPreset();" />
-                                    <option ng-repeat="(option,style) in aersiaCtrl.presetStyles" value="{{option}}">{{option}}</option>
-                                </select>
-                            </label></div>
-                        </section>
-                        <div class="sep"></div>
-                        <section>
-                            <div><label><input type="color" name="colorfocus" ng-model="aersiaCtrl.currentStyles.focus" ng-change="aersiaCtrl.changeStyle('focus');" />Focus</label></div>
-                            <div><label><input type="color" name="colorbackground" ng-model="aersiaCtrl.currentStyles.background" ng-change="aersiaCtrl.changeStyle('background');" />Background</label></div>
-                            <div><label><input type="color" name="colorcontrast" ng-model="aersiaCtrl.currentStyles.contrast" ng-change="aersiaCtrl.changeStyle('contrast');" />Contrast</label></div>
-                            <div><label><input type="color" name="coloractive" ng-model="aersiaCtrl.currentStyles.active" ng-change="aersiaCtrl.changeStyle('active');" />Active</label></div>
-                            <div><label><input type="color" name="colorscrollbar" ng-model="aersiaCtrl.currentStyles.scrollbar" ng-change="aersiaCtrl.changeStyle('scrollbar');" />Scrollbar</label></div>
-                            <div><label><input type="color" name="colorloadbar" ng-model="aersiaCtrl.currentStyles.loadbar" ng-change="aersiaCtrl.changeStyle('loadbar');" />Loadbar</label></div>
-                            <div class='sep'></div>
-                            <section>
-                                <span>Controls Border</span>
-                                <div>
-                                    <input type="color" name="colorcontrolsoutstart" ng-model="aersiaCtrl.currentStyles.controlsout['']" ng-change="aersiaCtrl.changeGradient('controlsout');" />
-                                    <input type="color" name="colorcontrolsoutend" ng-model="aersiaCtrl.currentStyles.controlsout['10']" ng-change="aersiaCtrl.changeGradient('controlsout');" />
-                                </div>
-                            </section>
-                            <section>
-                                <span>Controls</span>
-                                <div>
-                                    <input type="color" name="colorcontrolsinstart" ng-model="aersiaCtrl.currentStyles.controlsin['']" ng-change="aersiaCtrl.changeGradient('controlsin');" />
-                                    <input type="color" name="colorcontrolsinend" ng-model="aersiaCtrl.currentStyles.controlsin['10']" ng-change="aersiaCtrl.changeGradient('controlsin');" />
-                                </div>
-                            </section>
-                            <div class="sep"></div>
-                            <section>
-                                <button class="topcoat-button" ng-click="aersiaCtrl.triggerUpload()">Import</button>
-                                <button class="topcoat-button" ng-click="aersiaCtrl.exportStyles()">Export</button>
-                            </section>
-                        </section>
-                    </div>
-
-                    <!-- <div id="tab-news" class="effeckt-tab-content">
-                        <div style="font-size:48px;text-align:center">Recent News</div>
-                    </div> -->
-
-                </div>
-            </div>
-        </div>
-        <div class="vbox">
-
-            <!-- this can be moved under controls-container if I want the gradient to inherit -->
-            <div id="messagebox" class="hidden"><span></span><div id="mboxclose" class='closebutton ui-icon ui-icon-circle-close'></div></div>
-
-            <div id="streambox" class="hidden">
-                <div class="hbox nogrow"> <!-- Image and controls near image -->
-                    <div class="vbox"><img id="sboxSongImg" class="fade" src="assets/img/placeholder.png" /></div>
-                </div>
-
-                <!-- Song information, links, etc. -->
-                <div class="infopane-h">
-                    <div class="vbox songinfo">
-                        <li id="sboxSongTitle">Loading...</li>
-                        <li id="sboxSongCreator">Loading...</li>
-                    </div>
-                </div>
-
                 <div class="controls-container">
-                    <div><div class="controls-text"><!--%= friendlyname --> v<!--%= version --></div></div>
+                  <div id="toggleShuffle" class="controlsToggle" ng-click="aersiaCtrl.toggleShuffle();">
+                    <svg width="17px" height="17px" ><use xlink:href="#icon-poweron" /></svg>
+                    <svg width="17px" height="17px" ><use xlink:href="#icon-poweroff" /></svg>
+                  </div>
 
-                    <div class="options" ng-click="aersiaCtrl.toggleOptionsBox();">
-                        <svg width="17px" height="17px" ><use xlink:href="#icon-gear" /></svg>
+                  <div class="hidden">
+                    <div class="spacer"></div>
+                    <div id="rateup" ng-click="aersiaCtrl.rateUp();">
+                      <svg width="17px" height="17px" ><use xlink:href="#icon-rateup" /></svg>
                     </div>
+                    <div id="ratedown" ng-click="aersiaCtrl.rateDown();">
+                      <svg width="17px" height="17px" ><use xlink:href="#icon-ratedown" /></svg>
+                    </div>
+                    <div class="controls-text" id="curSongRating" >0</div>
+                  </div>
+                  <div class="spacer"></div>
+                  <!-- <div ng-click="aersiaCtrl.triggerLinkDownload(aersiaCtrl.songs[aersiaCtrl.curSong].location)" >
+                    <svg width="17px" height="17px" ><use xlink:href="#icon-download" /></svg>
+                  </div> -->
+                  <div id="copyBtn" >
+                    <svg width="17px" height="17px" ><use xlink:href="#icon-share" /></svg>
+                  </div>
                 </div>
+              </div>
+              <div class="vbox">
+                <section>
+                  <div><label>
+                    Playlists
+                    <select name="preset" ng-model="aersiaCtrl.selectedPlaylist" ng-change="aersiaCtrl.changePlaylist();" />
+                      <option ng-repeat="(option,null) in aersiaCtrl.playlists" value="{{option}}">{{aersiaCtrl.playlists[option].longName}}</option>
+                    </select>
+                  </label></div>
+                </section>
+                <div class='sep'></div>
+                <section>
+                  <div><label class="topcoat-checkbox"><input type="checkbox" name="autoplay" ng-model="aersiaCtrl.autoplay" /><div class="topcoat-checkbox__checkmark"></div>Autoplay</label></div>
+                  <div><label class="topcoat-checkbox"><input type="checkbox" name="anims" ng-model="aersiaCtrl.features.animations.enabled" ng-change="aersiaCtrl.toggleScrollSmooth()" /><div class="topcoat-checkbox__checkmark"></div>Scroll Smooth</label></div>
+                </section>
+              </div>
+              <!-- Song remix information -->
+              <div class="infopane-v space" ng-show="aersiaCtrl.songs[aersiaCtrl.curSong].remixes.length >= 0">
+                <div>Remixes
+                  <div class="playlist">
+                    <li ng-click="aersiaCtrl.playSong($index)"
+                      ng-repeat="song in aersiaCtrl.songs[aersiaCtrl.curSong].remixes track by $index">{{song.creator}} - {{song.title}}</li>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <div class="controls-container fullwidth" id="mainControls">
-    			<audio> <p>Your browser does not support the <code>audio</code> element.</p> </audio>
-                <div id="playpause" class="controlsToggle" ng-click="aersiaCtrl.togglePlay();">
-                    <svg width="17px" height="17px" ><use xlink:href="#icon-play" /></svg>
-                    <svg width="17px" height="17px" ><use xlink:href="#icon-pause" /></svg>
-                </div>
-                <div id="prev" ng-click="aersiaCtrl.seek(-1);">
-                    <svg width="17px" height="17px" ><use xlink:href="#icon-prev" /></svg>
-                </div>
-                <div id="next" ng-click="aersiaCtrl.seek(1);">
-                    <svg width="17px" height="17px" ><use xlink:href="#icon-next" /></svg>
-                </div>
-                <div id="timebox">
-                    <div class="controls-text" id="timeProgText"></div>
-                    <div class="vbox">
-                        <div id="timeline" ng-click="aersiaCtrl.seekBar($event);">
-                            <div id="loadBar"></div>
-                            <div id="playedBar"></div>
-                        </div>
-                        <div id="playhead"></div>
-                    </div>
-                    <div class="controls-text" id="timeLoadPct"></div>
-                </div>
-                <div id="controlsInfoBox" class="hidden">
-                    <div>
-                        <span class="controls-text" id="controlsProgText"></span>
-                        <span class="controls-text divide" >/</span>
-                        <span class="controls-text" id="controlsLoadPct"></span>
-                    </div>
-
-                    <div>
-                        <span class="controls-text" id="controlsSongTitle">Loading...</span>
-                        <span class="controls-text divide" >-</span>
-                        <span class="controls-text" id="controlsSongCreator">Loading...</span>
-                    </div>
-
-                    <div class="controls-text"><!--%= friendlyname --> v<!--%= version --></div>
-                </div>
-                <div ng-click="aersiaCtrl.toggleOptionsBox();">
-                <svg width="17px" height="17px" ><use xlink:href="#icon-gear" /></svg>
-                </div>
-                <div id="fullscreen" ng-click="aersiaCtrl.toggleFullscreen();">
-                <svg width="17px" height="17px" ><use xlink:href="#icon-fullscreen" /></svg>
-                </div>
-                <div class="volbox hbox">
-                    <div id="volumeMute" class="controlsToggle" ng-click="aersiaCtrl.toggleMute();" ng-class="{ toggled: aersiaCtrl.prevVolume === 0 }">
-                        <svg width="17px" height="17px" ><use xlink:href="#icon-volMute" /></svg>
-                        <svg width="17px" height="17px" ><use xlink:href="#icon-vol" /></svg>
-                    </div>
-                    <div id="volumeBar" ng-click="aersiaCtrl.volume($event);">
-                    </div>
-                    <div id="volumeMax" ng-click="aersiaCtrl.volume('',1);">
-                    </div>
-                </div>
+          <div id="tab-layout" class="effeckt-tab-content">
+            <div id="layoutbox" class="infopane-h space">
+              <!-- boxes are created here for each layout -->
             </div>
+          </div>
 
-            <div class="playlist-container hbox">
-                <div class="playlist vbox hidden" id="playlist">
-                    <li ng-click="aersiaCtrl.playSong(song.index)"
-                        ng-repeat="song in aersiaCtrl.songs | orderBy:'song.creator' track by $index">{{song.creator}} - {{song.title}}</li>
+          <div id="tab-theme" class="effeckt-tab-content">
+            <section>
+              <div><label>
+                Presets
+                <select name="preset" ng-model="aersiaCtrl.selectedPreset" ng-change="aersiaCtrl.loadPreset();" />
+                  <option ng-repeat="(option,style) in aersiaCtrl.presetStyles" value="{{option}}">{{option}}</option>
+                </select>
+              </label></div>
+            </section>
+            <div class="sep"></div>
+            <section>
+              <div><label><input type="color" name="colorfocus" ng-model="aersiaCtrl.currentStyles.focus" ng-change="aersiaCtrl.changeStyle('focus');" />Focus</label></div>
+              <div><label><input type="color" name="colorbackground" ng-model="aersiaCtrl.currentStyles.background" ng-change="aersiaCtrl.changeStyle('background');" />Background</label></div>
+              <div><label><input type="color" name="colorcontrast" ng-model="aersiaCtrl.currentStyles.contrast" ng-change="aersiaCtrl.changeStyle('contrast');" />Contrast</label></div>
+              <div><label><input type="color" name="coloractive" ng-model="aersiaCtrl.currentStyles.active" ng-change="aersiaCtrl.changeStyle('active');" />Active</label></div>
+              <div><label><input type="color" name="colorscrollbar" ng-model="aersiaCtrl.currentStyles.scrollbar" ng-change="aersiaCtrl.changeStyle('scrollbar');" />Scrollbar</label></div>
+              <div><label><input type="color" name="colorloadbar" ng-model="aersiaCtrl.currentStyles.loadbar" ng-change="aersiaCtrl.changeStyle('loadbar');" />Loadbar</label></div>
+              <div class='sep'></div>
+              <section>
+                <span>Controls Border</span>
+                <div>
+                  <input type="color" name="colorcontrolsoutstart" ng-model="aersiaCtrl.currentStyles.controlsout['']" ng-change="aersiaCtrl.changeGradient('controlsout');" />
+                  <input type="color" name="colorcontrolsoutend" ng-model="aersiaCtrl.currentStyles.controlsout['10']" ng-change="aersiaCtrl.changeGradient('controlsout');" />
                 </div>
-            </div>
+              </section>
+              <section>
+                <span>Controls</span>
+                <div>
+                  <input type="color" name="colorcontrolsinstart" ng-model="aersiaCtrl.currentStyles.controlsin['']" ng-change="aersiaCtrl.changeGradient('controlsin');" />
+                  <input type="color" name="colorcontrolsinend" ng-model="aersiaCtrl.currentStyles.controlsin['10']" ng-change="aersiaCtrl.changeGradient('controlsin');" />
+                </div>
+              </section>
+              <div class="sep"></div>
+              <section>
+                <button class="topcoat-button" ng-click="aersiaCtrl.triggerUpload()">Import</button>
+                <button class="topcoat-button" ng-click="aersiaCtrl.exportStyles()">Export</button>
+              </section>
+            </section>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="vbox">
+
+      <!-- this can be moved under controls-container if I want the gradient to inherit -->
+      <div id="messagebox" class="hidden"><span></span><div id="mboxclose" class='closebutton ui-icon ui-icon-circle-close'></div></div>
+
+      <div id="streambox" class="hidden">
+        <div class="hbox nogrow"> <!-- Image and controls near image -->
+          <div class="vbox"><img id="sboxSongImg" class="fade" src="assets/img/placeholder.png" /></div>
         </div>
 
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-        <script>window.jQuery || document.write('<script src="assets/js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
+        <!-- Song information, links, etc. -->
+        <div class="infopane-h">
+          <div class="vbox songinfo">
+            <li id="sboxSongTitle">Loading...</li>
+            <li id="sboxSongCreator">Loading...</li>
+          </div>
+        </div>
 
-        <script src="assets/js/js.cookie.js"></script>
-        <script src="assets/js/lightbox.js"></script>
-        <script src="assets/js/logger.js"></script>
-        <script src="assets/js/x2js.js"></script>
-        <script src="assets/js/perfect-scrollbar.js"></script>
-        <script src="assets/js/ofi.browser.js"></script>
-        <script src="assets/js/angular.js"></script>
-        <script src="assets/js/plugins.js"></script>
-        <script src="assets/js/main.js"></script>
-    </body>
+        <div class="controls-container">
+          <div><div class="controls-text"><!--%= friendlyname --> v<!--%= version --></div></div>
+
+          <div class="options" ng-click="aersiaCtrl.toggleOptionsBox();">
+            <svg width="17px" height="17px" ><use xlink:href="#icon-gear" /></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-container fullwidth" id="mainControls">
+  			<audio> <p>Your browser does not support the <code>audio</code> element.</p> </audio>
+        <div id="playpause" class="controlsToggle" ng-click="aersiaCtrl.togglePlay();">
+          <svg width="17px" height="17px" ><use xlink:href="#icon-play" /></svg>
+          <svg width="17px" height="17px" ><use xlink:href="#icon-pause" /></svg>
+        </div>
+        <div id="prev" ng-click="aersiaCtrl.seek(-1);">
+          <svg width="17px" height="17px" ><use xlink:href="#icon-prev" /></svg>
+        </div>
+        <div id="next" ng-click="aersiaCtrl.seek(1);">
+          <svg width="17px" height="17px" ><use xlink:href="#icon-next" /></svg>
+        </div>
+        <div id="timebox">
+          <div class="controls-text" id="timeProgText"></div>
+          <div class="vbox">
+            <div id="timeline" ng-click="aersiaCtrl.seekBar($event);">
+              <div id="loadBar"></div>
+              <div id="playedBar"></div>
+            </div>
+            <div id="playhead"></div>
+          </div>
+          <div class="controls-text" id="timeLoadPct"></div>
+        </div>
+        <div id="controlsInfoBox" class="hidden">
+          <div>
+            <span class="controls-text" id="controlsProgText"></span>
+            <span class="controls-text divide" >/</span>
+            <span class="controls-text" id="controlsLoadPct"></span>
+          </div>
+
+          <div>
+            <span class="controls-text" id="controlsSongTitle">Loading...</span>
+            <span class="controls-text divide" >-</span>
+            <span class="controls-text" id="controlsSongCreator">Loading...</span>
+          </div>
+
+          <div class="controls-text"><!--%= friendlyname --> v<!--%= version --></div>
+        </div>
+        <div ng-click="aersiaCtrl.toggleOptionsBox();">
+        <svg width="17px" height="17px" ><use xlink:href="#icon-gear" /></svg>
+        </div>
+        <div id="fullscreen" ng-click="aersiaCtrl.toggleFullscreen();">
+        <svg width="17px" height="17px" ><use xlink:href="#icon-fullscreen" /></svg>
+        </div>
+        <div class="volbox hbox">
+          <div id="volumeMute" class="controlsToggle" ng-click="aersiaCtrl.toggleMute();" ng-class="{ toggled: aersiaCtrl.prevVolume === 0 }">
+            <svg width="17px" height="17px" ><use xlink:href="#icon-volMute" /></svg>
+            <svg width="17px" height="17px" ><use xlink:href="#icon-vol" /></svg>
+          </div>
+          <div id="volumeBar" ng-click="aersiaCtrl.volume($event);">
+          </div>
+          <div id="volumeMax" ng-click="aersiaCtrl.volume('',1);">
+          </div>
+        </div>
+      </div>
+
+      <div class="playlist-container hbox">
+        <div class="playlist vbox hidden" id="playlist">
+          <li ng-click="aersiaCtrl.playSong(song.index)"
+            ng-repeat="song in aersiaCtrl.songs | orderBy:'song.creator' track by $index">{{song.creator}} - {{song.title}}</li>
+        </div>
+      </div>
+    </div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="assets/js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
+
+    <!-- JS Scripts --><!--%= jsdeps -->
+  </body>
 </html>

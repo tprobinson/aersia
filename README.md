@@ -1,5 +1,7 @@
 Replacing Aersia's Flash-based player!
 
+Released under the [MIT License](https://www.tldrlegal.com/l/mit)
+
 # Done in version 0.1.1:
 * Internals
     * Corrected an error in playlist sorting, Angular does not preserve the original index pre-sort.
