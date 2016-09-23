@@ -1,40 +1,4 @@
 /* Overlays */
-
-.topcoat-progress-bar {
-position: relative;
-z-index:3;
-  overflow: hidden;
-  width: 75%;
-  height: 1.25rem;
-  margin: 20px auto;
-  border-radius: 12px;
-  background-color: #373737;
-  box-shadow: 0 1px rgba(255,255,255,0.25), inset 0 1px rgba(0,0,0,0.12);
-}
-.topcoat-progress-bar > .progress {
-  display: block;
-  height: 100%;
-  border-radius: 12px 0 0 12px;
-  background-color: #e0f0fa;
-  box-shadow: inset 0 1px rgba(0,0,0,0.12);
-}
-.progress--complete {
-  width: 100%;
-}
-.progress--forever {
-	position: absolute;
-	left: 0; top: 0;
-	width: 200%;
-	background-repeat: repeat;
-	background-image: url("../img/ui/ui-bg_diagonals-thick_15_0b3e6f_40x40.png");
-	animation: scrollforever 5s linear infinite;
-	transform: translate3d(0,0,0); /* Trick browser into using GPU */
-}
-@keyframes scrollforever {
-	0% { transform: translateX(0); }
-	100% { transform: translateX(-50%); }
-}
-
 body
 {
 	font-family: "Titillium Web", sans-serif;
@@ -50,109 +14,12 @@ li { list-style: none; }
 
 input, select { color: #333; }
 
-/* Modal dialog */
-
-.effeckt-modal-confirm,
-.effeckt-modal-cancel
-{
-	line-height: 1.75rem;
-	font-size: 1rem;
-	padding-left: 15px;
-	padding-right: 15px;
-}
-
-
-.md-modal {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	width: 50%;
-	max-width: 630px;
-	min-width: 320px;
-	height: auto;
-	z-index: 2000;
-	visibility: hidden;
-	backface-visibility: hidden;
-	transform: translateX(-50%) translateY(-50%);
-}
-
-.md-show {
-	visibility: visible;
-}
-
-.md-overlay {
-	position: fixed;
-	width: 100%;
-	height: 100%;
-	visibility: hidden;
-	top: 0;
-	left: 0;
-	z-index: 1000;
-	opacity: 0;
-	background: rgba(143,27,15,0.8);
-	transition: all 0.3s;
-}
-
-.md-show ~ .md-overlay {
-	opacity: 1;
-	visibility: visible;
-}
-
-
-.effeckt-modal-wrap {
-  transform: translate(-50%, -50%);
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 50%;
-  max-width: 320px;
-  min-width: 630px;
-  z-index: 2000;
-  display: none;
-}
-
-.effeckt-modal {
-  visibility: hidden;
-  backface-visibility: hidden;
-}
-
-.effeckt-show .effeckt-modal {
-  visibility: visible;
-}
-
-.effeckt-overlay.effeckt-show {
-  opacity: 1;
-  visibility: visible;
-}
-
-.effeckt-overlay {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  visibility: hidden;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  transition: 250ms;
-  z-index:1;
-  background-color:rgba(0,0,0,0.5);
-}
-
-/*
-  Individual modal styles with animations/transitions
-*/
-
-/* Effect 2: Slide from the right */
-
-.md-effect-2 .effeckt-modal {
-  transform: translateX(30%);
-  opacity: 0;
-  transition: 250ms cubic-bezier(0.25, 0.5, 0.5, 0.9);
-}
-
-.effeckt-show.md-effect-2 .effeckt-modal {
-  transform: translateX(0);
-  opacity: 1;
+/* Main layouts */
+body {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	overflow:hidden;
 }
 
 .hbox, .vbox {
@@ -187,16 +54,6 @@ input, select { color: #333; }
 .minimized { background-color: #222; width: 50px; flex: 0 0 auto; }
 
 .halfview, .fullview { justify-content: flex-start; }
-
-
-/* Flexbox layout! */
-/* Main layouts */
-body {
-	display: flex;
-	flex-direction: column;
-	height: 100vh;
-	overflow:hidden;
-}
 
 /* Touch style interface */
 html.layout-touch body, html.layout-touch>body>.vbox {
@@ -535,28 +392,14 @@ section,
 	height: 17px;
 }
 
-/*html.layout-touch .optionsbox {
-	top: auto;
-	left: 0;
-	right: 0;
-	bottom: 1vh;
-
-	margin: 0 2.5vw;
-
-	/*flex-direction: row;*/
-/*}*/
-
 .optionsbox {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-around;
-/*
-	border-width: 2px;
-	border-style: solid;*/
 }
 
-html.layout-touch section label /* to expand the hitbox */
-{
+/* to expand the hitbox */
+html.layout-touch section label {
 	display: flex;
 	flex: 1 1 auto;
 	justify-content: center;
@@ -724,31 +567,6 @@ html.layout-streambox #messagebox, html.layout-streambar #messagebox {
 	left: 15px;
 }
 
-/* Overrides on Topcoat */
-.topcoat-list__container { overflow-y: scroll; }
-.topcoat-list__item{ padding: 0.75rem 1.75rem; }
-.topcoat-switch { z-index: 1; }
-.topcoat-range { margin-top: .5em; width: 100%; }
-.topcoat-button-bar__item:first-child .topcoat-button--large--cta { border-top-right-radius: 0; border-bottom-right-radius:0; } /* fix CTA on button bar */
-.topcoat-button-bar__item:last-child .topcoat-button--large--cta { border-top-left-radius: 0; border-bottom-left-radius:0; }
-
-.topcoat-button-bar__item > .topcoat-button-bar__button:not(:first-child),
-.topcoat-button-bar__item > .topcoat-button-bar__button--large:not(:first-child)
-{ border-left: 0; }
-
-.topcoat-button-bar__item:last-child > .topcoat-button-bar__button:not(:last-child),
-.topcoat-button-bar__item:last-child > .topcoat-button-bar__button--large:not(:last-child)
-{ border-right: 0; }
-
-.btnmiddle { border-left: 0; border-right: 0; } /* odd that this would need to be overridden */
-legend { color: #DADADA; }
-
-/* This is removed by UnCSS, even with ignores. This SHOULD be temporary. */
-@keyframes moveIn {
-  to {
-    opacity: 1;
-    transform: translateX(0); } }
-
 
 h2 { margin: 0; } /* Firefox, wtf? */
 
@@ -769,100 +587,6 @@ h6 {
 
 input[type=number] {
     width: 3rem;
-}
-
-/* Syntax highlighting */
-pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
-.string { color: green; }
-.number { color: darkorange; }
-.boolean { color: blue; }
-.null { color: magenta; }
-.key { color: red; }
-
-/* Cordon overlay */
-.cordon { position: relative; }
-.cordon:before {
-	position:absolute;
-	content: 'Under Construction';
-	width: 100%;
-	height: 100%;
-	background-image: url("../img/ui/ui-bg_diagonals-thick_15_0b3e6f_40x40.png");
-	opacity: 0.35;
-	color: #FCFF63;
-	text-transform: uppercase;
-	text-align: center;
-	font-weight: bolder;
-}
-
-span.label { font-weight: bold; }
-span.value { font-style: italic; }
-
-.labelsmall {
-	margin: 0;
-	font-style: italic;
-	font-size: 85%;
-	color: #888; /* add text-shadow on non-mobiles */
-}
-
-/* styles for the slider bar */
-.measuremarks {
-	position: relative;
-	margin: 0 7px;
-	display: flex;
-	height: 1rem;
-}
-
-.measuremarks>div {
-	position: relative;
-	flex-grow: 1;
-	height:5px;
-	border-right: 1px solid #444;
-}
-
-.measuremarks>div:first-of-type {
-	border-left: 1px solid #444;
-}
-
-/* the numbers */
-.measuremarks span {
-	position: absolute;
-	font-size: 75%;
-	font-style: italic;
-	top: 100%;
-}
-.measuremarks>span {
-	left: -0.25rem; /* the minimum mark */
-	top: 5px; /* same as height */
-}
-.measuremarks>div>span {
-	right: -0.25rem;
-}
-
-
-.shade {
-	animate: all;
-	animation: unflip 0.5s ease-in-out;
-	animation-fill-mode:forwards;
-/*
-	background-image: url("../img/checkbox_unchecked_dark.png");
-*/
-}
-.expandedbutton { width: 16px; right: 4px; background-image: url("../img/checkbox_checked_dark.png"); }
-
-.flip {
-	transform: translate3d(0,0,0);
-	animation: flip 0.5s ease-in-out;
-	animation-fill-mode:forwards;
-}
-
-@keyframes flip {
-	0% { transform: rotateZ(0deg); }
-	100% { transform: rotateZ(180deg); }
-}
-
-@keyframes unflip {
-	0% { transform: rotateZ(180deg); }
-	100% { transform: rotateZ(360deg); }
 }
 
 .no-animation {
