@@ -119,7 +119,7 @@
 		this.playlists = {
 			"VIP": {
 				"url": "/roster.json",
-				//"url": "http://vip.aersia.net/roster.xml",
+				// "url": "http://vip.aersia.net/roster.xml",
 				"longName": "Vidya Intarweb Playlist",
 			},
 			"VIP - Source": {
