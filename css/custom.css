@@ -599,3 +599,12 @@ input[type=number] {
 	animation: none;
 	transition: none;
 }
+
+.release {
+	position: absolute;
+	bottom: 0%;
+	right: 12px;
+	z-index: 999;
+	pointer-events: none;
+	opacity: 0.5;
+}

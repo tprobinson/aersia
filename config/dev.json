@@ -1,0 +1,9 @@
+{
+  "development": 1,
+  "release": "δev",
+  "dirs": {
+      "output": "dev/",
+      "generated": "devgenerated/",
+      "themes": "config/themes/"
+  }
+}

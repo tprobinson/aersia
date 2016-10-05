@@ -20,6 +20,7 @@
     "grunt-html-validation": "^0.1.18",
     "grunt-image": "^1.0.4",
     "grunt-include-replace": "^3.2.0",
+    "grunt-jsonmin": "^0.2.4",
     "grunt-phplint": "0.0.8",
     "grunt-preprocess": "^5.0.1",
     "grunt-processhtml": "^0.3.8",

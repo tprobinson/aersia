@@ -1440,7 +1440,7 @@
 			var hash = this.decodeHash();
 			if( hash[0] !== false ) { this.selectedPlaylist = hash[0]; }
 
-			//Load up our playlist, this is async and will start playing automatically.
+			// Load up our playlist, this is async and will start playing automatically.
 			this.loadPlaylist(hash[1]);
 
 		}.bind(this);
