@@ -111,9 +111,9 @@ grunt.initConfig({
         livereload: true
       },
       files: [
-        'dist/**/*.html',
-        'dist/assets/css/{,*/}*.css',
-        'dist/assets/js/{,*/}*.js'
+        '<%= config.dirs.output %>**/*.html',
+        '<%= config.dirs.output %>assets/css/{,*/}*.css',
+        '<%= config.dirs.output %>assets/js/{,*/}*.js'
       ]
     }
   },
@@ -263,7 +263,7 @@ grunt.initConfig({
         port: 9001,
         protocol: 'http',
         hostname: 'localhost',
-        base: './dist/',  // '.' operates from the root of your Gruntfile, otherwise -> 'Users/user-name/www-directory/website-directory'
+        base: '<%= config.dirs.output %>',  // '.' operates from the root of your Gruntfile, otherwise -> 'Users/user-name/www-directory/website-directory'
         keepalive: false, // set to false to work side by side w/watch task.
         livereload: true,
         open: true
@@ -416,10 +416,10 @@ grunt.initConfig({
           'css/boilerplate.css',
           'css/topcoat-desktop-dark.css',
           'css/jqui-icons.css',
-          '<%= config.dirs.generated %>effeckt.css',
+          '<%= config.dirs.generated %>scss/effeckt.css',
           'node_modules/jsonlylightbox/css/lightbox.css',
           // '<%= config.dirs.generated %>simptip.css',
-          '<%= config.dirs.generated %>perfect-scrollbar.css',
+          '<%= config.dirs.generated %>scss/perfect-scrollbar.css',
           'css/custom.css'
         ],
         cwd: '',

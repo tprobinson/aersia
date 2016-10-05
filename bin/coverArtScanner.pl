@@ -13,7 +13,7 @@ use List::Util qw/any/;
 use Data::Dumper;
 
 # Get the root of this repo and change to it
-my $rootdir = `git rev-parse --show-toplevel`;
+chomp( my $rootdir = `git rev-parse --show-toplevel` );
 chdir($rootdir) || die "Could not move to $rootdir: $!";
 
 # As these are all regular expressions, rather than strict matches,
@@ -75,9 +75,13 @@ my %desired_titles = (
   'Media' => 4,
 );
 
+my $fullArtKey = 'fullArt';
+my $artKey = 'art';
+
 #Process dash options
 my ( $opt_namemapping, $opt_force, $opt_trace, $opt_quiet, $opt_reprocess, $opt_clean, $opt_only, $opt_manual, $opt_manual_grab );
 my $opt_env = 'default';
+my $opt_nameMappingFile = 'bin/nameMapping.json';
 
 GetOptions ('n|namemap!' => \$opt_namemapping,
             'r|reprocess!' => \$opt_reprocess,
@@ -96,14 +100,21 @@ if( ! -f "config/$opt_env.json" ) {
   die "Could not find config file $rootdir/config/$opt_env.json";
 }
 
-my $config = $json->decode("config/$opt_env.json");
+my $config = read_json($json,"config/$opt_env.json");
+
+my $agent = WWW::Mechanize->new(onerror => undef);
+
+my %unique_fullArts = ();
+my %unique_arts = ();
+
+my $playlist = read_json($json,'bin/roster.json') || die $!;
 
 if( $opt_clean )
 {
     map
     {
-        delete $_->{'art'};
-        delete $_->{'fullArt'};
+        delete $_->{$artKey};
+        delete $_->{$fullArtKey};
     } @$playlist;
 
     write_file( $config->{'dirs'}->{'generated'}.'roster_clean.json', $json->encode($playlist)) || die $!;
@@ -113,15 +124,8 @@ if( $opt_clean )
     exit 0;
 }
 
-
-my $agent = WWW::Mechanize->new();
-
-my %unique_arts = ();
-
-my $playlist = $json->decode(read_file('bin/roster.json')) || die $!;
-
 my $mapping;
-if( -f 'nameMapping.json' ) { $mapping = $json->decode(read_file('bin/nameMapping.json')) || die $!; }
+if( -f $opt_nameMappingFile ) { $mapping = read_json($json,$opt_nameMappingFile); }
 
 
 my $progress;
@@ -138,11 +142,11 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
     { next; }
 
     # If we have already scanned this game this run, skip.
-    if( defined $unique_arts{$game} )
+    if( defined $unique_fullArts{$game} )
     {
-        if( $unique_arts{$game} != 0 )
+        if( $unique_fullArts{$game} != 0 )
         {
-            $playlist->[$i]->{'fullArt'} = $unique_arts{$game};
+            $playlist->[$i]->{$fullArtKey} = $unique_fullArts{$game};
         }
         next GAME;
     }
@@ -150,12 +154,12 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
     # If we're forcing, remove any art we've already found for this item.
     if( $opt_force )
     {
-        delete $playlist->[$i]->{'art'};
-        delete $playlist->[$i]->{'fullArt'};
+        delete $playlist->[$i]->{$artKey};
+        delete $playlist->[$i]->{$fullArtKey};
     }
 
     # If this game already has art in the file (such as a re-run), skip.
-    if( defined $playlist->[$i]->{'art'} || defined $playlist->[$i]->{'fullArt'} )
+    if( defined $playlist->[$i]->{$artKey} || defined $playlist->[$i]->{$fullArtKey} )
     { next; }
 
     # Skip stuff at the front.
@@ -163,7 +167,8 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
         $game eq 'Vidya Intarweb Playlist' ||
         $game =~ /^MOTD/ ||
         $game eq 'Changelog' ||
-        $game eq 'Notice'
+        $game eq 'Notice' ||
+        $game eq 'All Tracks'
     ) { next GAME; }
 
 
@@ -188,16 +193,14 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
                 print "Enter a Mobygames-compatible name for $game, or 'skip'\n: ";
                 chomp($gameurl = <STDIN>);
 
-                if( $gameurl =~ /^\s*skip\s*$/i )
+                if( $gameurl =~ /^\s*skip\s*$/i || $gameurl eq '' )
                 {
-                    $unique_arts{$game} = 0;
+                    $unique_fullArts{$game} = 0;
                     next GAME;
                 }
 
                 # Check mobygames for this name.
-                $agent->get('http://www.mobygames.com/game/'. translate_game_to_url($gameurl) .'/cover-art') || die $!;
-
-                $content = $agent->content();
+                $content = goget($agent,'http://www.mobygames.com/game/'. translate_game_to_url($gameurl) .'/cover-art')->content();
                 if( $content !~ /The requested page could not be found, perhaps one of these games might be what you are looking for/ )
                 {
                     if( ! defined $mapping ) { $mapping = {}; }
@@ -205,7 +208,7 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
                     last NAMEMAP;
                 }
 
-                print "\n$gameurl was not found.\n";
+                warn "\n$gameurl was not found.\n";
             }
         }
         else { $gameurl = $game; }
@@ -215,13 +218,11 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
     if( ! defined $content )
     {
         # Check mobygames
-        $agent->get('http://www.mobygames.com/game/'. translate_game_to_url($gameurl) .'/cover-art') || die $!;
-
-        $content = $agent->content();
+        $content = goget($agent,'http://www.mobygames.com/game/'. translate_game_to_url($gameurl) .'/cover-art')->content();
         if( $content =~ /The requested page could not be found, perhaps one of these games might be what you are looking for/ )
         {
-            $unique_arts{$game} = 0;
-            print "Could not find Mobygames page for $game.";
+            $unique_fullArts{$game} = 0;
+            $progress->message("Could not find Mobygames page for $game.");
             next GAME;
         }
 
@@ -230,7 +231,7 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
     # We have our content.
     if( ! $tree->parse($content) )
     {
-        print "Webpage parse failed for $game";
+        warn "Webpage parse failed for $game";
         next;
     }
 
@@ -314,8 +315,8 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
     # Strip out the uniqueness-keys of thumbnail URLs when storing.
     my $fullart = [values %shots];
 
-    $playlist->[$i]->{'art'} = $fullart;
-    $unique_arts{$game} = $fullart;
+    $playlist->[$i]->{$fullArtKey} = $fullart;
+    $unique_fullArts{$game} = $fullart;
 
     if( ! $opt_quiet ) { print "\n"; }
 }
@@ -328,7 +329,7 @@ else {
     if ( ! -f $config->{'dirs'}->{'generated'}.'roster_fullArt.json' )
     { die 'Reprocess specified, but '.$config->{'dirs'}->{'generated'}."roster_fullArt.json does not exist.\n" }
 
-    $playlist = $json->decode(read_file( $config->{'dirs'}->{'generated'}.'roster_fullArt.json')) || die $!;
+    $playlist = read_json($json, $config->{'dirs'}->{'generated'}.'roster_fullArt.json');
 }
 
 # Go through and find the best art.
@@ -349,25 +350,27 @@ SONG: foreach my $song ( @$playlist )
   {
     if( $unique_arts{$game} != 0 )
     {
-      $song->{'art'} = $unique_arts{$game};
+      $song->{$artKey} = $unique_arts{$game};
+      delete $song->{$fullArtKey};
     }
     next SONG;
   }
   #
   # # If we're forcing, remove any art we've already processed for this item.
   # if( $opt_force )
-  # { delete $song->{'art'}; }
+  # { delete $song->{$artKey}; }
 
   # Skip stuff at the front.
   if (
     $game eq 'Vidya Intarweb Playlist' ||
     $game =~ /^MOTD/ ||
     $game eq 'Changelog' ||
-    $game eq 'Notice'
+    $game eq 'Notice' ||
+    $game eq 'All Tracks'
   ) { next SONG; }
 
   # If the game didn't get anything from MobyGames, skip.
-  if( ! defined $song->{'art'} )
+  if( ! defined $song->{$fullArtKey} )
   {
     print "$game has no art.\n";
     next SONG;
@@ -375,7 +378,7 @@ SONG: foreach my $song ( @$playlist )
 
   my $root = 'metadata';
 
-  foreach my $ref ( @{ $song->{'art'} } )
+  foreach my $ref ( @{ $song->{$fullArtKey} } )
   {
     $ref->{$root}->{'weight'} = 0;
     tracelog($game,'Weighting art: '.Dumper($ref));
@@ -476,14 +479,14 @@ SONG: foreach my $song ( @$playlist )
     }
   }
 
-  tracelog($game,"Cover weighting complete. Ranking:\n".Dumper($song->{'art'}));
+  tracelog($game,"Cover weighting complete. Ranking:\n".Dumper($song->{$fullArtKey}));
 
   # Take only the best of each cover type.
   my @fix;
   my %test;
-  $song->{'art'} = [sort { $b->{'metadata'}->{'weight'} <=> $a->{'metadata'}->{'weight'} } @{$song->{'art'}}];
+  $song->{$artKey} = [sort { $b->{'metadata'}->{'weight'} <=> $a->{'metadata'}->{'weight'} } @{$song->{$fullArtKey}}];
 
-  foreach my $item ( @{ $song->{'art'} } )
+  foreach my $item ( @{ $song->{$artKey} } )
   {
     if( ! defined $test{$item->{'title'}} )
     {
@@ -494,21 +497,25 @@ SONG: foreach my $song ( @$playlist )
 
   tracelog($game,"Deduplication complete. Ranking:\n".Dumper(\@fix));
 
-  $song->{'art'} = \@fix;
+  $song->{$artKey} = \@fix;
 
-  if( scalar @{$song->{'art'}} > 5 )
+  if( scalar @{$song->{$artKey}} > 5 )
   {
-    $song->{'art'} = [$song->{'art'}->[0..4]];
+    $song->{$artKey} = [$song->{$artKey}->[0..4]];
   }
 
-  tracelog($game,"Trimmed to 5. Ranking:\n".Dumper($song->{'art'}));
+  $unique_arts{$game} = $song->{$artKey};
 
-  map { delete $_->{'metadata'} } @{ $song->{'art'} };
+  tracelog($game,"Trimmed to 5. Ranking:\n".Dumper($song->{$artKey}));
+
+  map { delete $_->{'metadata'} } @{ $song->{$artKey} };
+
+  delete $song->{$fullArtKey};
 }
 
 write_file($config->{'dirs'}->{'generated'}.'roster_new.json', $json->encode($playlist)) || die $!;
 
-if( defined $mapping && scalar keys %$mapping > 0 ) { write_file('bin/nameMapping.json', $json->encode($mapping)) || die $!; }
+if( defined $mapping && scalar keys %$mapping > 0 ) { write_file($opt_nameMappingFile, $json->encode($mapping)) || die $!; }
 
 
 sub translate_game_to_url {
@@ -561,4 +568,27 @@ Usage: $0 [options]
     --env or -e
         Specifies the name of the json file to read from config. Similar to the Grunt option.
 EOF
+}
+
+sub goget {
+  my $agent = shift;
+  my $url = shift;
+
+  $agent->get($url) || die;
+
+  my $code = $agent->status();
+
+  if( $code >= 400 && $code != 404 ) {
+    die "Unable to get $url: code $code";
+  }
+
+  return $agent;
+}
+
+sub read_json {
+  my $json = shift;
+  my $file = shift;
+  print STDOUT "Decoding $file...\n";
+  my $contents = read_file($file) || die $!;
+  return $json->decode($contents);
 }
