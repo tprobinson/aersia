@@ -14,6 +14,7 @@ var pkg = grunt.file.readJSON( 'package.json' );
 grunt.template.addDelimiters('html-comments-delimiters', '<!--%', '-->');
 grunt.template.addDelimiters('php-comments-delimiters', '/*%', '*/');
 grunt.initConfig({
+  config: config,
   // Copied from Bootstrap
   banner: '/*!\n' +
   ' * '+ pkg.friendlyname +' v'+ pkg.version +'\n' +
@@ -273,7 +274,9 @@ grunt.initConfig({
   copy: {
     roster: {
       files: [
-        { expand: true, cwd: config.dirs.generated, src: ['./roster_new.json'], dest: '<%= config.dirs.output %>/roster.json' }
+        { expand: true, flatten: true, src: ['<%= config.dirs.generated %>roster_new.json'], dest: '<%= config.dirs.output %>',rename: function(dest, src) {
+        return dest + src.replace('roster_new','roster');
+        } }
       ]
     },
     flat: {
