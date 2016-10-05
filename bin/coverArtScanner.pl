@@ -12,6 +12,10 @@ use List::Util qw/any/;
 
 use Data::Dumper;
 
+# Get the root of this repo and change to it
+my $rootdir = `git rev-parse --show-toplevel`;
+chdir($rootdir) || die "Could not move to $rootdir: $!";
+
 # As these are all regular expressions, rather than strict matches,
 # be careful. E.g. "Wii" will match "Wii" and "Wii U"
 my %desired_platforms = (
@@ -33,15 +37,17 @@ my %desired_platforms = (
   'Xbox' => 1,
 
   # For mobile versions, these are usually good, but not as good as any existing PC versions.
-  'i(Phone|Pad)' => 5,
-  'Android' => 5,
+  'J2ME' => 5,
+  'i(Phone|Pad)' => 4,
+  'Android' => 4,
 );
 
 my %desired_attributes = (
   'Packaging' => {
-    # Prefer electronic for quality, keep case for authenticity, jewel case for aspect ratio.
+    # Prefer electronic for quality, keep case or box for authenticity, jewel case for aspect ratio.
     'Electronic' => 10,
     'Keep Case' => 9,
+    'Box' => 9,
     'Jewel Case' => 8,
   },
 
@@ -69,19 +75,9 @@ my %desired_titles = (
   'Media' => 4,
 );
 
-
-my $agent = WWW::Mechanize->new();
-
-my $playlist = decode_json(read_file('roster.json')) || die $!;
-
-my $mapping;
-if( -f 'nameMapping.json' ) { $mapping = decode_json(read_file('nameMapping.json')) || die $!; }
-
-my %unique_arts = ();
-
-
 #Process dash options
 my ( $opt_namemapping, $opt_force, $opt_trace, $opt_quiet, $opt_reprocess, $opt_clean, $opt_only, $opt_manual, $opt_manual_grab );
+my $opt_env = 'default';
 
 GetOptions ('n|namemap!' => \$opt_namemapping,
             'r|reprocess!' => \$opt_reprocess,
@@ -90,7 +86,17 @@ GetOptions ('n|namemap!' => \$opt_namemapping,
       			'f|force!' => \$opt_force,
             'c|clean!' => \$opt_clean,
             'o|only=s@' => \$opt_only,
+            'e|env=s' => \$opt_env,
 ) || die(Usage());
+
+my $json = JSON::MaybeXS->new('utf8' => 1, 'pretty' => 1);
+
+# Read the config file
+if( ! -f "config/$opt_env.json" ) {
+  die "Could not find config file $rootdir/config/$opt_env.json";
+}
+
+my $config = $json->decode("config/$opt_env.json");
 
 if( $opt_clean )
 {
@@ -100,12 +106,22 @@ if( $opt_clean )
         delete $_->{'fullArt'};
     } @$playlist;
 
-    write_file('../generated/roster_clean.json', encode_json($playlist)) || die $!;
+    write_file( $config->{'dirs'}->{'generated'}.'roster_clean.json', $json->encode($playlist)) || die $!;
 
     print "Cleaned roster of all art, output to roster_clean.json.\n";
 
     exit 0;
 }
+
+
+my $agent = WWW::Mechanize->new();
+
+my %unique_arts = ();
+
+my $playlist = $json->decode(read_file('bin/roster.json')) || die $!;
+
+my $mapping;
+if( -f 'nameMapping.json' ) { $mapping = $json->decode(read_file('bin/nameMapping.json')) || die $!; }
 
 
 my $progress;
@@ -304,15 +320,15 @@ GAME: foreach my $i ( 0..((scalar @{$playlist}) - 1) ) {
     if( ! $opt_quiet ) { print "\n"; }
 }
 
-write_file('../generated/roster_fullArt.json', encode_json($playlist)) || die $!;
+write_file( $config->{'dirs'}->{'generated'}.'roster_fullArt.json', $json->encode($playlist)) || die $!;
 print "Art retrieved, post-processing.\n";
 
 } # If we're reprocessing, we've skipped all the art retrieval.
 else {
-    if ( ! -f '../generated/roster_fullArt.json' )
-    { die "Reprocess specified, but ../generated/roster_fullArt.json does not exist.\n" }
+    if ( ! -f $config->{'dirs'}->{'generated'}.'roster_fullArt.json' )
+    { die 'Reprocess specified, but '.$config->{'dirs'}->{'generated'}."roster_fullArt.json does not exist.\n" }
 
-    $playlist = decode_json(read_file('../generated/roster_fullArt.json')) || die $!;
+    $playlist = $json->decode(read_file( $config->{'dirs'}->{'generated'}.'roster_fullArt.json')) || die $!;
 }
 
 # Go through and find the best art.
@@ -490,9 +506,9 @@ SONG: foreach my $song ( @$playlist )
   map { delete $_->{'metadata'} } @{ $song->{'art'} };
 }
 
-write_file('../generated/roster_new.json', encode_json($playlist)) || die $!;
+write_file($config->{'dirs'}->{'generated'}.'roster_new.json', $json->encode($playlist)) || die $!;
 
-if( defined $mapping && scalar keys %$mapping > 0 ) { write_file('nameMapping.json', encode_json($mapping)) || die $!; }
+if( defined $mapping && scalar keys %$mapping > 0 ) { write_file('bin/nameMapping.json', $json->encode($mapping)) || die $!; }
 
 
 sub translate_game_to_url {
@@ -541,5 +557,8 @@ Usage: $0 [options]
 
     --reprocess or -r
         Only runs the second, post-scanning step. This is only useful when changing weights or weighting algorithms.
+
+    --env or -e
+        Specifies the name of the json file to read from config. Similar to the Grunt option.
 EOF
 }

@@ -3,11 +3,10 @@
 !/node_modules/perfect-scrollbar
 
 /dist
-/dist/*
+/dev
 
 /generated
-/generated/*
+/devgenerated
 
 npm-debug.log
 .grunt/
-

@@ -1,2 +1,9 @@
 {
+  "development": 0,
+  "release": "βeta",
+  "dirs": {
+      "output": "dist/",
+      "generated": "generated/",
+      "themes": "config/themes/"
+  }
 }

@@ -10,12 +10,6 @@ require('jit-grunt')(grunt);
 
 var config = grunt.file.readJSON( 'config/'+ (grunt.option('env') || 'default') +'.json' );
 var pkg = grunt.file.readJSON( 'package.json' );
-var development = 1;
-var dirs = {
-    output: "dist/",
-    generated: "generated/",
-    themes: "config/themes/",
-};
 
 grunt.template.addDelimiters('html-comments-delimiters', '<!--%', '-->');
 grunt.template.addDelimiters('php-comments-delimiters', '/*%', '*/');
@@ -26,13 +20,11 @@ grunt.initConfig({
   ' * This file is compiled using Grunt.\n' +
   ' */\n',
 
-  dirs: dirs, //this is stupid and I am probably doing something wrong
-
   modernizr: {
     dist: {
       "crawl": false,
       "customTests": [],
-      "dest": "<%= dirs.output %>assets/js/modernizr.js",
+      "dest": "<%= config.dirs.output %>assets/js/modernizr.js",
       "tests": [
         "audio",
         "cookies",
@@ -58,9 +50,9 @@ grunt.initConfig({
     css: {
       files: [
         'node_modules/normalize.css/normalize.css',
-        '<%= dirs.generated %>effeckt.css',
-        '<%= dirs.generated %>simptip.css',
-        '<%= dirs.generated %>perfect-scrollbar.css',
+        '<%= config.dirs.generated %>effeckt.css',
+        '<%= config.dirs.generated %>simptip.css',
+        '<%= config.dirs.generated %>perfect-scrollbar.css',
         'css/*.css'
       ],
       tasks: ['update-css']
@@ -78,7 +70,7 @@ grunt.initConfig({
         'node_modules/js-logger/src/logger.js',
         'js/modules/*.js',
         'js/polyfills/*.js',
-        '<%= dirs.generated %>modernizr.js',
+        '<%= config.dirs.generated %>modernizr.js',
       ],
       tasks: ['update-js']
     },
@@ -130,7 +122,7 @@ grunt.initConfig({
       files : [{
         src : ['*.scss', 'effeckts/*.scss','modules/*.scss'],
         cwd : 'scss',
-        dest : '<%= dirs.generated %>scss/',
+        dest : '<%= config.dirs.generated %>scss/',
         ext : '.css',
         expand : true
       }],
@@ -140,7 +132,7 @@ grunt.initConfig({
     },
     ps: {
       files : {
-        '<%= dirs.generated %>scss/perfect-scrollbar.css': 'node_modules/perfect-scrollbar/src/css/main.scss',
+        '<%= config.dirs.generated %>scss/perfect-scrollbar.css': 'node_modules/perfect-scrollbar/src/css/main.scss',
       },
       options: {
         style: 'compressed'
@@ -149,22 +141,22 @@ grunt.initConfig({
   },
 
   template: {
-    html: { files: [{ dest: '<%= dirs.output %>', src: '*.html', cwd: 'html', expand:true }],
+    html: { files: [{ dest: '<%= config.dirs.output %>', src: '*.html', cwd: 'html', expand:true }],
       options: {
         delimiters: 'html-comments-delimiters',
         data: function() {
           //Provide the generated SVGSTORE file
-          var iconstring = grunt.file.read(dirs.generated+'icons.include');
+          var iconstring = grunt.file.read(config.dirs.generated+'icons.include');
           iconstring = iconstring.replace(new RegExp('viewBox'),'style="visibility:hidden;width:0;height:0;" viewBox');
 
-          var layoutstring = grunt.file.read(dirs.generated+'layouts.include');
+          var layoutstring = grunt.file.read(config.dirs.generated+'layouts.include');
           layoutstring = layoutstring.replace(new RegExp('viewBox'),'style="visibility:hidden;width:0;height:0;" viewBox');
 
           //Provide the generated favicon markup
-          var favicons = grunt.file.read(dirs.generated+'favicon.html');
+          var favicons = grunt.file.read(config.dirs.generated+'favicon.html');
 
           // Provide all required CSS dependencies
-          if( development ) {
+          if( config.development ) {
             cssdeps = `
     <link rel="stylesheet" href="assets/css/normalize.css">
     <link rel="stylesheet" href="assets/css/boilerplate.css">
@@ -182,7 +174,7 @@ grunt.initConfig({
 `;
           }
 
-          if( development ) {
+          if( config.development ) {
             jsdeps = `
     <script src="assets/js/angular.js"></script>
     <script src="assets/js/plugins.js"></script>
@@ -202,12 +194,13 @@ grunt.initConfig({
             favicons: favicons,
             cssdeps: cssdeps,
             jsdeps: jsdeps,
+            release: config.release,
           };
         }
       }
     },
 
-    // php: { files: [{ dest: '<%= dirs.output %>', src: '*.php', cwd: 'html', expand:true }],
+    // php: { files: [{ dest: '<%= config.dirs.output %>', src: '*.php', cwd: 'html', expand:true }],
     //   options: {
     //     delimiters: 'php-comments-delimiters',
     //     data: function() { return {
@@ -216,13 +209,13 @@ grunt.initConfig({
     //   }
     // },
 
-    js: { files: [{ dest: '<%= dirs.generated %>', src: 'js/main.js', expand:true }],
+    js: { files: [{ dest: '<%= config.dirs.generated %>', src: 'js/main.js', expand:true }],
       options: {
         delimiters: 'php-comments-delimiters',
         data: function() {
           //moar stuff here
           var themestring = '';
-          grunt.file.recurse(dirs.themes, function callback(abspath, rootdir, subdir, filename) {
+          grunt.file.recurse(config.dirs.themes, function callback(abspath, rootdir, subdir, filename) {
             var themename = filename.replace(new RegExp('\.json'),'');
             var contents = grunt.file.read(abspath);
             themestring += '"'+themename+'": ' + contents + ',\n';
@@ -256,11 +249,11 @@ grunt.initConfig({
 
   // 'html-validation': {
   //   options: {  failHard: true },
-  //   files: {src: ['<%= dirs.output %>*.html'] },
+  //   files: {src: ['<%= config.dirs.output %>*.html'] },
   // },
 
   phplint: {
-    files: ['<%= dirs.output %>*.php']
+    files: ['<%= config.dirs.output %>*.php']
   },
 
   connect: {
@@ -278,36 +271,41 @@ grunt.initConfig({
   },
 
   copy: {
+    roster: {
+      files: [
+        { expand: true, cwd: config.dirs.generated, src: ['./roster_new.json'], dest: '<%= config.dirs.output %>/roster.json' }
+      ]
+    },
     flat: {
       files: [
-        { expand: true, cwd: './flat', src: ['./**/*.xml','./**/*.txt'], dest: '<%= dirs.output %>' }
+        { expand: true, cwd: './flat', src: ['./**/*.xml','./**/*.txt','./**/*.json'], dest: '<%= config.dirs.output %>' }
       ]
     },
     html: {
       files: [
-        { expand: true, cwd: '<%= dirs.generated %>html', src: ['*.html'], dest: '<%= dirs.output %>' }
+        { expand: true, cwd: '<%= config.dirs.generated %>html', src: ['*.html'], dest: '<%= config.dirs.output %>' }
       ]
     },
     imgflat: {
       files: [
-        { expand: true, cwd: '<%= dirs.generated %>/img', src: ['./**/*.*'], dest: '<%= dirs.output %>assets/img' },
+        { expand: true, cwd: '<%= config.dirs.generated %>/img', src: ['./**/*.*'], dest: '<%= config.dirs.output %>assets/img' },
       ]
     },
     js: {
       files: [
-        { expand: true, flatten: true, src: ['<%= dirs.generated %>plugins.js'], dest: '<%= dirs.output %>assets/js/' }
+        { expand: true, flatten: true, src: ['<%= config.dirs.generated %>plugins.js'], dest: '<%= config.dirs.output %>assets/js/' }
       ]
     },
     mainjs: {
       files: [
-        { expand: true, flatten: true, src: ['<%= dirs.generated %>js/main.js'], dest: '<%= dirs.output %>assets/js/' }
+        { expand: true, flatten: true, src: ['<%= config.dirs.generated %>js/main.js'], dest: '<%= config.dirs.output %>assets/js/' }
       ]
     },
     nodeModules: {
       files: [
         { expand: true, flatten:true, src: [
           'node_modules/angular/angular.js',
-        ], dest: '<%= dirs.output %>assets/js' }
+        ], dest: '<%= config.dirs.output %>assets/js' }
       ]
     }
   },
@@ -323,7 +321,7 @@ grunt.initConfig({
           '../css/boilerplate.css',
           '../css/topcoat-desktop-dark.css',
           '../css/jqui-icons.css',
-          /*'../<%= dirs.generated %>effeckt.css'*/
+          /*'../<%= config.dirs.generated %>effeckt.css'*/
         ],
         ignore: [
           // /topcoat-button-bar/,
@@ -346,7 +344,7 @@ grunt.initConfig({
         ]
       },
       files: {
-        '<%= dirs.generated %>tidy.css': ['html/index.html']
+        '<%= config.dirs.generated %>tidy.css': ['html/index.html']
       }
     }
   },
@@ -385,21 +383,21 @@ grunt.initConfig({
         //My libraries
         'js/modules/library.js',
       ],
-      dest: '<%= dirs.generated %>plugins.js'
+      dest: '<%= config.dirs.generated %>plugins.js'
     },
     tidycss: {
       src: [
-        '<%= dirs.generated %>tidy.css',
-        '<%= dirs.generated %>scss/effeckt.css',
-        // '<%= dirs.generated %>scss/simptip.css',
+        '<%= config.dirs.generated %>tidy.css',
+        '<%= config.dirs.generated %>scss/effeckt.css',
+        // '<%= config.dirs.generated %>scss/simptip.css',
         'node_modules/jsonlylightbox/css/lightbox.css',
 
         'css/jqui-icons.css',
 
-        '<%= dirs.generated %>scss/perfect-scrollbar.css',
+        '<%= config.dirs.generated %>scss/perfect-scrollbar.css',
         'css/custom.css'
       ],
-      dest: '<%= dirs.generated %>tidy.concat.css'
+      dest: '<%= config.dirs.generated %>tidy.concat.css'
     }
   },
 
@@ -415,14 +413,14 @@ grunt.initConfig({
           'css/boilerplate.css',
           'css/topcoat-desktop-dark.css',
           'css/jqui-icons.css',
-          '<%= dirs.generated %>effeckt.css',
+          '<%= config.dirs.generated %>effeckt.css',
           'node_modules/jsonlylightbox/css/lightbox.css',
-          // '<%= dirs.generated %>simptip.css',
-          '<%= dirs.generated %>perfect-scrollbar.css',
+          // '<%= config.dirs.generated %>simptip.css',
+          '<%= config.dirs.generated %>perfect-scrollbar.css',
           'css/custom.css'
         ],
         cwd: '',
-        dest: '<%= dirs.output %>assets/css',
+        dest: '<%= config.dirs.output %>assets/css',
         expand: true,
         flatten: true,
       }]
@@ -432,7 +430,7 @@ grunt.initConfig({
         browsers: ['last 3 versions', '> 1%', 'Safari >= 6']
       },
       files: [{
-        src : ['<%= dirs.generated %>tidy.concat.css'],
+        src : ['<%= config.dirs.generated %>tidy.concat.css'],
         cwd : '',
         dest : '.',
         expand : true
@@ -447,7 +445,7 @@ grunt.initConfig({
     },
     tidy: {
       files: {
-        '<%= dirs.output %>assets/css/tidy.min.css': ['<%= dirs.generated %>tidy.concat.css'],
+        '<%= config.dirs.output %>assets/css/tidy.min.css': ['<%= config.dirs.generated %>tidy.concat.css'],
       }
     }
   },
@@ -471,7 +469,7 @@ grunt.initConfig({
         cwd: 'img/flat/',
         src: ['**/*.*'],
         expand: true,
-        dest: '<%= dirs.generated %>img/'
+        dest: '<%= config.dirs.generated %>img/'
       }]
     },
     icons: {
@@ -479,7 +477,7 @@ grunt.initConfig({
         cwd: 'img/icons/',
         src: ['**/*.*'],
         expand: true,
-        dest: '<%= dirs.generated %>icons/'
+        dest: '<%= config.dirs.generated %>icons/'
       }]
     },
     layouts: {
@@ -487,7 +485,7 @@ grunt.initConfig({
         cwd: 'img/layouts/',
         src: ['**/*.*'],
         expand: true,
-        dest: '<%= dirs.generated %>layouts/'
+        dest: '<%= config.dirs.generated %>layouts/'
       }]
     },
     favicons: {
@@ -495,7 +493,7 @@ grunt.initConfig({
         cwd: 'img/',
         src: ['aersia.svg','aersia-silhouette.svg'],
         expand: true,
-        dest: '<%= dirs.generated %>img/'
+        dest: '<%= config.dirs.generated %>img/'
       }]
     }
   },
@@ -512,7 +510,7 @@ grunt.initConfig({
         }
       },
       files: {
-        '<%= dirs.generated %>icons.include': ['<%= dirs.generated %>icons/*.svg'],
+        '<%= config.dirs.generated %>icons.include': ['<%= config.dirs.generated %>icons/*.svg'],
       }
     },
     layouts: {
@@ -525,7 +523,7 @@ grunt.initConfig({
         }
       },
       files: {
-        '<%= dirs.generated %>layouts.include': ['<%= dirs.generated %>layouts/*.svg'],
+        '<%= config.dirs.generated %>layouts.include': ['<%= config.dirs.generated %>layouts/*.svg'],
       }
     }
   },
@@ -533,7 +531,7 @@ grunt.initConfig({
   sass_globbing: {
     effeckt: {
       files: {
-        '<%= dirs.generated %>effeckt_importMap.scss': 'scss/modules/**/*.scss',
+        '<%= config.dirs.generated %>effeckt_importMap.scss': 'scss/modules/**/*.scss',
       }
     }
   },
@@ -547,10 +545,10 @@ grunt.initConfig({
         screw_ie8: true,
         reserveDOMProperties: true,
         mangleProperties: true,
-        nameCache: '<%= dirs.generated %>grunt-uglify-cache.json',
+        nameCache: '<%= config.dirs.generated %>grunt-uglify-cache.json',
 
         sourceMap: true,
-        sourceMapName: '<%= dirs.generated %>sourceMap.map',
+        sourceMapName: '<%= config.dirs.generated %>sourceMap.map',
         toplevel: true,
       },
       compress: {
@@ -575,10 +573,10 @@ grunt.initConfig({
     },
     all: {
       files: {
-        '<%= dirs.output %>assets/js/main.min.js': [
+        '<%= config.dirs.output %>assets/js/main.min.js': [
           'node_modules/angular/angular.js',
-          '<%= dirs.generated %>plugins.js',
-          '<%= dirs.generated %>main.templated.js',
+          '<%= config.dirs.generated %>plugins.js',
+          '<%= config.dirs.generated %>main.templated.js',
         ]
       }
     }
@@ -595,11 +593,11 @@ grunt.initConfig({
 
 	realFavicon: {
 		favicons: {
-			src: '<%= dirs.generated %>img/aersia.svg',
-			dest: '<%= dirs.output %>',
+			src: '<%= config.dirs.generated %>img/aersia.svg',
+			dest: '<%= config.dirs.output %>',
 			options: {
 				iconsPath: '/',
-				html: [ '<%= dirs.generated %>favicon.html' ],
+				html: [ '<%= config.dirs.generated %>favicon.html' ],
 				design: {
 					ios: {
 						pictureAspect: 'backgroundAndMargin',
@@ -611,7 +609,7 @@ grunt.initConfig({
 					windows: {
 						masterPicture: {
 							type: 'inline',
-							content: '<%= dirs.generated %>img/aersia-silhouette.svg',
+							content: '<%= config.dirs.generated %>img/aersia-silhouette.svg',
 						},
 						pictureAspect: 'whiteSilhouette',
 						backgroundColor: '#da532c',
@@ -632,7 +630,7 @@ grunt.initConfig({
 					safariPinnedTab: {
 						masterPicture: {
 							type: 'inline',
-							content: '<%= dirs.generated %>img/aersia-silhouette.svg',
+							content: '<%= config.dirs.generated %>img/aersia-silhouette.svg',
 						},
 						pictureAspect: 'silhouette',
 						themeColor: '#183C63'
@@ -645,7 +643,19 @@ grunt.initConfig({
 				}
 			}
 		}
-	}
+	},
+
+  jsonmin: {
+    roster: {
+      options: {
+        stripWhitespace: true,
+        stripComments: true,
+      },
+      files: {
+        '<%= config.dirs.output %>roster.json': '<%= config.dirs.generated %>roster_new.json',
+      },
+    }
+  }
 
 });
 
@@ -653,7 +663,38 @@ grunt.registerTask('js', ['concat:js','copy:js','copy:nodeModules','template:js'
 grunt.registerTask('dev', ['connect', 'watch']);
 grunt.registerTask('watchnow', ['watch']);
 
-grunt.registerTask('full-deploy', [
+grunt.registerTask('full-deploy', 'Deploys the entire app', function() { list = [
+  [
+      // Build node-modules
+      'shell:ps','shell:logger',
+
+      // Compile SCSS files
+      'sass_globbing:effeckt','sass', // these feed into CSS
+
+      // Compile CSS files
+      'uncss:tidy','concat:tidycss','autoprefixer:tidy','cssmin:tidy', // ends up as tidy.min.css
+
+      // Put together the JS files
+      'modernizr', // goes in as its own file
+      'concat:js','copy:js','copy:nodeModules', //ends up as plugins.js
+      'template:js','uglify:all', // ends up as main.js
+
+      // Prepare static resources
+      'image:icons','svgstore:icons', // img/icons
+      'image:layouts','svgstore:layouts', // img/layouts
+      'image:favicons','realFavicon', // img/aersia.svg and silhouette
+
+      'image:imgflat','copy:imgflat', //img/flat
+
+      // Prepare HTML -- this happens last so we can read dirs for deps
+      'template:html',
+
+      // Copy the roster, minified
+      'jsonmin:roster',
+
+      // Copy all unprocessed files over
+      'copy:flat',
+  ], [
     // Build node-modules
     'shell:ps','shell:logger',
 
@@ -677,47 +718,35 @@ grunt.registerTask('full-deploy', [
 
     // Prepare HTML -- this happens last so we can read dirs for deps
     'template:html',
+
+    // Copy the roster
+    'copy:roster',
+
     // Copy all unprocessed files over
     'copy:flat',
-]);
-
-grunt.registerTask('full-prod-deploy', [
-    'set-prod',
-    // Build node-modules
-    'shell:ps','shell:logger',
-
-    // Compile SCSS files
-    'sass_globbing:effeckt','sass', // these feed into CSS
-
-    // Compile CSS files
-    'uncss:tidy','concat:tidycss','autoprefixer:tidy','cssmin:tidy', // ends up as tidy.min.css
-
-    // Put together the JS files
-    'modernizr', // goes in as its own file
-    'concat:js','copy:js','copy:nodeModules', //ends up as plugins.js
-    'template:js','uglify:all', // ends up as main.js
-
-    // Prepare static resources
-    'image:icons','svgstore:icons', // img/icons
-    'image:layouts','svgstore:layouts', // img/layouts
-    'image:favicons','realFavicon', // img/aersia.svg and silhouette
-
-    'image:imgflat','copy:imgflat', //img/flat
-
-    // Prepare HTML -- this happens last so we can read dirs for deps
-    'template:html',
-    // Copy all unprocessed files over
-    'copy:flat',
-]);
+  ]];
+  grunt.task.run(list[config.development]);
+});
 
 // Tasks to completely update one resource
 grunt.registerTask('update-scss',['sass_globbing:effeckt','sass','update-css']);
-grunt.registerTask('update-css',['uncss:tidy','concat:tidycss','autoprefixer:tidy','cssmin:tidy']);
+grunt.registerTask('update-css','updates CSS', function() { list = [
+    ['uncss:tidy','concat:tidycss','autoprefixer:tidy','cssmin:tidy'],
+    ['autoprefixer:dev'],
+  ];
+  grunt.task.run(list[config.development]);
+});
 
 grunt.registerTask('update-html',['template:html']);
 
 grunt.registerTask('update-js',['concat:js','copy:js','copy:nodeModules']);
-grunt.registerTask('update-mainjs',['template:js','copy:mainjs',]);
+
+grunt.registerTask('update-mainjs','Updates the main JS file', function() { list = [
+    ['template:js','uglify:all'],
+    ['template:js','copy:mainjs'],
+  ];
+  grunt.task.run(list[config.development]);
+});
 
 grunt.registerTask('update-imgflat',['image:imgflat','copy:imgflat']);
 grunt.registerTask('update-icons',['image:icons','svgstore:icons','template:html']);
@@ -725,10 +754,8 @@ grunt.registerTask('update-layouts',['image:layouts','svgstore:layouts','templat
 grunt.registerTask('update-favicons',['image:favicons','realFavicon']);
 
 // grunt.registerTask('mkdir','Creates directories in the deploy dir.',function() {
-//   grunt.log.ok('Creating directory '+dirs.output+'config');
-//   grunt.file.mkdir(dirs.output+'config');
+//   grunt.log.ok('Creating directory '+config.dirs.output+'config');
+//   grunt.file.mkdir(config.dirs.output+'config');
 // });
-
-grunt.registerTask('set-prod','sets var',function() { development = 0; });
 
 };
