@@ -1,8 +1,95 @@
+# Aersia Player
+
+<!-- MDTOC maxdepth:1 firsth1:0 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
+
+- [Usage and Development](#usage-and-development)   
+- [Changelog](#changelog)   
+- [Previous Versions](#previous-versions)   
+- [License](#license)   
+
+<!-- /MDTOC -->
+
 Replacing Aersia's Flash-based player!
 
-Released under the [MIT License](https://www.tldrlegal.com/l/mit)
+This is primarily a Javascript-based music player.
 
-# Done in version 0.1.1:
+
+## Usage and Development
+
+Examples given are of an Ubuntu system. Some processes may not work exactly as shown.
+
+Install Node.js and NPM on your system:
+
+```shell
+sudo apt install nodejs npm
+sudo npm install -g n
+sudo n stable
+sudo npm install -g npm
+```
+
+Checkout this repository:
+
+```shell
+# The recursive flag is important to get submodules
+git clone --recursive <this checkout url>
+cd aersia
+```
+
+Install dependencies:
+
+```shell
+npm install
+
+cd node_modules/js-logger
+npm install
+cd -
+
+cd node_modules/perfect-scrollbar
+npm install
+cd -
+```
+
+**Temporary step:** edit the node_modules/js-logger/gulpfile and remove the inside of the 'test' task. This is broken, and I don't know why.
+
+```js
+gulp.task('test', [ 'version' ], function () {
+});
+```
+
+Run the full deploy:
+```shell
+grunt full-deploy
+# or
+grunt --env=dev full-deploy
+```
+
+Open a web browser to see and work on the app:
+```shell
+grunt dev
+# or
+grunt --env=dev dev
+```
+
+
+## Changelog
+#### Done in version 0.1.2:
+* Internals
+    * Reworked the internal build process to support a 'dev' and 'prod' branch
+    * Added a little overlay to show the build type.
+    * Reworked most of the actual pipeline, resulting in minified CSS and uglified JS
+
+* Player
+    * Updated the playlist to the Sept 7th update
+
+
+#### Planned for the next version:
+* Fixing some layout issues in the options box. Making Streambox less dynamic?
+
+#### Planned for the future:
+* Mobile support?
+
+## Previous Versions
+### 0.1.1
 * Internals
     * Corrected an error in playlist sorting, Angular does not preserve the original index pre-sort.
     * Reduced CPU usage in timelineUpdate() by caching bounding rectangles.
@@ -14,16 +101,7 @@ Released under the [MIT License](https://www.tldrlegal.com/l/mit)
     * Removed the Recent News tab, as it doesn't do anything.
     * Removed the "album" listing.
 
-
-#Planned for the next version:
-* Fixing some layout issues in the options box. Making Streambox less dynamic?
-
-#Planned for the future:
-* Mobile support?
-* Compile the JS
-
-##Previous Versions
-###0.1.0:
+### 0.1.0
 * Internals
     * Allowed both XML and JSON formats to be loaded as playlists. This functionality, along with the ability to parse XML, will probably be removed later.
     * Object-fit polyfill included, for browsers that don't support it.
@@ -37,7 +115,7 @@ Released under the [MIT License](https://www.tldrlegal.com/l/mit)
 * Layouts
     * Song art properly included and a few things were locked down to make sure the art doesn't "escape".
 
-###0.0.6
+### 0.0.6
 * Internals
     * Removed more broken Angular code
     * Layout fixes and automatic correction of when the layout changes.
@@ -47,7 +125,7 @@ Released under the [MIT License](https://www.tldrlegal.com/l/mit)
     * Streambox, a stubby version of the Current Song tab.
     * Streambar, the top controls bar and nothing else.
 
-###0.0.5
+### 0.0.5
 * Song information panel
  * Toggle shuffling to current song
  * Direct download
@@ -58,7 +136,7 @@ Released under the [MIT License](https://www.tldrlegal.com/l/mit)
  * Check available filetypes for each song and choose best available
  * Generated favicons for every platform
 
-###0.0.4
+### 0.0.4
 * Rebranding from VIP to Aersia
 * Play history
  * Player tracks up to 100 songs of history, and Prev button will go back in this list.
@@ -75,16 +153,19 @@ Released under the [MIT License](https://www.tldrlegal.com/l/mit)
  * Partially rewrote modules/tabs.js to use data tags instead of href, as that can interfere with link sharing
 * Updated robots.txt and humans.txt
 
-###0.0.3
+### 0.0.3
 * Increase the size of the playlist items on the touch interface
 * Add some support for saving/loading/remembering themes, so if a user sets it the app will read a cookie to get their preferences, or presets.
 * Re-style the Options box to use the right colors.
 * Make some icons so the site will show the right graphics on the Chrome New Tab, Mozilla Recent Tabs, or Windows Metro UI panels.
 * Allow switching between the different playlists.
 
-###0.0.2
+### 0.0.2
 * Added a new font, "Titillium Web".
 * Added an options menu, accessible by clicking the gear next to the Fullscreen button.
 * Added a touch-style interface, automatically applied on all touchscreen devices, manually toggleable in the Options menu.
 * Added some themeing support. Currently, it doesn't change the gradients on the controls bar.
 * Added scrolling animation on the list when a new song is played.
+
+## License
+Released under the [MIT License](https://www.tldrlegal.com/l/mit)

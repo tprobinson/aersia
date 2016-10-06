@@ -579,7 +579,6 @@ grunt.initConfig({
         join_vars: true,
         cascade: true,
         collapse_vars: true,
-        passes: 3,
       }
     },
     all: {
