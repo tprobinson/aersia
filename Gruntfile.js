@@ -51,7 +51,7 @@ grunt.initConfig({
     css: {
       files: [
         'node_modules/normalize.css/normalize.css',
-        '<%= config.dirs.generated %>effeckt.css',
+        '<%= config.dirs.generated %>scss/effeckt.css',
         '<%= config.dirs.generated %>simptip.css',
         '<%= config.dirs.generated %>perfect-scrollbar.css',
         'css/*.css'
@@ -121,9 +121,9 @@ grunt.initConfig({
   sass: {
     build: {
       files : [{
-        src : ['*.scss', 'effeckts/*.scss','modules/*.scss'],
-        cwd : 'scss',
-        dest : '<%= config.dirs.generated %>scss/',
+        src : ['<%= config.dirs.generated %>/effeckt_importMap.scss','scss/*.scss', 'scss/effeckts/*.scss','scss/modules/*.scss'],
+        // cwd : 'scss',
+        dest : '<%= config.dirs.generated %>',
         ext : '.css',
         expand : true
       }],
@@ -163,7 +163,7 @@ grunt.initConfig({
     <link rel="stylesheet" href="assets/css/boilerplate.css">
     <link rel="stylesheet" href="assets/css/topcoat-desktop-dark.css">
     <link rel="stylesheet" href="assets/css/jqui-icons.css">
-    <link rel="stylesheet" href="assets/css/effeckt.css">
+    <link rel="stylesheet" href="assets/css/effeckt.concat.css">
     <link rel="stylesheet" href="assets/css/lightbox.css">
     <link rel="stylesheet" href="assets/css/simptip.css">
     <link rel="stylesheet" href="assets/css/perfect-scrollbar.css">
@@ -388,6 +388,13 @@ grunt.initConfig({
       ],
       dest: '<%= config.dirs.generated %>plugins.js'
     },
+    cssdev: {
+      src: [
+        '<%= config.dirs.generated %>scss/modules/*',
+        '<%= config.dirs.generated %>scss/effeckt.css',
+      ],
+      dest: '<%= config.dirs.generated %>effeckt.concat.css'
+    },
     tidycss: {
       src: [
         '<%= config.dirs.generated %>tidy.css',
@@ -416,7 +423,7 @@ grunt.initConfig({
           'css/boilerplate.css',
           'css/topcoat-desktop-dark.css',
           'css/jqui-icons.css',
-          '<%= config.dirs.generated %>scss/effeckt.css',
+          '<%= config.dirs.generated %>effeckt.concat.css',
           'node_modules/jsonlylightbox/css/lightbox.css',
           // '<%= config.dirs.generated %>simptip.css',
           '<%= config.dirs.generated %>scss/perfect-scrollbar.css',
@@ -672,7 +679,7 @@ grunt.registerTask('full-deploy', 'Deploys the entire app', function() { list = 
       'shell:ps','shell:logger',
 
       // Compile SCSS files
-      'sass_globbing:effeckt','sass', // these feed into CSS
+      'sass_globbing:effeckt','sass-glob-prepare','sass', // these feed into CSS
 
       // Compile CSS files
       'uncss:tidy','concat:tidycss','autoprefixer:tidy','cssmin:tidy', // ends up as tidy.min.css
@@ -702,7 +709,7 @@ grunt.registerTask('full-deploy', 'Deploys the entire app', function() { list = 
     'shell:ps','shell:logger',
 
     // Compile SCSS files
-    'sass_globbing:effeckt','sass', // these feed into CSS
+    'sass_globbing:effeckt','sass-glob-prepare','sass', // these feed into CSS
 
     // Compile CSS files
     'autoprefixer:dev', // Dumps all the CSS files into the directory
@@ -732,10 +739,10 @@ grunt.registerTask('full-deploy', 'Deploys the entire app', function() { list = 
 });
 
 // Tasks to completely update one resource
-grunt.registerTask('update-scss',['sass_globbing:effeckt','sass','update-css']);
+grunt.registerTask('update-scss',['sass_globbing:effeckt','sass-glob-prepare','sass','update-css']);
 grunt.registerTask('update-css','updates CSS', function() { list = [
     ['uncss:tidy','concat:tidycss','autoprefixer:tidy','cssmin:tidy'],
-    ['autoprefixer:dev'],
+    ['concat:cssdev','autoprefixer:dev'],
   ];
   grunt.task.run(list[config.development]);
 });
@@ -756,6 +763,13 @@ grunt.registerTask('update-icons',['image:icons','svgstore:icons','template:html
 grunt.registerTask('update-layouts',['image:layouts','svgstore:layouts','template:html']);
 grunt.registerTask('update-favicons',['image:favicons','realFavicon']);
 
+grunt.registerTask('sass-glob-prepare','Prepares a file to import Effeckt files', function() {
+  grunt.file.write(config.dirs.generated+'main.scss',
+    "@import \"_variables\";\n" +
+    "@import \"_global\";\n" +
+    "@import \"../"+config.dirs.generated+"effeckt_importMap.scss\";\n"
+  );
+});
 // grunt.registerTask('mkdir','Creates directories in the deploy dir.',function() {
 //   grunt.log.ok('Creating directory '+config.dirs.output+'config');
 //   grunt.file.mkdir(config.dirs.output+'config');
