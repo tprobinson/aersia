@@ -712,7 +712,7 @@ grunt.registerTask('full-deploy', 'Deploys the entire app', function() { list = 
     'sass_globbing:effeckt','sass-glob-prepare','sass', // these feed into CSS
 
     // Compile CSS files
-    'autoprefixer:dev', // Dumps all the CSS files into the directory
+    'concat:cssdev','autoprefixer:dev', // Dumps all the CSS files into the directory
 
     // Put together the JS files
     'modernizr', // goes in as its own file
