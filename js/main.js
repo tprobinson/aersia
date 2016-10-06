@@ -209,14 +209,14 @@
 
 		this.hookSongArtElement = function(el) {
 			addEvent(el, window.transitionEnd, function() {
+				if( ! this.songArt.rotating )
+				{
+					// If the rotation was cancelled for any reason, break out.
+					return;
+				}
+
 				if( classie.hasClass(el,"fadeout") )
 				{
-					if( ! this.songArt.rotating )
-					{
-						// If the rotation was cancelled for any reason, break out.
-						return;
-					}
-
 					// Grab the art in question
 					if( this.curSong == null || this.songArt.nextArt === false ||
 						this.songs[this.curSong] == null || this.songs[this.curSong].art == null ||
@@ -236,6 +236,9 @@
 					this.songArt.nextArt++;
 					if( this.songArt.nextArt > this.songs[this.curSong].art.length - 1 )
 					{ this.songArt.nextArt = 0; }
+				} else {
+					// Trigger the next rotation eventually.
+					this.songArt.timer = window.setTimeout(this.rotateSongArt, this.songArt.period);
 				}
 			}.bind(this));
 
@@ -1387,7 +1390,7 @@
 				if( this.songs[this.curSong].art.length > 1 )
 				{
 					this.songArt.rotating = true;
-					this.songArt.timer = window.setTimeout(this.rotateSongArt, this.songArt.rotateperiod);
+					this.songArt.timer = window.setTimeout(this.rotateSongArt, this.songArt.period);
 				}
 			}
 		}.bind(this);
