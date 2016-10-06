@@ -274,7 +274,7 @@ grunt.initConfig({
   copy: {
     roster: {
       files: [
-        { expand: true, flatten: true, src: ['<%= config.dirs.generated %>roster_new.json'], dest: '<%= config.dirs.output %>',rename: function(dest, src) {
+        { expand: true, flatten: true, src: ['bin/roster.json'], dest: '<%= config.dirs.output %>',rename: function(dest, src) {
         return dest + src.replace('roster_new','roster');
         } }
       ]

@@ -2,6 +2,7 @@
 
 <!-- MDTOC maxdepth:1 firsth1:0 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
 
+- [Known issues](#known-issues)   
 - [Usage and Development](#usage-and-development)   
 - [Changelog](#changelog)   
 - [Previous Versions](#previous-versions)   
@@ -13,6 +14,19 @@ Replacing Aersia's Flash-based player!
 
 This is primarily a Javascript-based music player.
 
+## Known issues
+
+### Interface
+The touch interface has some problems, like pieces of the interface overlapping.
+
+You can't Ctrl-F on the list.
+
+### Cover Art
+Not all playlists have cover art, just VIP so far.
+
+Some of the cover art is kind of weird, when there are better options available. So far, I'm only using the Mobygames cover art resource, and which art is chosen is decided based on a weighting algorithm that can still use a few tweaks. Some games also are not available on Mobygames' database.
+
+The cover art acts a little differently on the Streambox interface than it does on Classic.
 
 ## Usage and Development
 
