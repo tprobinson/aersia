@@ -235,11 +235,11 @@ grunt.initConfig({
 
   'gh-pages': {
     options: {
-      base: 'dist'
+      base: '<%= config.dirs.output %>'
     },
     io: {
       options: {
-        base: 'dist',
+        base: '<%= config.dirs.output %>',
         repo: 'git@github.com:tprobinson/tprobinson.github.io.git',
         branch: 'master'
       },
