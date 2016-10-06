@@ -183,7 +183,7 @@ grunt.initConfig({
 `;
           } else {
             jsdeps = `
-    <script src="assets/js/main.js"></script>
+    <script src="assets/js/main.min.js"></script>
 `;
           }
 
@@ -296,7 +296,7 @@ grunt.initConfig({
     },
     js: {
       files: [
-        { expand: true, flatten: true, src: ['<%= config.dirs.generated %>plugins.js'], dest: '<%= config.dirs.output %>assets/js/' }
+        { expand: true, flatten: true, src: ['<%= config.dirs.generated %>js/plugins.js'], dest: '<%= config.dirs.output %>assets/js/' }
       ]
     },
     mainjs: {
@@ -386,7 +386,7 @@ grunt.initConfig({
         //My libraries
         'js/modules/library.js',
       ],
-      dest: '<%= config.dirs.generated %>plugins.js'
+      dest: '<%= config.dirs.generated %>js/plugins.js'
     },
     cssdev: {
       src: [
@@ -398,6 +398,7 @@ grunt.initConfig({
     tidycss: {
       src: [
         '<%= config.dirs.generated %>tidy.css',
+        '<%= config.dirs.generated %>scss/modules/*',
         '<%= config.dirs.generated %>scss/effeckt.css',
         // '<%= config.dirs.generated %>scss/simptip.css',
         'node_modules/jsonlylightbox/css/lightbox.css',
@@ -585,8 +586,8 @@ grunt.initConfig({
       files: {
         '<%= config.dirs.output %>assets/js/main.min.js': [
           'node_modules/angular/angular.js',
-          '<%= config.dirs.generated %>plugins.js',
-          '<%= config.dirs.generated %>main.templated.js',
+          '<%= config.dirs.generated %>js/plugins.js',
+          '<%= config.dirs.generated %>js/main.js',
         ]
       }
     }
@@ -662,7 +663,7 @@ grunt.initConfig({
         stripComments: true,
       },
       files: {
-        '<%= config.dirs.output %>roster.json': '<%= config.dirs.generated %>roster_new.json',
+        '<%= config.dirs.output %>roster.json': 'bin/roster.json',
       },
     }
   }
