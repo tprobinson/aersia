@@ -730,7 +730,12 @@
 							playlist[i].index = i;
 						}
 
-						//Set the song list
+						// Sort the playlist, but first pull off the headers from the playlist to force their location.
+						var headers = playlist.splice(0,5);
+						playlist.sort(function(a, b) { return a.creator.localeCompare(b.creator); });
+						playlist = headers.concat(playlist);
+
+						//Set the visible song list
 						this.songs = playlist;
 
 						this.lastPlaylist = this.selectedPlaylist;
@@ -904,7 +909,7 @@
 					i !== this.curSong &&
 
 					// it's not in our list of things not to shuffle
-					this.noShuffles[this.selectedPlaylist].indexOf(i) === -1
+					this.noShuffles[this.selectedPlaylist].indexOf(this.songs[i].index) === -1
 				)
 				{
 					list.push(i);

@@ -239,8 +239,8 @@
       <div class="playlist-container hbox">
         <div class="release"><!--%= release --></div>
         <div class="playlist vbox hidden" id="playlist">
-          <li ng-click="aersiaCtrl.playSong(song.index)"
-            ng-repeat="song in aersiaCtrl.songs | orderBy:'creator' track by $index">{{song.creator}} - {{song.title}}</li>
+          <li ng-click="aersiaCtrl.playSong($index)"
+            ng-repeat="song in aersiaCtrl.songs track by $index">{{song.creator}} - {{song.title}}</li>
         </div>
       </div>
     </div>

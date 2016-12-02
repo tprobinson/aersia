@@ -9,4 +9,5 @@
 /devgenerated
 
 npm-debug.log
+yarn*.log
 .grunt/
