@@ -1,9 +1,0 @@
-[submodule "node_modules/perfect-scrollbar"]
-	path = node_modules/perfect-scrollbar
-	url = git@github.com:tprobinson/perfect-scrollbar.git
-[submodule "aersia-mobile"]
-	path = aersia-mobile
-	url = git@github.com:tprobinson/aersia-mobile.git
-[submodule "js/ofi"]
-	path = js/ofi
-	url = https://github.com/bfred-it/object-fit-images.git

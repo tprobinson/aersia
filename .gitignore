@@ -1,6 +1,4 @@
-/node_modules/*
-!/node_modules
-!/node_modules/perfect-scrollbar
+/node_modules
 
 /dist
 /dev

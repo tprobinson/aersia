@@ -363,7 +363,7 @@ grunt.initConfig({
         'js/polyfills/*',
         'js/modules/noconsole.js',
         'js/modules/transitionEnd.js',
-        'js/ofi/dist/ofi.browser.js',
+        'node_modules/object-fit-images/dist/ofi.browser.js',
         'node_modules/x2js/x2js.js',
         'node_modules/desandro-classie/classie.js',
         'js/modules/jquery.hashchange.js',
