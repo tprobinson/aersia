@@ -2,11 +2,11 @@
 
 <!-- MDTOC maxdepth:1 firsth1:0 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
 
-- [Known issues](#known-issues)   
-- [Usage and Development](#usage-and-development)   
-- [Changelog](#changelog)   
-- [Previous Versions](#previous-versions)   
-- [License](#license)   
+- [Known issues](#known-issues)
+- [Usage and Development](#usage-and-development)
+- [Changelog](#changelog)
+- [Previous Versions](#previous-versions)
+- [License](#license)
 
 <!-- /MDTOC -->
 
@@ -44,15 +44,14 @@ sudo npm install -g npm
 Checkout this repository:
 
 ```shell
-# The recursive flag is important to get submodules
-git clone --recursive <this checkout url>
+git clone  <this checkout url>
 cd aersia
 ```
 
 Install dependencies:
 
 ```shell
-npm install
+npm install (or yarn)
 
 cd node_modules/js-logger
 npm install
@@ -86,7 +85,25 @@ grunt --env=dev dev
 
 
 ## Changelog
-#### Done in version 0.1.2:
+#### Done in version 0.1.3:
+* Internals
+    * Added Yarn as a dependency management, updated all Node modules.
+    * Moved playlist sorting to main.js, instead of relying on Angular.
+    * Song "indexes" are now used a bit more like ID numbers instead of weird mappings
+
+* Player
+    * Updated the playlist to the Nov 16th Update
+
+
+#### Planned for the next version:
+* Nothing
+
+#### Planned for the future:
+* Fixing some layout issues in the options box. Making Streambox less dynamic?
+* Mobile support?
+
+## Previous Versions
+### 0.1.2
 * Internals
     * Reworked the internal build process to support a 'dev' and 'prod' branch
     * Added a little overlay to show the build type.
@@ -95,14 +112,6 @@ grunt --env=dev dev
 * Player
     * Updated the playlist to the Sept 7th update
 
-
-#### Planned for the next version:
-* Fixing some layout issues in the options box. Making Streambox less dynamic?
-
-#### Planned for the future:
-* Mobile support?
-
-## Previous Versions
 ### 0.1.1
 * Internals
     * Corrected an error in playlist sorting, Angular does not preserve the original index pre-sort.
