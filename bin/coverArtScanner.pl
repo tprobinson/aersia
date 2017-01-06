@@ -372,7 +372,7 @@ SONG: foreach my $song ( @$playlist )
   # If the game didn't get anything from MobyGames, skip.
   if( ! defined $song->{$fullArtKey} )
   {
-    print "$game has no art.\n";
+    # print "$game has no art.\n";
     next SONG;
   }
 
