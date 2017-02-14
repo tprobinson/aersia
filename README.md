@@ -2,14 +2,14 @@
 
 <!-- MDTOC maxdepth:2 firsth1:1 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
 
-- [Aersia Player](#aersia-player)   
-- [Changelog](#changelog)   
-- [Known issues](#known-issues)   
-- [Usage and Development](#usage-and-development)   
-   - [Updating the Playlist from XML](#updating-the-playlist-from-xml)   
-   - [Deploying to the demo site](#deploying-to-the-demo-site)   
-- [Previous Versions](#previous-versions)   
-- [License](#license)   
+- [Aersia Player](#aersia-player)
+- [Changelog](#changelog)
+- [Known issues](#known-issues)
+- [Usage and Development](#usage-and-development)
+   - [Updating the Playlist from XML](#updating-the-playlist-from-xml)
+   - [Deploying to the demo site](#deploying-to-the-demo-site)
+- [Previous Versions](#previous-versions)
+- [License](#license)
 
 <!-- /MDTOC -->
 
@@ -88,6 +88,11 @@ cd -
 cd node_modules/perfect-scrollbar
 npm install
 cd -
+```
+
+If this is the first time this deploy has been done on this machine, you may need this:
+```shell
+npm rebuild node-sass
 ```
 
 **Temporary step:** edit node_modules/js-logger/gulpfile.js and remove the inside of the 'test' task. This is broken, and I don't know why.
@@ -172,7 +177,7 @@ $ perl coverArtScanner.pl -e dev -o 'Civilization III' -n
 Decoding config/dev.json...
 Decoding bin/roster.json...
 Decoding bin/nameMapping.json...
-Civilization III                                                                
+Civilization III
  98% [================*======================================================= ]
 Enter a Mobygames-compatible name for Civilization III, or 'skip'
 : sid-meiers-civilization-iii

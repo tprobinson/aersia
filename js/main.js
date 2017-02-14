@@ -44,12 +44,11 @@
         if( this.copyPlaylist === true ) {
           this.success('Entire playlist copied to clipboard.');
           this.copyPlaylist = false;
-          return JSON.stringify(this.songs,null, '\t');
-        } else {
-          this.success('Share link copied to clipboard.');
-
-          return window.location.origin + '/#' + encodeURIComponent( 'playlist=' + this.selectedPlaylist + '|' + 'song=' + this.curSong );
+          return JSON.stringify(this.songs, null, '\t');
         }
+
+        this.success('Share link copied to clipboard.');
+        return window.location.origin + '/#' + encodeURIComponent( 'playlist=' + this.selectedPlaylist + '|' + 'song=' + this.curSong );
       }.bind(this)
     });
 
@@ -1274,7 +1273,7 @@
     this.decodeHash = function (takeAction = true) {
       let info = {};
       if( window.location.hash != null && window.location.hash !== '#' ) {
-        decodeURIComponent(window.location.hash).substr(1).split('|').forEach(function(str) {
+        decodeURIComponent(window.location.hash).substr(1).split('|').forEach(function (str) {
           let pair = str.split('=');
           if( pair[0] === 'song' || pair[0] === 'playlist' || pair[0] === 'seed' ) {
             info[pair[0]] = pair[1];
@@ -1285,8 +1284,8 @@
 
       if( takeAction ) {
         if( info.playlist != null ) {
-          this.selectedPlaylist = hash.playlist;
-          this.loadPlaylist(hash.song);
+          this.selectedPlaylist = info.playlist;
+          this.loadPlaylist(info.song);
         } else if( info.song != null ) {
           this.playSong(info.song);
         }
