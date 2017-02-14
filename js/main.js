@@ -16,7 +16,7 @@
 
 (function () {
   // Initialize Angular app
-  let app = angular.module('aersia', []);
+  var app = angular.module('aersia', []);
 
   app.controller('aersiaController', ['$scope', '$http', function ($scope, $http) {
     this.friendlyname = '/*%= friendlyname */';
@@ -39,16 +39,17 @@
 
     // Initialize the share button
     this.copyPlaylist = false;
-    let clipboard = new Clipboard(document.getElementById('copyBtn'), {
+    var clipboard = new Clipboard(document.getElementById('copyBtn'), {
       text: function (btn) {
         if( this.copyPlaylist === true ) {
           this.success('Entire playlist copied to clipboard.');
           this.copyPlaylist = false;
-          return JSON.stringify(this.songs, null, '\t');
-        }
+          return JSON.stringify(this.songs,null, '\t');
+        } else {
+          this.success('Share link copied to clipboard.');
 
-        this.success('Share link copied to clipboard.');
-        return window.location.origin + '/#' + encodeURIComponent( 'playlist=' + this.selectedPlaylist + '|' + 'song=' + this.curSong );
+          return window.location.origin + '/#' + encodeURIComponent( 'playlist=' + this.selectedPlaylist + '|' + 'song=' + this.curSong );
+        }
       }.bind(this)
     });
 
@@ -371,25 +372,25 @@
 
     // Add a box for each layout in the layoutsbox.
     Object.keys(this.layouts).forEach(function (key) {
-      let container = document.createElement('div');
+      var container = document.createElement('div');
       classie.addClass(container, 'vbox');
       classie.addClass(container, 'centertext');
 
-      let div = document.createElement('div');
+      var div = document.createElement('div');
       container.appendChild(div);
 
       // Why do I need a namespace for this, what is even the difference in the markup??
-      let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('height', '120px');
       svg.setAttribute('width', '120px');
       div.appendChild(svg);
 
       // Why do I need a namespace for this, what is even the difference in the markup??
-      let use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
       use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#' + this.layouts[key].href);
       svg.appendChild(use);
 
-      let name = document.createElement('div');
+      var name = document.createElement('div');
       name.innerHTML = key;
       container.appendChild(name);
 
@@ -604,11 +605,11 @@
 
     // This will be called as downloading progresses.
     this.progressUpdate = function (e, amt) {
-      let newText = '';
+      var newText = '';
 
       // Respond to either event or direct invocation.
       if( e !== '' ) {
-        let bufend = 0;
+        var bufend = 0;
         if( this.player.buffered.length > 0 ) { bufend = this.player.buffered.end(0); }
         if( bufend === this.player.duration ) {
           if( this.fullyLoaded === 0 ) {
@@ -649,7 +650,7 @@
     // This will be called as the song progresses.
     this.timeTextUpdate = function (e, amt) {
       // Don't update the time if it will look the same.
-      let newTime = this.timeFormat(this.player.currentTime);
+      var newTime = this.timeFormat(this.player.currentTime);
       if( this.lastTimeText !== newTime ) { this.timeText.textContent = newTime; this.lastTimeText = newTime; }
     }.bind(this);
 
@@ -668,7 +669,7 @@
 
       // This pixel-perfect version is just to achieve that one-pixel offset effect in the original .swf
       // Move the playhead
-      let clickpx = (this.timelinerect.right - this.timelinerect.left) * amt;
+      var clickpx = (this.timelinerect.right - this.timelinerect.left) * amt;
       this.playhead.style.left = clickpx + 'px';
 
       // Move the playedBar in the timeline
@@ -697,22 +698,22 @@
         $http.get(this.playlists[this.selectedPlaylist].url)
         .then(function (res) {
           // Prepare the playlist for use
-          let playlist = res.data;
+          var playlist = res.data;
 
           // Convert it from XML to JSON if necessary
           if( /.xml$/.test(this.playlists[this.selectedPlaylist].url) ) {
-            let x2js = new X2JS();
+            var x2js = new X2JS();
             playlist = x2js.xml2js(playlist).playlist.trackList.track;
           }
 
           // Give each song an index -- this is necessary so Angular can track the objects.
           // I really want this bit of code to die.
-          for ( let i = 0; i < playlist.length; i++ ) {
+          for ( var i = 0; i < playlist.length; i++ ) {
             playlist[i].index = i;
           }
 
           // Sort the playlist, but first pull off the headers from the playlist to force their location.
-          let headers = playlist.splice(0, 5);
+          var headers = playlist.splice(0, 5);
           playlist.sort(function (a, b) { return a.creator.localeCompare(b.creator); });
           playlist = headers.concat(playlist);
 
@@ -828,8 +829,8 @@
 
       // Play
       if( this.songs[this.curSong].formats != null ) {
-        let selFormat = '';
-        let BreakException = {};
+        var selFormat = '';
+        var BreakException = {};
         try {
           this.preferredFormats.forEach(function (format) {
             if( this.songs[this.curSong].formats[format] != null ) { selFormat = format; throw BreakException; }
@@ -862,8 +863,8 @@
       // Make sure this list is defined first.
       if( this.noShuffles[this.selectedPlaylist] == null ) { this.noShuffles[this.selectedPlaylist] = []; }
 
-      let list = [];
-      for ( let i = 0; i < this.songs.length; i++ ) {
+      var list = [];
+      for ( var i = 0; i < this.songs.length; i++ ) {
         if
         (
           // Ensure we don't play the same song again and
@@ -877,7 +878,7 @@
         }
       }
 
-      let selected = Math.floor(this.random() * list.length);
+      var selected = Math.floor(this.random() * list.length);
 
       // Start our random song.
       this.playSong( list[selected] );
@@ -888,7 +889,7 @@
       // If we haven't blocked anything on this playlist yet, give it the structure.
       if( this.noShuffles[this.selectedPlaylist] == null ) { this.noShuffles[this.selectedPlaylist] = []; }
 
-      let pos = this.noShuffles[this.selectedPlaylist].indexOf(this.curSong);
+      var pos = this.noShuffles[this.selectedPlaylist].indexOf(this.curSong);
       if( pos === -1 ) {
         Logger.get('player').info('Disabled shuffle for ' + this.curSong);
         this.noShuffles[this.selectedPlaylist].push(this.curSong);
@@ -1006,7 +1007,7 @@
 
     this.toggleMute = function () {
       // Toggle
-      let vol = this.player.volume;
+      var vol = this.player.volume;
       this.volume('', this.prevVolume);
       this.prevVolume = vol;
     }.bind(this);
@@ -1022,7 +1023,7 @@
     }.bind(this);
 
     this.timeFormat = function (sec) {
-      let min = Math.floor(sec / 60);
+      var min = Math.floor(sec / 60);
       sec = Math.floor(sec % 60);
       return zeroPad(min, 2) + ':' + zeroPad(sec, 2);
     };
@@ -1048,9 +1049,9 @@
       if( this.songs.length === 0 ) { return; }
 
       // Get the elements' height, since this could change.
-      let height = this.playlist.firstElementChild.offsetHeight;
+      var height = this.playlist.firstElementChild.offsetHeight;
 
-      let targetY = height * index;
+      var targetY = height * index;
 
       // If this element would be closer to the end of the list than the viewport allows, just scroll to the bottom to avoid overflowing.
       // The browser should realistically stop this, but every 'set' seems to move a pixel beyond the limit, and the smooth animation sets rapidly, causing a big overflow.
@@ -1097,10 +1098,10 @@
       if( this.features.options.enabled ) {
         // Open the optionsbox if it's hidden, re-adjust the tab, and set the optionsbox back the way it was.
         // This is done because the tab height will probably have changed when the layout changes.
-        let orig = this.optionsBoxShown;
+        var orig = this.optionsBoxShown;
         this.toggleOptionsBox(true);
 
-        let tab = document.getElementsByClassName('effeckt-tab active')[0];
+        var tab = document.getElementsByClassName('effeckt-tab active')[0];
         if( tab != null ) {
           window.setTimeout( function () {
             Tabs.showTab(tab);
@@ -1129,8 +1130,8 @@
 
     this.gradientSet = function (type) {
       // This is really bad. Maybe find a library for this later.
-      let begin = this.currentStyles[type]['0%'];
-      let end = this.currentStyles[type]['100%'];
+      var begin = this.currentStyles[type]['0%'];
+      var end = this.currentStyles[type]['100%'];
       this.styleNodes[type].innerHTML = this.styleCssGradientText[type] + ' { \n' +
       'background: ' + begin + ';\n' + // Old browsers
       'background: -moz-linear-gradient(top, ' + begin + ' 0%, ' + end + ' 100%);\n' + // FF3.6-15
@@ -1171,14 +1172,14 @@
     // This function is called when the FileReader loads, which is called when the file input changes, which is called when user picks file.
     this.importStyles = function (event) {
       Logger.get('internals').info('FileReader loaded file.');
-      let result;
+      var result;
 
       try { result = JSON.parse(event.target.result); }
       catch ( e ) { this.error('The style you uploaded does not contain a valid JSON structure.'); }
 
       if( result != null ) {
         // Check that all the right things are defined
-        let BreakException = {};
+        var BreakException = {};
         try {
           Object.keys(this.currentStyles).forEach(function (key) {
             Logger.get('internals').debug(key);
@@ -1209,7 +1210,7 @@
     // Cookie functions
 
     this.getCookie = function () {
-      let cookie = Cookies.getJSON(this.cookieName);
+      var cookie = Cookies.getJSON(this.cookieName);
       if( cookie == null ) {
         // First launch, if this is a touch device, put it into touch mode by default.
         if( isMobile.any() ) { this.switchLayout('Touch'); }
@@ -1270,11 +1271,12 @@
     }.bind(this);
 
     // Reads the sharing links
-    this.decodeHash = function (takeAction = true) {
-      let info = {};
+    this.decodeHash = function (takeAction) {
+      if( takeAction == null ) { takeAction = true; }
+      var info = {};
       if( window.location.hash != null && window.location.hash !== '#' ) {
-        decodeURIComponent(window.location.hash).substr(1).split('|').forEach(function (str) {
-          let pair = str.split('=');
+        decodeURIComponent(window.location.hash).substr(1).split('|').forEach(function(str) {
+          var pair = str.split('=');
           if( pair[0] === 'song' || pair[0] === 'playlist' || pair[0] === 'seed' ) {
             info[pair[0]] = pair[1];
           }
@@ -1284,8 +1286,8 @@
 
       if( takeAction ) {
         if( info.playlist != null ) {
-          this.selectedPlaylist = info.playlist;
-          this.loadPlaylist(info.song);
+          this.selectedPlaylist = hash.playlist;
+          this.loadPlaylist(hash.song);
         } else if( info.song != null ) {
           this.playSong(info.song);
         }
@@ -1399,14 +1401,14 @@
       this.setLayout(this.selectedLayout);
 
       // Detect browser support for file formats and remove any formats that are not supported
-      let formats = [];
+      var formats = [];
       this.preferredFormats.forEach(function (format) {
         if( Modernizr.audio[format] != null && Modernizr.audio[format] !== '' ) { formats.push(format); }
       });
       this.preferredFormats = formats;
 
       // Check the window location for a share link. This overrides our starting playlist and song.
-      let hash = this.decodeHash(false);
+      var hash = this.decodeHash(false);
       if( hash.playlist != null ) { this.selectedPlaylist = hash.playlist; }
 
       // Load up our playlist, this is async and will start playing automatically.

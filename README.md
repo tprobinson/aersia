@@ -18,23 +18,18 @@ Replacing Aersia's Flash-based player!
 This is a Javascript-based music player.
 
 # Changelog
-#### Done in version 0.1.4:
-* Internals
-    * Switch to ESLint instead of JSHint, reformatted all the code.
-    * Fixed a potential bug with source-type selection.
-    * Fixed a share-link bug: if you share while you already have a share link loaded, it broke.
-    * Reformatted share-links to be more useful
-    * Added a fixed-seed capability. It can't be triggered by any GUI control, but using a share link of `/#seed=whatever` will fix the seed. The fixed seed can be removed by using `/#seed=false` or reloading the page without the seed share link.
-    * Added a timeout to the message box that appears on share-linking. Otherwise it stayed up permanently. Errors still stay up forever.
-    * Automatic logging level selection dev vs beta
+#### Done in version 0.1.5:
 
-* Player
-    * Play progress bars don't reset when pause/unpausing anymore.
-    * Updated the playlist to the Dec 18th update
+* Internals
+  * Updated all dependencies to newest versions available
+  * Fixed a bug in share linking
 
 
 #### Planned for the next version:
-* Nothing
+* Conversion to React
+* Link to the homepage on the player bar
+* Convert other playlists
+* Release?
 
 #### Planned for the future:
 * Fixing some layout issues in the options box. Making Streambox less dynamic?
@@ -212,6 +207,20 @@ Copy the output file to `bin/roster.json`. Remove `bin/roster.*.json`. Commit th
 Run `grunt full-deploy`, then run `grunt gh-pages`.
 
 # Previous Versions
+#### 0.1.4
+* Internals
+    * Switch to ESLint instead of JSHint, reformatted all the code.
+    * Fixed a potential bug with source-type selection.
+    * Fixed a share-link bug: if you share while you already have a share link loaded, it broke.
+    * Reformatted share-links to be more useful
+    * Added a fixed-seed capability. It can't be triggered by any GUI control, but using a share link of `/#seed=whatever` will fix the seed. The fixed seed can be removed by using `/#seed=false` or reloading the page without the seed share link.
+    * Added a timeout to the message box that appears on share-linking. Otherwise it stayed up permanently. Errors still stay up forever.
+    * Automatic logging level selection dev vs beta
+
+* Player
+    * Play progress bars don't reset when pause/unpausing anymore.
+    * Updated the playlist to the Dec 18th update
+    *
 #### 0.1.3
 * Internals
     * Added Yarn as a dependency management, updated all Node modules.
