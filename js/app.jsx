@@ -1,18 +1,58 @@
-/* global angular: false, Lightbox: false, Clipboard: false, Logger: false,
-  classie: false, Ps: false, addEvent: false, removeEvent: false, clickPercent: false,
-  X2JS: false, objectFitImages: false, toggleFullScreen: false, Cookies: false,
-  isMobile: false, Modernizr: false, Tabs: false, scrollToSmooth: false, zeroPad: false
-*/
-//---
-// /*%= friendlyname */ v/*%= version */
-//
-// To do tags:
-// 	CSS: Ongoing changes to the CSS.
-// 	REWORK: Changes to do in the future.
-// 	MOREFILE: Move this out into a compiled library file in the future
-// 	FUTURE: Stuff to do much later.
-//---
+/* global Modernizr: false */
 'use strict';
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import Clipboard from 'clipboard';
+import classie from 'desandro-classie';
+import classnames from 'classnames';
+import Logger from 'js-logger';
+import Lightbox from 'jsonlylightbox';
+import Ps from 'perfect-scrollbar';
+import Cookies from 'js-cookie';
+import X2JS from 'x2js';
+import objectFitImages from 'object-fit-images';
+import isMobile from 'ismobilejs';
+import SeedRandom from 'seedrandom';
+
+import EffecktTabs from './modules/effeckt-tabs.js';
+const Tabs = new EffecktTabs();
+
+import toggleFullScreen from './modules/fullscreen.js';
+import zeroPad from './modules/zeroPad.js';
+import {addEvent, removeEvent} from './modules/events.js';
+import {scrollToSmooth, clickPercent} from './modules/animations.js';
+
+
+class GlobalLoader extends React.Component {
+  render() {
+    return (
+      <div className={classnames('loading', {'hidden': this.props.hidden})}>
+        <img src="assets/img/aersia.svg" />
+      </div>
+    );
+  }
+}
+
+
+class App extends React.Component {
+
+}
+
+
+/**
+ * The root of the project, an element with ID 'rootNode'
+ * @type {DOM}
+ */
+const rootNode = document.getElementById('rootNode');
+try {
+  ReactDOM.render(<App config={appConfig} />, rootNode);
+} catch(e) {
+  ReactDOM.render(<ErrorPage error={e} />, rootNode);
+}
+
+
 
 (function () {
   // Initialize Angular app
@@ -52,27 +92,6 @@
         }
       }.bind(this)
     });
-
-    // Init logger
-    Logger.useDefaults({
-      logLevel: Logger.WARN,
-      formatter: function (messages, context) {
-        messages.unshift('[Aersia]');
-        if (context.name) {messages.unshift('[' + context.name + ']');}
-      }
-    });
-
-    if( this.development === 1 || this.development === '1' ) {
-      Logger.get('internals').setLevel(Logger.INFO);
-      Logger.get('player').setLevel(Logger.INFO);
-      Logger.get('animation').setLevel(Logger.ERROR);
-      Logger.get('songart').setLevel(Logger.WARNING);
-    } else {
-      Logger.get('internals').setLevel(Logger.ERROR);
-      Logger.get('player').setLevel(Logger.ERROR);
-      Logger.get('animation').setLevel(Logger.ERROR);
-      Logger.get('songart').setLevel(Logger.ERROR);
-    }
 
     // js-cookie variables
     this.cookieName = 'aersia';
@@ -914,7 +933,7 @@
         Logger.get('internals').info('Test:', this.random());
       } else {
         Logger.get('internals').info('Initializing random generator with ', seed);
-        this.random = new Math.seedrandom(seed).quick;
+        this.random = new SeedRandom(seed).quick;
         Logger.get('internals').info('Test:', this.random());
         Logger.get('internals').info('Test:', this.random());
         Logger.get('internals').info('Test:', this.random());

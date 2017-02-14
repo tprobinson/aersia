@@ -17,28 +17,6 @@ module.exports = function (grunt) {
       */
     `,
 
-    modernizr: {
-      dist: {
-        crawl: false,
-        customTests: [],
-        dest: '<%= config.dirs.output %>assets/js/modernizr.js',
-        tests: [
-          'audio',
-          'cookies',
-          'eventlistener',
-          'forcetouch',
-          'fullscreen',
-          'hashchange',
-          'audiopreload'
-        ],
-        options: [
-          'setClasses'
-        ],
-        uglify: true
-      }
-    },
-
-
     watch: {
       scss: {
         files: ['scss/**/*.scss'],
@@ -517,12 +495,7 @@ module.exports = function (grunt) {
       icons: {
         options: {
           prefix: 'icon-', // This will prefix each <g> ID
-          inheritviewbox: true,
-          // includedemo: true,
-          svg: {
-            viewBox: '0 0 17 17',
-            xmlns: 'http://www.w3.org/2000/svg'
-          }
+
         },
         files: {
           '<%= config.dirs.generated %>icons.include': ['<%= config.dirs.generated %>icons/*.svg']
