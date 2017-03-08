@@ -76,6 +76,7 @@
 
     // js-cookie variables
     this.cookieName = 'aersia';
+    Cookies.defaults.expires = 365;
     Cookies.defaults.domain = window.location.hostname;
     Cookies.defaults.path = window.location.pathname;
 
