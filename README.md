@@ -18,12 +18,13 @@ Replacing Aersia's Flash-based player!
 This is a Javascript-based music player.
 
 # Changelog
-#### Done in version 0.1.5:
+#### March 8, 2017, Hotfix 0.1.6:
+* Fixed cookie behavior.
 
+#### Done in version 0.1.5:
 * Internals
   * Updated all dependencies to newest versions available
   * Fixed a bug in share linking
-
 
 #### Planned for the next version:
 * Conversion to React
