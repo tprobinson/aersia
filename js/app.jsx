@@ -37,9 +37,11 @@ class GlobalLoader extends React.Component {
 
 
 class App extends React.Component {
-  static friendlyname = '/*%= friendlyname */';
-  static version = '/*%= version */';
-  static development = '/*%= development */';
+  static config = {
+    /*%= friendlyname */
+    /*%= version */
+    /*%= development */
+  };
 }
 
 
@@ -87,6 +89,27 @@ try {
         }
       }.bind(this)
     });
+
+    // Init logger
+    Logger.useDefaults({
+      logLevel: Logger.WARN,
+      formatter: function (messages, context) {
+        messages.unshift('[Aersia]');
+        if (context.name) {messages.unshift('[' + context.name + ']');}
+      }
+    });
+
+    if( this.config.development ) {
+      Logger.get('internals').setLevel(Logger.INFO);
+      Logger.get('player').setLevel(Logger.INFO);
+      Logger.get('animation').setLevel(Logger.ERROR);
+      Logger.get('songart').setLevel(Logger.WARNING);
+    } else {
+      Logger.get('internals').setLevel(Logger.ERROR);
+      Logger.get('player').setLevel(Logger.ERROR);
+      Logger.get('animation').setLevel(Logger.ERROR);
+      Logger.get('songart').setLevel(Logger.ERROR);
+    }
 
     // js-cookie variables
     this.cookieName = 'aersia';
@@ -338,9 +361,9 @@ try {
         loadbar: '#635d62',
         controlsout: {'0%': '#c0ccd9', '100%': '#000c19'},
         controlsin: {'0%': '#3D6389', '100%': '#072d53'}
-      }
+      }, // eslint-disable-line comma-dangle
       // Styles from JSON files
-      /* %= includedstyles */
+      /*%= includedstyles */
     };
 
     // CSS definitions of where all the colors go

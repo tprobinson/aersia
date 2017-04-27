@@ -195,18 +195,17 @@ module.exports = function (grunt) {
           data: function () {
             // moar stuff here
             let themestring = '';
-            grunt.file.recurse(config.dirs.themes, function callback(abspath, rootdir, subdir, filename) {
-              let themename = filename.replace(new RegExp('\.json'), '');
+            grunt.file.recurse(config.dirs.themes, function (abspath, rootdir, subdir, filename) {
+              let themename = filename.replace(/\.json$/, '');
               let contents = grunt.file.read(abspath);
               themestring = themestring + '"' + themename + '": ' + contents + ',\n';
             });
 
             return {
-              version: pkg.version,
-              friendlyname: pkg.friendlyname,
-              release: config.release,
               includedstyles: themestring,
-              development: config.development
+              friendlyname: 'friendlyname: \'' + pkg.friendlyname + '\',',
+              version: 'version: \'' + pkg.version + '\',',
+              development: 'development: ' + config.development + ','
             };
           }
         }
@@ -712,7 +711,7 @@ module.exports = function (grunt) {
       // Copy all unprocessed files over
       'copy:flat'
     ]];
-    grunt.task.run(list[config.development]);
+    grunt.task.run(list[config.development ? 1 : 0]);
   });
 
   // Tasks to completely update one resource
@@ -721,7 +720,7 @@ module.exports = function (grunt) {
       ['uncss:tidy', 'concat:tidycss', 'autoprefixer:tidy', 'cssmin:tidy'],
       ['concat:cssdev', 'autoprefixer:dev']
   ];
-    grunt.task.run(list[config.development]);
+    grunt.task.run(list[config.development ? 1 : 0]);
   });
 
   grunt.registerTask('update-html', ['template:html']);
@@ -732,7 +731,7 @@ module.exports = function (grunt) {
       ['template:js', 'uglify:all'],
       ['template:js', 'copy:mainjs']
   ];
-    grunt.task.run(list[config.development]);
+    grunt.task.run(list[config.development ? 1 : 0]);
   });
 
   grunt.registerTask('update-imgflat', ['image:imgflat', 'copy:imgflat']);
