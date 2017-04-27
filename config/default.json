@@ -1,5 +1,5 @@
 {
-  "development": 0,
+  "development": false,
   "release": "βeta",
   "dirs": {
       "output": "dist/",

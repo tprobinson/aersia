@@ -1,5 +1,5 @@
 {
-  "development": 1,
+  "development": true,
   "release": "δev",
   "dirs": {
       "output": "dev/",
