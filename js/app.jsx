@@ -37,7 +37,9 @@ class GlobalLoader extends React.Component {
 
 
 class App extends React.Component {
-
+  static friendlyname = '/*%= friendlyname */';
+  static version = '/*%= version */';
+  static development = '/*%= development */';
 }
 
 
@@ -54,14 +56,7 @@ try {
 
 
 
-(function () {
-  // Initialize Angular app
-  var app = angular.module('aersia', []);
 
-  app.controller('aersiaController', ['$scope', '$http', function ($scope, $http) {
-    this.friendlyname = '/*%= friendlyname */';
-    this.version = '/*%= version */';
-    this.development = '/*%= development */';
 
     //---
     // Library initializations
