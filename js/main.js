@@ -19,9 +19,11 @@
   var app = angular.module('aersia', []);
 
   app.controller('aersiaController', ['$scope', '$http', function ($scope, $http) {
-    this.friendlyname = '/*%= friendlyname */';
-    this.version = '/*%= version */';
-    this.development = '/*%= development */';
+    this.config = {
+      /*%= friendlyname */
+      /*%= version */
+      /*%= development */
+    };
 
     //---
     // Library initializations
@@ -62,7 +64,7 @@
       }
     });
 
-    if( this.development === 1 || this.development === '1' ) {
+    if( this.config.development ) {
       Logger.get('internals').setLevel(Logger.INFO);
       Logger.get('player').setLevel(Logger.INFO);
       Logger.get('animation').setLevel(Logger.ERROR);
@@ -145,8 +147,8 @@
     this.selectedPlaylist = 'VIP';
     this.playlists = {
       VIP: {
-        url: '/roster.json',
-        // url: 'http://vip.aersia.net/roster.xml',
+        // url: '/roster.json',
+        url: 'http://vip.aersia.net/roster.xml',
         longName: 'Vidya Intarweb Playlist'
       },
       'VIP - Source': {
@@ -324,9 +326,9 @@
         loadbar: '#635d62',
         controlsout: {'0%': '#c0ccd9', '100%': '#000c19'},
         controlsin: {'0%': '#3D6389', '100%': '#072d53'}
-      }
+      }, // eslint-disable-line comma-dangle
       // Styles from JSON files
-      /* %= includedstyles */
+      /*%= includedstyles */
     };
 
     // CSS definitions of where all the colors go
@@ -725,7 +727,7 @@
           this.lastPlaylist = this.selectedPlaylist;
 
           // Update the window's title.
-          document.title = this.playlists[this.selectedPlaylist].longName + ' - ' + this.friendlyname + ' v' + this.version;
+          document.title = this.playlists[this.selectedPlaylist].longName + ' - ' + this.config.friendlyname + ' v' + this.config.version;
 
           // Hide loading, in a little while.
           window.setTimeout(this.hideLoading, 1000);

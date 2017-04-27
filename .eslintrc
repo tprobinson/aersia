@@ -193,7 +193,7 @@
     "space-in-parens": [0], // require or disallow spaces inside parentheses (off by default)
     "space-infix-ops": [1, {"int32Hint": false}], // require spaces around operators
     "space-unary-ops": [1, {"words": true, "nonwords": false}], // Require or disallow spaces before/after unary operators (words on by default, nonwords off by default)
-    "spaced-comment": [2, "always", { "line": { "exceptions": ["-"] } }], // require or disallow a space immediately following the // in a line comment (off by default)
+    "spaced-comment": [2, "always", { "line": { "exceptions": ["-", "%"] } }], // require or disallow a space immediately following the // in a line comment (off by default)
     "wrap-regex": 0, // require regex literals to be wrapped in parentheses (off by default)
 
     //
