@@ -90,7 +90,9 @@ try {
 
     // js-cookie variables
     this.cookieName = 'aersia';
-    this.cookieConfig = { };
+    Cookies.defaults.expires = 365;
+    Cookies.defaults.domain = window.location.hostname;
+    Cookies.defaults.path = window.location.pathname;
 
     // Initialize variables
     this.songs = [];
@@ -1258,7 +1260,7 @@ try {
         selectedPreset: this.selectedPreset,
         selectedPlaylist: this.selectedPlaylist,
         noShuffles: this.noShuffles
-      }, this.cookieConfig);
+      });
       Logger.get('internals').info('Cookie written.');
     }.bind(this);
 
